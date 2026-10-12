@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "simweave"
+version = "0.1.0"
+description = "Portable, vendor-neutral simulation experiments with deterministic replay"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11,<3.15"
+dependencies = ["pydantic>=2.11,<3", "fastapi>=0.115,<1", "uvicorn>=0.34,<1"]
+
+[project.optional-dependencies]
+mujoco = ["mujoco>=3.3,<4"]
+dev = ["pytest>=8,<10", "httpx>=0.28,<1", "ruff>=0.11,<1", "build>=1.2,<2"]
+
+[project.scripts]
+simweave = "simweave.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/simweave"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
