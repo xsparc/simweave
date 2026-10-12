@@ -60,3 +60,25 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
 acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
 evidence_refs = ["tests/test_service.py", "tests/test_adapters.py"]
+
+[[requirements]]
+id = "REQ-USABLE-DELIVERY"
+statement = "Provide an accessible dashboard, portable packaging, operations, and ongoing stewardship evidence."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0001-portable-core.md"]
+implementation_refs = ["src/simweave/static/index.html", "src/simweave/static/app.js", "src/simweave/cli.py", "Dockerfile", "compose.yaml"]
+verification_refs = ["tests/test_delivery.py", ".github/workflows/ci.yml"]
+validation_refs = ["docs/governance/mvp-validation.md", "docs/governance/stewardship.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW003-DASHBOARD-OPERATIONS"
+title = "Dashboard, portable delivery, and stewardship"
+status = "verified"
+requirement_ids = ["REQ-USABLE-DELIVERY"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
+acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
+evidence_refs = ["tests/test_delivery.py", "docs/governance/mvp-validation.md"]

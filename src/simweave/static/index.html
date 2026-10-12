@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="SimWeave simulation experiment control plane"
+    />
+    <title>SimWeave · Experiment lab</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/static/app.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to experiments</a>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="SimWeave home"
+        ><span class="mark">≋</span> simweave<span class="version">0.1</span></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon">S</span>
+        <div>Simulation workspace<small>LOCAL CONTROL PLANE</small></div>
+      </div>
+      <nav aria-label="Workspace">
+        <span class="nav-label">WORKSPACE</span
+        ><a class="active" href="#main"><span>◈</span> Experiment lab</a
+        ><a href="#runs-section"><span>▤</span> Run history</a
+        ><a href="/docs" target="_blank" rel="noopener"
+          ><span>⌘</span> API reference <span class="outbound">↗</span></a
+        >
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="nav-label">ADAPTERS</span>
+        <p><i class="dot"></i> Reference <span>Built in</span></p>
+        <p>
+          <i class="dot" id="mujoco-dot"></i> MuJoCo
+          <span id="mujoco-status">Connect to check</span>
+        </p>
+        <p><i class="dot muted"></i> ROS 2 <span>CLI bridge</span></p>
+        <div class="local-note">
+          Your experiments. Your stack.<br />Portable by design.
+        </div>
+        <a
+          href="https://github.com/xsparc/simweave"
+          target="_blank"
+          rel="noopener"
+          >View source <span>↗</span></a
+        >
+      </div>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <span class="muted-text">Workspace</span
+          ><span class="slash">/</span>Experiment lab
+        </div>
+        <button
+          id="connection-toggle"
+          class="connection"
+          aria-controls="connection-panel"
+          aria-expanded="true"
+        >
+          <i class="dot muted" id="connection-dot"></i
+          ><span id="connection-state">Not connected</span>
+        </button>
+      </header>
+      <main id="main">
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow">BUILD CONFIDENCE, ONE RUN AT A TIME</div>
+            <h1>Experiment lab<span class="accent">.</span></h1>
+            <p>
+              One scenario. Any supported simulator. Evidence you can replay.
+            </p>
+          </div>
+          <span class="pill">MVP <span> / </span> CART RECOVERY</span>
+        </section>
+        <section
+          id="connection-panel"
+          class="connect-panel"
+          aria-label="Connect to your workspace"
+        >
+          <div>
+            <strong>Connect your workspace</strong>
+            <p>
+              Use the API token from your local server. It stays in this tab’s
+              memory.
+            </p>
+          </div>
+          <form id="connect-form">
+            <label class="sr-only" for="token">API token</label
+            ><input
+              id="token"
+              type="password"
+              autocomplete="off"
+              placeholder="Paste API token"
+              required
+            /><button class="primary" type="submit">
+              Connect <span>↗</span>
+            </button>
+          </form>
+        </section>
+        <div id="notice" role="status" aria-live="polite" hidden></div>
+        <div class="lab-grid">
+          <section
+            class="card scenario-card"
+            aria-labelledby="scenario-heading"
+          >
+            <div class="card-heading">
+              <div>
+                <span class="section-number">01</span>
+                <h2 id="scenario-heading">Scenario</h2>
+              </div>
+              <button id="reset-example" class="text-button">
+                Reset example
+              </button>
+            </div>
+            <form id="scenario-form">
+              <label for="scenario-name">Experiment name</label
+              ><input
+                id="scenario-name"
+                name="name"
+                value="Cart disturbance recovery"
+                maxlength="100"
+                required
+              />
+              <div class="form-row">
+                <div>
+                  <label for="adapter">Simulator</label
+                  ><select id="adapter" name="adapter">
+                    <option value="reference">Reference</option>
+                    <option value="mujoco" disabled>
+                      MuJoCo · connect to check
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label for="seed">Random seed</label
+                  ><input
+                    id="seed"
+                    name="seed"
+                    type="number"
+                    min="0"
+                    max="4294967295"
+                    value="42"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div>
+                  <label for="steps">Simulation steps</label
+                  ><input
+                    id="steps"
+                    name="steps"
+                    type="number"
+                    min="1"
+                    max="20000"
+                    value="600"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="target">Target position <span>m</span></label
+                  ><input
+                    id="target"
+                    name="target"
+                    type="number"
+                    min="-100"
+                    max="100"
+                    step="any"
+                    value="1"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="scenario-summary">
+                <span>PD controller</span><span>Seeded sensor noise</span
+                ><span>Force disturbance</span>
+              </div>
+              <details id="contract-details">
+                <summary>Scenario contract <span>JSON ↗</span></summary>
+                <label class="sr-only" for="scenario-json">Scenario JSON</label
+                ><textarea
+                  id="scenario-json"
+                  spellcheck="false"
+                  rows="19"
+                ></textarea>
+                <p class="hint">
+                  Edit the full world, robot, sensors, disturbances, controller,
+                  and gates.
+                </p>
+              </details>
+              <button id="launch" class="primary launch" type="submit" disabled>
+                <span>▶</span> Run experiment <kbd>RUN</kbd>
+              </button>
+              <p class="hint centered" id="run-hint">
+                Connect to submit a run to the durable queue.
+              </p>
+            </form>
+          </section>
+          <section class="card replay-card" aria-labelledby="replay-heading">
+            <div class="card-heading">
+              <div>
+                <span class="section-number">02</span>
+                <h2 id="replay-heading">Run & replay</h2>
+              </div>
+              <span id="run-status" class="status neutral"
+                >NO RUN SELECTED</span
+              >
+            </div>
+            <div class="replay-title">
+              <h3 id="selected-name">Your next experiment starts here</h3>
+              <p id="selected-meta">
+                Launch a scenario or select a previous run.
+              </p>
+            </div>
+            <div class="plot" id="plot">
+              <svg
+                id="chart"
+                viewBox="0 0 720 270"
+                role="img"
+                aria-label="Position telemetry over simulation time"
+              >
+                <g id="chart-grid"></g>
+                <line
+                  id="target-line"
+                  class="target-line"
+                  x1="44"
+                  y1="132"
+                  x2="700"
+                  y2="132"
+                />
+                <polyline id="trajectory" points="" />
+                <line id="playhead" x1="44" y1="20" x2="44" y2="236" />
+                <circle id="play-dot" r="5" cx="44" cy="236" />
+                <text id="chart-axis" x="44" y="261">SIMULATION TIME / S</text>
+                <text x="44" y="16">POSITION / M</text>
+              </svg>
+              <div class="plot-empty" id="plot-empty">
+                <span>⌁</span><strong>A clear view of every step</strong>
+                <p>Position telemetry and replay will appear here.</p>
+              </div>
+            </div>
+            <div class="plot-legend">
+              <span><i class="legend-line"></i>Position</span
+              ><span><i class="legend-line target"></i>Target</span
+              ><span id="sample-count">0 samples</span>
+            </div>
+            <div class="playback">
+              <button
+                id="play"
+                class="icon-button"
+                aria-label="Play telemetry"
+                disabled
+              >
+                ▶</button
+              ><label class="sr-only" for="scrubber">Replay step</label
+              ><input
+                id="scrubber"
+                type="range"
+                min="0"
+                max="0"
+                value="0"
+                disabled
+              /><output id="replay-time">0.00 s</output
+              ><label class="sr-only" for="speed">Playback speed</label
+              ><select id="speed">
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option value="4">4×</option>
+              </select>
+            </div>
+            <div class="metric-grid">
+              <div>
+                <span>FINAL ERROR</span><strong id="metric-error">—</strong
+                ><small>metres from target</small>
+              </div>
+              <div>
+                <span>TRACKING RMSE</span><strong id="metric-rmse">—</strong
+                ><small>metres, all steps</small>
+              </div>
+              <div>
+                <span>QUALITY GATES</span><strong id="metric-gates">—</strong
+                ><small id="gates-caption">awaiting evidence</small>
+              </div>
+            </div>
+            <div id="gate-details" class="gate-details"></div>
+            <div class="run-actions">
+              <button id="verify" class="secondary" disabled>
+                ✓ Verify recording</button
+              ><button id="download" class="text-button" disabled>
+                Export JSONL ↓</button
+              ><button id="rerun" class="text-button" disabled>
+                Load scenario ↗</button
+              ><button id="cancel" class="text-button danger" hidden>
+                Cancel run
+              </button>
+            </div>
+            <p class="hint" id="verification-note">
+              Replay checks recorded telemetry. Repeatability is scoped to the
+              same engine and environment.
+            </p>
+          </section>
+        </div>
+        <section
+          id="runs-section"
+          class="card history-card"
+          aria-labelledby="history-heading"
+        >
+          <div class="card-heading">
+            <div>
+              <span class="section-number">03</span>
+              <h2 id="history-heading">Run history</h2>
+              <span id="history-count" class="count">0</span>
+            </div>
+            <div class="history-controls">
+              <button id="refresh" class="text-button" disabled>
+                Refresh ↻</button
+              ><button id="more" class="text-button" hidden>
+                Load older ↓
+              </button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>EXPERIMENT</th>
+                  <th>SIMULATOR</th>
+                  <th>SEED</th>
+                  <th>STATUS</th>
+                  <th>GATES</th>
+                  <th>CREATED</th>
+                  <th><span class="sr-only">Open run</span></th>
+                </tr>
+              </thead>
+              <tbody id="history"></tbody>
+            </table>
+          </div>
+          <div class="history-empty" id="history-empty">
+            No runs yet. Start with the recovery scenario above.
+          </div>
+        </section>
+        <footer>
+          <span
+            ><i class="dot"></i> Deterministic contracts · Portable
+            recordings</span
+          ><span>SimWeave is open source · MIT license</span>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

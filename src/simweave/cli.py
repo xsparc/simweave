@@ -29,6 +29,9 @@ def main(argv: list[str] | None = None) -> int:
     serve = commands.add_parser("serve", help="start the authenticated HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
+    demo = commands.add_parser("demo", help="start the local dashboard, API, and worker")
+    demo.add_argument("--port", type=int, default=8000)
+    demo.add_argument("--database", type=Path, default=Path(".simweave/demo.sqlite3"))
     worker = commands.add_parser("worker", help="consume durable simulation jobs")
     worker.add_argument("--database", type=Path)
     worker.add_argument("--once", action="store_true")
@@ -39,6 +42,32 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command == "demo":
+            import multiprocessing
+            import secrets
+
+            import uvicorn
+
+            from simweave.api import create_app
+            from simweave.config import Settings
+            from simweave.store import Store
+            from simweave.worker import work_forever
+
+            token = secrets.token_urlsafe(32)
+            settings = Settings(args.database, {token: "demo"})
+            app = create_app(settings)
+            process = multiprocessing.get_context("spawn").Process(
+                target=work_forever, args=(Store(args.database),), daemon=True
+            )
+            process.start()
+            print(f"Dashboard: http://127.0.0.1:{args.port}/#token={token}", flush=True)
+            print("Local demo token lasts for this server session. Press Ctrl+C to stop.")
+            try:
+                uvicorn.run(app, host="127.0.0.1", port=args.port)
+            finally:
+                process.terminate()
+                process.join(timeout=5)
+            return 0
         if args.command == "serve":
             import uvicorn
 
@@ -85,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.path.is_file():
                 with args.path.open(encoding="utf-8") as stream:
                     manifest = json.loads(next(stream))
-                    if manifest.get("type") != "manifest":
+                    if not isinstance(manifest, dict) or manifest.get("type") != "manifest":
                         raise ValueError("missing recording manifest")
                     scenario = Scenario.model_validate(manifest["scenario"])
                     result = RunResult.model_validate(manifest["result"])
@@ -93,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
                     def samples():
                         for line in stream:
                             item = json.loads(line)
-                            if item.get("type") != "sample":
+                            if not isinstance(item, dict) or item.get("type") != "sample":
                                 raise ValueError("invalid recording entry")
                             yield Sample.model_validate(item["data"])
 
