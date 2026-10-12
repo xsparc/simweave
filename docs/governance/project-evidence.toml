@@ -1,0 +1,40 @@
+schema_version = 1
+project = "simweave"
+research_decisions = []
+
+[authority]
+source_priority = ["docs/architecture/overview.md", "docs/roadmap/implementation-roadmap.md", "docs/architecture/decisions/", "code-and-tests", "supporting-documentation"]
+dhf_is_authoritative = false
+
+[review]
+last_reviewed = "2026-10-13"
+review_due = "2026-11-13"
+
+[[objectives]]
+id = "OBJ-PORTABLE-EXPERIMENTS"
+statement = "Run auditable experiments through vendor-neutral, portable contracts."
+status = "active"
+source_refs = ["docs/architecture/overview.md"]
+validation_refs = ["docs/governance/verification-and-validation.md"]
+
+[[requirements]]
+id = "REQ-CONTRACTS-CORE"
+statement = "Validate bounded scenarios, repeat seeded runs, and verify recordings."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0001-portable-core.md"]
+implementation_refs = ["src/simweave/contracts.py", "src/simweave/engine.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_core.py"]
+validation_refs = ["docs/governance/verification-and-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW001-CONTRACTS-CORE"
+title = "Contracts and deterministic execution core"
+status = "verified"
+requirement_ids = ["REQ-CONTRACTS-CORE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
+acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
+evidence_refs = ["tests/test_core.py"]

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "name": "Cart disturbance recovery",
+  "adapter": "reference",
+  "seed": 42,
+  "world": {"timestep": 0.01, "steps": 600},
+  "robot": {"kind": "cart_1d", "mass": 1.0, "damping": 0.2},
+  "controller": {"kind": "pd", "target": 1.0, "kp": 8.0, "kd": 4.0, "max_force": 20.0},
+  "sensors": {"position_noise_std": 0.005},
+  "disturbances": [{"start_step": 200, "duration_steps": 30, "force": 3.0}],
+  "gates": [{"metric": "final_error", "op": "lte", "threshold": 0.05}]
+}
