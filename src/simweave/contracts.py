@@ -6,7 +6,7 @@ import hashlib
 import json
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 Number = Annotated[float, Field(allow_inf_nan=False)]
 MetricName = Literal["final_error", "rmse", "max_abs_position", "control_effort"]
@@ -69,6 +69,13 @@ class Scenario(Contract):
         max_length=16,
     )
 
+    @field_validator("schema_version", mode="before")
+    @classmethod
+    def integer_version(cls, value):
+        if type(value) is not int:
+            raise ValueError("schema_version must be an integer")
+        return value
+
     @model_validator(mode="after")
     def validate_horizon(self) -> Scenario:
         for disturbance in self.disturbances:
@@ -110,6 +117,27 @@ class RunResult(Contract):
     metrics: dict[str, Number]
     gates: list[GateResult]
     passed: bool
+
+
+class RunView(Contract):
+    id: str
+    scenario: Scenario
+    scenario_digest: str
+    status: Literal["queued", "running", "succeeded", "failed", "cancelled"]
+    created_at: Number
+    updated_at: Number
+    result: RunResult | None
+    error: str | None
+
+
+class RunsPage(Contract):
+    items: list[RunView]
+    next_before: str | None
+
+
+class TelemetryPage(Contract):
+    items: list[Sample]
+    next_after: int | None
 
 
 def canonical(value: object) -> str:

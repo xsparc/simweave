@@ -19,6 +19,11 @@ Exercise real headless MuJoCo separately from the ROS fake-transport suite.
 Test concurrent claims, tenant isolation, idempotent submissions, cancellation,
 lease expiry, restart persistence, telemetry pagination, and recording verification.
 
+2026-10-13 local SW002 verification: 53 tests passed, including real MuJoCo
+3.15.0 repeatability on Python 3.12. Ruff and static/dated strict governance
+checks passed. One upstream Starlette/httpx test-client deprecation warning was
+reported. ROS is covered by fake transport tests, not a live ROS environment.
+
 ## SW003
 
 Run the full suite, build a wheel, inspect the package's static resources, exercise

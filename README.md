@@ -27,6 +27,21 @@ The reference simulator is a small deterministic test/demo model. Repeatability
 requires the same engine, adapter, dependency versions, platform, and seed;
 different simulators are not expected to be numerically identical.
 
+## Service and simulator integrations
+
+Install `.[dev,mujoco]` for the optional physics engine. Change the scenario's
+`adapter` to `mujoco` and use the same CLI. No GPU or viewer is required.
+
+The authenticated HTTP service and durable worker run independently:
+`simweave serve` and `simweave worker`. Configure the token-to-tenant mapping first
+as described in the [API quickstart](docs/operations/api.md). OpenAPI lives at
+`/docs`; tenant-scoped run endpoints support idempotency, cancellation, paginated
+telemetry, gate verification, and portable recording export.
+
+The [ROS 2 bridge](docs/operations/ros2.md) provides feature discovery, reset,
+pause, and stepping of an existing simulator. It is a lifecycle bridge; full ROS
+robot experiments are deferred until actuator and sensor mappings are defined.
+
 ## Engineering
 
 ```sh
