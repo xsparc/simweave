@@ -38,3 +38,25 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
 acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
 evidence_refs = ["tests/test_core.py"]
+
+[[requirements]]
+id = "REQ-ADAPTERS-API"
+statement = "Run MuJoCo and reference experiments through tenant-scoped durable jobs; expose ROS lifecycle control."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0001-portable-core.md"]
+implementation_refs = ["src/simweave/api.py", "src/simweave/store.py", "src/simweave/worker.py", "src/simweave/adapters/mujoco.py", "src/simweave/adapters/ros2.py"]
+verification_refs = ["tests/test_service.py", "tests/test_adapters.py"]
+validation_refs = ["docs/operations/api.md", "docs/operations/ros2.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW002-ADAPTERS-API"
+title = "Simulator adapters, durable worker, and HTTP control plane"
+status = "verified"
+requirement_ids = ["REQ-ADAPTERS-API"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
+acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
+evidence_refs = ["tests/test_service.py", "tests/test_adapters.py"]
