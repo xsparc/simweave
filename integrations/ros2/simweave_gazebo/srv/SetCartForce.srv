@@ -1,0 +1,5 @@
+# Acknowledge a force for the next step, before StepSimulation is called.
+uint64 expected_step
+float64 force
+---
+simulation_interfaces/Result result

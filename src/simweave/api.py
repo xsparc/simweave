@@ -2,13 +2,16 @@
 
 import importlib.util
 import secrets
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 
+from simweave.adapters.gazebo import available as gazebo_available
 from simweave.config import Settings
 from simweave.contracts import (
     RunResult,
@@ -106,6 +109,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         response.headers["Cache-Control"] = "no-store"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["X-Frame-Options"] = "DENY"
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; "
+                "base-uri 'none'; form-action 'self'"
+            )
         return response
 
     def required(name, identifier):
@@ -130,6 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "kind": "experiment",
                 },
                 {"id": "ros2", "available": False, "kind": "operator_lifecycle_bridge"},
+                {"id": "gazebo", "available": gazebo_available(), "kind": "experiment"},
             ],
             "max_steps": 20_000,
             "max_active_runs_per_tenant": 20,
@@ -150,6 +160,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ):
         if scenario.adapter == "mujoco" and importlib.util.find_spec("mujoco") is None:
             raise HTTPException(422, "MuJoCo is not installed in the service environment")
+        if scenario.adapter == "gazebo" and not gazebo_available():
+            raise HTTPException(
+                422, "ROS/Gazebo cart fixture is not installed in the service environment"
+            )
         run, created = store.submit(name, scenario, idempotency_key)
         response.status_code = 202 if created else 200
         response.headers["Location"] = f"/api/v1/runs/{run['id']}"
@@ -233,5 +247,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             media_type="application/x-ndjson",
             headers={"Content-Disposition": f'attachment; filename="{identifier}.jsonl"'},
         )
+
+    static = Path(__file__).with_name("static")
+    app.mount("/static", StaticFiles(directory=static), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def dashboard():
+        return FileResponse(static / "index.html")
 
     return app

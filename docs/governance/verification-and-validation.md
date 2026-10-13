@@ -30,3 +30,18 @@ Run the full suite, build a wheel, inspect the package's static resources, exerc
 the API/UI flow, and run the benchmark. Record container and real ROS checks as
 unexecuted when the environment is unavailable. Cross-platform CI supplies
 additional evidence after publication, not before it.
+
+2026-10-13 SW003 local closeout: 56 tests passed; Ruff, JavaScript syntax,
+static/dated strict governance, Python package builds, isolated wheel asset
+checks, and Linux container execution passed. The browser exercised reference
+and MuJoCo submission, playback, verification, and export; the exported recording
+passed offline CLI replay. See `mvp-validation.md` for measurements and limits.
+
+## SW004
+
+2026-10-13 local closeout: 69 portable tests and 15 real ROS/Gazebo tests passed,
+including MuJoCo comparisons, seeded repeatability, reset/isolation, native input
+validation, lifecycle context handling, process faults, and CLI/API recording
+replay. Ruff, JavaScript syntax, static/dated strict governance, source/wheel
+builds, and wheel asset inspection passed. See `ros-gazebo-validation.md` for
+the tested runtime, tolerance budgets, exact commands, and remaining limits.

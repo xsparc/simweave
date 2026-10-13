@@ -32,8 +32,9 @@ class RosControl:
             raise RuntimeError("ROS simulator rejected the operation")
 
     def reset(self) -> None:
-        # Scope ALL requires all reset scopes; never assume a reset re-seeds the simulator.
-        self._require({20, 21, 22, 23})
+        # The server must accept ALL; individual partial scopes need not be advertised.
+        # Reset is never assumed to reseed arbitrary external simulators.
+        self._require({20})
         self._checked("reset_simulation", {"scope": 255})
 
     def step(self, steps: int = 1) -> None:
@@ -50,6 +51,7 @@ class RclpyTransport:
             raise ValueError("invalid ROS service namespace")
         import rclpy
         from rclpy.context import Context
+        from rclpy.executors import SingleThreadedExecutor
         from simulation_interfaces.srv import (
             GetSimulatorFeatures,
             ResetSimulation,
@@ -60,6 +62,7 @@ class RclpyTransport:
         self.rclpy = rclpy
         self.context = Context()
         rclpy.init(context=self.context)
+        self.executor = SingleThreadedExecutor(context=self.context)
         self.node = rclpy.create_node("simweave_control", context=self.context)
         self.namespace = namespace.rstrip("/")
         self.types = {
@@ -86,7 +89,10 @@ class RclpyTransport:
                     setattr(request, key, value)
             future = client.call_async(request)
             self.rclpy.spin_until_future_complete(
-                self.node, future, timeout_sec=max(0.0, deadline - time.monotonic())
+                self.node,
+                future,
+                executor=self.executor,
+                timeout_sec=max(0.0, deadline - time.monotonic()),
             )
             if not future.done():
                 future.cancel()
@@ -99,5 +105,6 @@ class RclpyTransport:
             self.node.destroy_client(client)
 
     def close(self) -> None:
+        self.executor.shutdown(timeout_sec=0)
         self.node.destroy_node()
         self.context.shutdown()

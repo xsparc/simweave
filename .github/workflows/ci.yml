@@ -17,12 +17,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install -e ".[dev]"
-      - run: python -m pytest
-      - run: ruff check .
-      - run: ruff format --check .
-      - run: python scripts/check_governance.py --strict
-      - run: python -m build
+      - run: python -m pip install uv==0.11.16
+      - run: uv sync --frozen --python ${{ matrix.python }} --extra dev
+      - run: uv run --frozen --extra dev python -m pytest
+      - run: uv run --frozen --extra dev ruff check .
+      - run: uv run --frozen --extra dev ruff format --check .
+      - run: uv run --frozen --extra dev python scripts/check_governance.py --strict
+      - run: uv build
   mujoco:
     runs-on: ubuntu-latest
     steps:
@@ -30,5 +31,39 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install -e ".[dev,mujoco]"
-      - run: python -m pytest tests/test_adapters.py
+      - run: python -m pip install uv==0.11.16
+      - run: uv sync --frozen --extra dev --extra mujoco
+      - run: uv run --frozen --extra dev --extra mujoco python -m pytest tests/test_adapters.py
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t simweave:test .
+      - run: >-
+          docker run --rm simweave:test python -c
+          "from simweave.contracts import Scenario;
+          from simweave.engine import execute;
+          from importlib.resources import files;
+          assert files('simweave').joinpath('static/index.html').is_file();
+          assert execute(Scenario.model_validate({'adapter':'mujoco'}),lambda s:None).passed"
+  ros-gazebo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f integrations/ros2/Dockerfile -t simweave:ros-cart .
+      - name: Real ROS/Gazebo conformance
+        run: >-
+          docker run --name simweave-ros-ci --network none
+          --pids-limit 256 --memory 4g --cpus 2 simweave:ros-cart
+          python -m pytest integrations/ros2/tests -v --tb=short
+          --junitxml=/workspace/ros-results.xml --durations=10
+      - name: Collect live test results
+        if: always()
+        run: docker cp simweave-ros-ci:/workspace/ros-results.xml ros-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ros-gazebo-conformance
+          path: ros-results.xml
+          if-no-files-found: warn

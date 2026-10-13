@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "name": "Gazebo cart disturbance recovery",
+  "adapter": "gazebo",
+  "seed": 42,
+  "world": {"timestep": 0.01, "steps": 600},
+  "sensors": {"position_noise_std": 0.01},
+  "disturbances": [{"start_step": 150, "duration_steps": 20, "force": -3.0}],
+  "gates": [{"metric": "final_error", "op": "lte", "threshold": 0.05}]
+}
