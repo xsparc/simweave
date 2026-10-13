@@ -21,6 +21,7 @@ from simweave.comparison import (
 )
 from simweave.contracts import Contract, Controller, Number, Scenario, canonical
 from simweave.engine import execute
+from simweave.provenance import Environment, capture
 
 Seed = Annotated[int, Field(ge=0, le=2**32 - 1)]
 Adapter = Literal["reference", "mujoco", "gazebo"]
@@ -221,7 +222,10 @@ class RecordingWriteError(OSError):
     """Abort the suite when recording storage fails, even inside the execution sink."""
 
 
-def execute_suite(suite: Suite, output: Path) -> SuiteReport:
+def execute_suite(
+    suite: Suite, output: Path, *, environment: Environment | None = None
+) -> SuiteReport:
+    environment = environment or capture()
     output.mkdir(parents=True, exist_ok=False)
     (output / "suite.json").write_text(suite.model_dump_json(indent=2), encoding="utf-8")
     cases = []
@@ -272,4 +276,10 @@ def execute_suite(suite: Suite, output: Path) -> SuiteReport:
     (output / "report.json").write_text(report.model_dump_json(), encoding="utf-8")
     (output / "summary.json").write_text(review(report).model_dump_json(), encoding="utf-8")
     write_junit(report, output / "junit.xml")
+    from simweave.bundles import write_bundle
+    from simweave.offline import write_report
+
+    (output / "environment.json").write_text(environment.model_dump_json(), encoding="utf-8")
+    write_report(report, output / "report.html", environment)
+    write_bundle(report, environment, output)
     return report

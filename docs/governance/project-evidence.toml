@@ -2,6 +2,34 @@ schema_version = 1
 project = "simweave"
 
 [[research_decisions]]
+id = "RD-REPRODUCIBLE-EVIDENCE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-14-reproducible-evidence.md"]
+design_refs = ["docs/architecture/decisions/0004-reproducible-evidence.md"]
+
+[[requirements]]
+id = "REQ-REPRODUCIBLE-EVIDENCE"
+statement = "Validate portable failure bundles, rerun compatible retained images, and inspect offline reports."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0004-reproducible-evidence.md"]
+implementation_refs = ["src/simweave/bundles.py", "src/simweave/provenance.py", "src/simweave/rerun.py", "src/simweave/offline.py", "src/simweave/static/offline.js"]
+verification_refs = ["tests/test_evidence.py", "scripts/check_evidence_ci.py", ".github/workflows/ci.yml"]
+validation_refs = ["docs/governance/evidence-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW006-REPRODUCIBLE-EVIDENCE"
+title = "Reproducible failure bundles and offline reports"
+status = "in-progress"
+requirement_ids = ["REQ-REPRODUCIBLE-EVIDENCE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-14-reproducible-bundles-offline-reports-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0004-reproducible-evidence.md"]
+evidence_refs = ["tests/test_evidence.py", "scripts/check_evidence_ci.py", "docs/governance/evidence-validation.md"]
+
+[[research_decisions]]
 id = "RD-REGRESSION-WORKFLOWS"
 disposition = "adopted"
 source_refs = ["docs/research/2026-10-13-regression-workflows.md"]
@@ -40,8 +68,8 @@ source_priority = ["docs/architecture/overview.md", "docs/roadmap/implementation
 dhf_is_authoritative = false
 
 [review]
-last_reviewed = "2026-10-13"
-review_due = "2026-11-13"
+last_reviewed = "2026-10-14"
+review_due = "2026-11-14"
 
 [[requirements]]
 id = "REQ-ROS-GAZEBO-CART"

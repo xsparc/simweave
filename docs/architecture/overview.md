@@ -84,6 +84,15 @@ comparisons share this logic. The dashboard opens bounded suite reports without
 importing jobs or accessing file paths; imported previews are not replay evidence.
 See ADR 0003 and the regression operations guide.
 
+Completed suites also emit a self-contained offline HTML report and bounded,
+checksummed JSON/JSONL evidence bundle. The bundle reader never extracts paths;
+it verifies full recordings and their plotted previews. Runtime fingerprints and
+explicit optional source/image provenance live alongside the existing v1 report,
+preserving API and recording compatibility. A separate operator-invoked container
+runner checks an explicitly selected retained image and installed runtime before
+executing the suite, then compares full telemetry/results. This runner has no API
+endpoint or Docker socket in the service. See ADR 0004 and the evidence guide.
+
 At most 20,000 steps, 64 disturbance intervals, and 16 gates per run. Workers
 stream samples and flush batches rather than retain a complete trajectory.
 Measure throughput with the supplied benchmark before changing these limits.

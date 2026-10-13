@@ -42,6 +42,9 @@ Output includes:
 - `report.json`: complete case summaries, suitable for opening in the dashboard.
 - `summary.json`: pair comparisons, signed metric changes, and aggregate exit code.
 - `junit.xml`: per-run quality gates and per-pair metric-increase checks.
+- `report.html`: self-contained review with failure navigation and pair export.
+- `environment.json`: bounded runtime/dependency fingerprint and optional revision/image ID.
+- `evidence.zip`: checked portable data bundle containing all complete recordings.
 - `case-NNNN/`: scenario, full-resolution telemetry, and result when execution
   completed. Failed execution may leave partial telemetry without a result.
 
@@ -54,6 +57,11 @@ specify an absolute maximum increase, in the metric's units, rather than a ratio
 changes alone do not imply a statistically significant improvement or regression.
 
 ## Inspect and export a regression
+
+For service-free review, open `report.html` and follow the three steps shown on
+the page. The [evidence guide](evidence.md) covers offline exports, bundle
+verification, and exact-image reruns. The existing connected dashboard workflow
+below remains available for workspace runs and older JSON reports.
 
 Start `simweave demo` and open its dashboard. In **Baseline & candidate**, choose
 two completed workspace runs and click **Compare runs**, or select the CLI suite's
@@ -91,3 +99,6 @@ and an intentionally degraded controller (`kp=kd=0`). The negative fixture is
 expected to return 1; the check fails if it returns 0 or 2. It also verifies every
 recording. GitHub CI runs ten seeds on MuJoCo, and the ROS job runs ten seeds on
 both MuJoCo and Gazebo, retaining JSON, JUnit, and recordings for seven days.
+The same artifacts now include offline HTML, environment metadata, and evidence
+ZIPs. The ROS job also reproduces a known failure in a fresh retained image and
+checks exact telemetry/result equality for all three installed adapters.

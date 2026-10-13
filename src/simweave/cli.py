@@ -23,6 +23,22 @@ def main(argv: list[str] | None = None) -> int:
     suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
     suite.add_argument("path", type=Path)
     suite.add_argument("--output", required=True, type=Path)
+    suite.add_argument("--source-revision", help="explicit 40-character Git commit (provenance)")
+    suite.add_argument("--image-id", help="explicit local sha256 Docker image ID (provenance)")
+    report = commands.add_parser("report", help="convert a suite JSON report to standalone HTML")
+    report.add_argument("path", type=Path)
+    report.add_argument("--output", required=True, type=Path)
+    bundle_check = commands.add_parser("bundle-check", help="verify bundle metadata and recordings")
+    bundle_check.add_argument("path", type=Path)
+    for name, help_text in (
+        ("rerun", "rerun a bundle in an explicitly selected local container image"),
+        ("_bundle-rerun", argparse.SUPPRESS),
+    ):
+        rerun = commands.add_parser(name, help=help_text)
+        rerun.add_argument("path", type=Path)
+        rerun.add_argument("--output", required=True, type=Path)
+        if name == "rerun":
+            rerun.add_argument("--image", required=True, help="trusted local sha256 image ID")
     validate = commands.add_parser("validate", help="validate a scenario")
     validate.add_argument("path", type=Path)
     run = commands.add_parser("run", help="run an experiment locally")
@@ -46,7 +62,44 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command == "report":
+            from simweave.bundles import MAX_REPORT
+            from simweave.offline import write_report
+            from simweave.suites import SuiteReport
+
+            if args.path.stat().st_size > MAX_REPORT:
+                raise ValueError("report exceeds 4 MiB")
+            write_report(SuiteReport.model_validate_json(args.path.read_bytes()), args.output)
+            print(canonical({"report_written": True, "provenance": "unknown"}))
+            return 0
+        if args.command == "bundle-check":
+            from simweave.bundles import read_bundle
+
+            manifest, report = read_bundle(args.path)
+            print(
+                canonical(
+                    {
+                        "verified": True,
+                        "suite_digest": report.suite_digest,
+                        "recordings": sum(c.summary is not None for c in report.cases),
+                        "execution_errors": sum(c.error is not None for c in report.cases),
+                        "environment": manifest.environment.model_dump(),
+                    }
+                )
+            )
+            return 0
+        if args.command in ("rerun", "_bundle-rerun"):
+            from simweave.rerun import rerun_container, rerun_here
+
+            code = (
+                rerun_container(args.path, args.image, args.output)
+                if args.command == "rerun"
+                else rerun_here(args.path, args.output)
+            )
+            print((args.output / "reproduction.json").read_text(encoding="utf-8"))
+            return code
         if args.command in ("suite", "suite-schema"):
+            from simweave.provenance import capture
             from simweave.suites import Suite, execute_suite, review
 
             if args.command == "suite-schema":
@@ -55,7 +108,11 @@ def main(argv: list[str] | None = None) -> int:
             if args.path.stat().st_size > 65_536:
                 raise ValueError("suite input exceeds 64 KiB")
             contract = Suite.model_validate_json(args.path.read_bytes())
-            report = execute_suite(contract, args.output)
+            report = execute_suite(
+                contract,
+                args.output,
+                environment=capture(args.source_revision, args.image_id),
+            )
             result = review(report)
             print(
                 canonical(

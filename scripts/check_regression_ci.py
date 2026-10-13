@@ -7,6 +7,7 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from simweave.bundles import read_bundle
 from simweave.contracts import Sample
 from simweave.engine import verify_recording
 from simweave.suites import Suite, SuiteReport, review
@@ -15,6 +16,8 @@ from simweave.suites import Suite, SuiteReport, review
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--source-revision")
+    parser.add_argument("--image-id")
     parser.add_argument(
         "--adapters",
         nargs="+",
@@ -33,8 +36,23 @@ def main():
         source = args.output / f"{label}.json"
         source.write_text(suite.model_dump_json(), encoding="utf-8")
         output = args.output / label
+        command = [
+            sys.executable,
+            "-m",
+            "simweave.cli",
+            "suite",
+            str(source),
+            "--output",
+            str(output),
+        ]
+        for flag, value in (
+            ("--source-revision", args.source_revision),
+            ("--image-id", args.image_id),
+        ):
+            if value:
+                command.extend([flag, value])
         completed = subprocess.run(
-            [sys.executable, "-m", "simweave.cli", "suite", str(source), "--output", str(output)],
+            command,
             check=False,
         )
         if completed.returncode != expected:
@@ -42,6 +60,9 @@ def main():
         report = SuiteReport.model_validate_json((output / "report.json").read_bytes())
         assert len(report.cases) == 20 * len(args.adapters)
         assert review(report).exit_code == expected
+        _, bundled = read_bundle(output / "evidence.zip")
+        assert bundled == report
+        assert (output / "report.html").stat().st_size > 1000
         xml = ET.parse(output / "junit.xml").getroot()
         assert xml.get("errors") == "0"
         assert (int(xml.get("failures")) > 0) == bool(expected)
