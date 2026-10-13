@@ -1,6 +1,11 @@
 schema_version = 1
 project = "simweave"
-research_decisions = []
+
+[[research_decisions]]
+id = "RD-ROS-GAZEBO-CART"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-13-ros-gazebo.md"]
+design_refs = ["docs/architecture/decisions/0002-isolated-ros-gazebo-cart.md"]
 
 [authority]
 source_priority = ["docs/architecture/overview.md", "docs/roadmap/implementation-roadmap.md", "docs/architecture/decisions/", "code-and-tests", "supporting-documentation"]
@@ -9,6 +14,28 @@ dhf_is_authoritative = false
 [review]
 last_reviewed = "2026-10-13"
 review_due = "2026-11-13"
+
+[[requirements]]
+id = "REQ-ROS-GAZEBO-CART"
+statement = "Execute and verify the built-in cart using real ROS/Gazebo actuation and observations."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0002-isolated-ros-gazebo-cart.md"]
+implementation_refs = ["src/simweave/adapters/gazebo.py", "integrations/ros2/simweave_gazebo/src/cart_server.cpp"]
+verification_refs = ["tests/test_gazebo.py", "integrations/ros2/tests/test_live_cart.py"]
+validation_refs = ["docs/governance/ros-gazebo-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW004-ROS-GAZEBO-CART"
+title = "Complete ROS/Gazebo cart experiments"
+status = "verified"
+requirement_ids = ["REQ-ROS-GAZEBO-CART"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-13-ros-gazebo-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0002-isolated-ros-gazebo-cart.md"]
+evidence_refs = ["tests/test_gazebo.py", "integrations/ros2/tests/test_live_cart.py", "docs/governance/ros-gazebo-validation.md"]
 
 [[objectives]]
 id = "OBJ-PORTABLE-EXPERIMENTS"

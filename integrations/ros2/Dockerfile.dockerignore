@@ -1,0 +1,16 @@
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!src/
+!src/**
+!tests/
+!tests/**
+!examples/
+!examples/**
+!integrations/
+!integrations/ros2/
+!integrations/ros2/**
+**/__pycache__/
+**/*.pyc

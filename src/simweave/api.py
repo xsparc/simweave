@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 
+from simweave.adapters.gazebo import available as gazebo_available
 from simweave.config import Settings
 from simweave.contracts import (
     RunResult,
@@ -138,6 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "kind": "experiment",
                 },
                 {"id": "ros2", "available": False, "kind": "operator_lifecycle_bridge"},
+                {"id": "gazebo", "available": gazebo_available(), "kind": "experiment"},
             ],
             "max_steps": 20_000,
             "max_active_runs_per_tenant": 20,
@@ -158,6 +160,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ):
         if scenario.adapter == "mujoco" and importlib.util.find_spec("mujoco") is None:
             raise HTTPException(422, "MuJoCo is not installed in the service environment")
+        if scenario.adapter == "gazebo" and not gazebo_available():
+            raise HTTPException(
+                422, "ROS/Gazebo cart fixture is not installed in the service environment"
+            )
         run, created = store.submit(name, scenario, idempotency_key)
         response.status_code = 202 if created else 200
         response.headers["Location"] = f"/api/v1/runs/{run['id']}"

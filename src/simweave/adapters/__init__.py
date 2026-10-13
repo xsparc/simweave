@@ -23,4 +23,8 @@ def create_adapter(name: str) -> Simulator:
         from simweave.adapters.mujoco import MujocoSimulator
 
         return MujocoSimulator()
+    if name == "gazebo":
+        from simweave.adapters.gazebo import GazeboSimulator
+
+        return GazeboSimulator()
     raise ValueError("unsupported simulator adapter")

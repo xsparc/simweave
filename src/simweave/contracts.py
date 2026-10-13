@@ -56,7 +56,7 @@ class Gate(Contract):
 class Scenario(Contract):
     schema_version: Literal[1] = 1
     name: str = Field(default="Cart disturbance recovery", min_length=1, max_length=100)
-    adapter: Literal["reference", "mujoco"] = "reference"
+    adapter: Literal["reference", "mujoco", "gazebo"] = "reference"
     seed: int = Field(default=42, ge=0, le=2**32 - 1)
     world: World = Field(default_factory=World)
     robot: Robot = Field(default_factory=Robot)
@@ -78,6 +78,10 @@ class Scenario(Contract):
 
     @model_validator(mode="after")
     def validate_horizon(self) -> Scenario:
+        if self.adapter == "gazebo":
+            nanoseconds = self.world.timestep * 1e9
+            if abs(nanoseconds - round(nanoseconds)) > 1e-6:
+                raise ValueError("Gazebo timestep must be representable as whole nanoseconds")
         for disturbance in self.disturbances:
             if disturbance.start_step + disturbance.duration_steps > self.world.steps:
                 raise ValueError("disturbance extends beyond the simulation horizon")

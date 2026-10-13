@@ -46,3 +46,24 @@ jobs:
           from importlib.resources import files;
           assert files('simweave').joinpath('static/index.html').is_file();
           assert execute(Scenario.model_validate({'adapter':'mujoco'}),lambda s:None).passed"
+  ros-gazebo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f integrations/ros2/Dockerfile -t simweave:ros-cart .
+      - name: Real ROS/Gazebo conformance
+        run: >-
+          docker run --name simweave-ros-ci --network none
+          --pids-limit 256 --memory 4g --cpus 2 simweave:ros-cart
+          python -m pytest integrations/ros2/tests -v --tb=short
+          --junitxml=/workspace/ros-results.xml --durations=10
+      - name: Collect live test results
+        if: always()
+        run: docker cp simweave-ros-ci:/workspace/ros-results.xml ros-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ros-gazebo-conformance
+          path: ros-results.xml
+          if-no-files-found: warn

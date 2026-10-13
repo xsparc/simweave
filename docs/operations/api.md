@@ -4,6 +4,12 @@ Install `.[dev,mujoco]` to enable the reference and MuJoCo adapters. Use the sam
 environment for the API and worker. Start each in a separate terminal with the
 same working directory or absolute `SIMWEAVE_DB` setting.
 
+For `gazebo` jobs, install and source the [ROS/Gazebo fixture](ros2.md) in both
+processes. The API rejects unavailable adapters before queueing. Capabilities
+describe the API installation; they do not prove a worker is healthy. Each active
+Gazebo worker owns one native fixture process. Bound worker counts and container
+memory/CPU explicitly; the lightweight default image has no ROS.
+
 Generate a fresh token locally with `python -c "import secrets; print(secrets.token_urlsafe(32))"`.
 Set `SIMWEAVE_TOKENS` to a JSON object mapping that token to a tenant name. Keep it
 in environment/secrets management; do not commit it. Example structure:

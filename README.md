@@ -14,8 +14,6 @@ disturbance.
 ```sh
 git clone https://github.com/xsparc/simweave.git
 cd simweave
-# Until the three MVP PRs merge, check out the complete stacked branch:
-git switch codex/sw003-dashboard-operations
 python -m venv .venv
 # Activate .venv (PowerShell: .venv\Scripts\Activate.ps1; POSIX: . .venv/bin/activate).
 python -m pip install -e '.[mujoco]'
@@ -68,9 +66,13 @@ as described in the [API quickstart](docs/operations/api.md). OpenAPI lives at
 `/docs`; tenant-scoped run endpoints support idempotency, cancellation, paginated
 telemetry, gate verification, and portable recording export.
 
-The [ROS 2 bridge](docs/operations/ros2.md) provides feature discovery, reset,
-pause, and stepping of an existing simulator. It is a lifecycle bridge; full ROS
-robot experiments are deferred until actuator and sensor mappings are defined.
+The [ROS/Gazebo integration](docs/operations/ros2.md) runs the built-in cart through
+real headless Gazebo physics, with acknowledged forces, joint observations,
+standard ROS lifecycle services, and the same metrics/gates/replay. Use
+`adapter: "gazebo"` in a ROS-enabled installation. An isolated verification image
+and live conformance suite are included; no host ROS install or GPU is needed
+when using that image. The generic lifecycle CLI remains available for existing
+external simulators. Arbitrary robot models remain outside this adapter's scope.
 
 For a SaaS or CI integration, set `SIMWEAVE_URL` and `SIMWEAVE_TOKEN` and run
 `python examples/submit.py examples/cart-recovery.json`. The standard-library
@@ -98,7 +100,7 @@ ruff format --check .
 python scripts/check_governance.py --strict
 ```
 
-See [architecture](docs/architecture/overview.md), [three-PR roadmap](docs/roadmap/implementation-roadmap.md),
+See [architecture](docs/architecture/overview.md), [implementation roadmap](docs/roadmap/implementation-roadmap.md),
 [security boundary](docs/security/threat-model.md), and [validation](docs/governance/verification-and-validation.md).
 `uv.lock` records the resolved environment; use `uv sync --frozen --extra dev`
 for a locked development install.
@@ -112,6 +114,7 @@ are pinned with hashes in `requirements.lock`, generated from `uv.lock`.
 
 The project follows an OpenSteward research, delivery, and evidence workflow.
 The [stewardship policy](docs/governance/stewardship.md) describes ongoing work and
-review boundaries. The three initial PRs form a stack and should merge in order.
+review boundaries. New delivery PRs target `main`. When a dependency is
+squash-merged, restack dependent changes and retarget before deleting its branch.
 
 Licensed under the MIT License.

@@ -27,6 +27,15 @@ def submit(client, scenario=None, headers=None):
     return client.post("/api/v1/runs", json=scenario or {}, headers=headers or AUTH_A)
 
 
+def test_gazebo_availability_is_enforced_before_queueing(service, monkeypatch):
+    client, store = service
+    monkeypatch.setattr("simweave.api.gazebo_available", lambda: False)
+    capabilities = client.get("/api/v1/capabilities", headers=AUTH_A).json()
+    assert next(a for a in capabilities["adapters"] if a["id"] == "gazebo")["available"] is False
+    assert submit(client, {"adapter": "gazebo"}).status_code == 422
+    assert store.list("alpha", 30, None) == []
+
+
 def test_service_full_run_export_and_offline_replay(service, tmp_path):
     client, store = service
     created = submit(client)

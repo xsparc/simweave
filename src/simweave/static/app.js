@@ -130,6 +130,12 @@ async function connect(value) {
       : "MuJoCo · unavailable";
     $("mujoco-status").textContent = mj ? "Installed" : "Not installed";
     $("mujoco-dot").classList.toggle("muted", !mj);
+    const gz = capabilities.adapters.find((a) => a.id === "gazebo")?.available ?? false;
+    $("adapter").querySelector('[value="gazebo"]').disabled = !gz;
+    $("adapter").querySelector('[value="gazebo"]').textContent = gz
+      ? "Gazebo (ROS 2 cart)" : "Gazebo · unavailable";
+    $("gazebo-status").textContent = gz ? "Installed" : "Not installed";
+    $("gazebo-dot").classList.toggle("muted", !gz);
     $("connection-state").textContent = "Workspace connected";
     $("connection-dot").classList.remove("muted");
     $("token").value = "";

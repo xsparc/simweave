@@ -16,14 +16,19 @@ flowchart LR
     Worker --> Engine[Streaming execution core]
     Engine --> Reference[Reference adapter]
     Engine --> MuJoCo[Headless MuJoCo adapter]
+    Engine --> CartROS[ROS cart adapter]
+    CartROS --> Gazebo[Isolated Gazebo cart process]
     ROSCLI[ROS control CLI] --> ROS[ROS 2 simulation_interfaces]
 ```
 
 The engine imports neither HTTP nor persistence. Adapters implement reset, step,
 and close. A fixed registration table prevents scenario-supplied code execution.
 ROS control is a separate capability-checked bridge; generic ROS services do not
-provide the cart actuator and sensor contract. Full ROS experiments require a
-future robot-specific adapter. This distinction must remain visible in the UI.
+provide the cart actuator and sensor contract. The Gazebo adapter adds a built-in
+cart fixture with acknowledged forces and native joint observations. Each run
+owns a headless Gazebo process, separate ROS context, namespace, and transport
+partition. The UI exposes the fixture when its operator-installed runtime is
+available. Arbitrary ROS robots remain outside this adapter. See ADR 0002.
 
 ## Interoperability and portability
 
@@ -32,7 +37,9 @@ numbers, unknown-field rejection, and bounded steps. `/api/v1` and OpenAPI defin
 the service boundary. JSON/JSONL recordings remain usable without the service.
 The reference adapter needs no GPU, ROS installation, or platform-specific build.
 MuJoCo is an optional dependency, loaded lazily. ROS is installed by the operator
-in a ROS-supported environment and is never required by the server.
+in a ROS-supported environment and is optional for reference/MuJoCo deployments.
+Gazebo experiments require the compiled fixture and matching ROS environment in
+both the API and worker. The Python package alone does not install ROS/Gazebo.
 
 ## Execution and persistence
 

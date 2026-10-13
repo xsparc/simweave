@@ -1,0 +1,9 @@
+# Built-in cart only; no executable code, asset paths, or XML.
+float64 timestep
+float64 mass
+float64 damping
+float64 initial_position
+float64 initial_velocity
+---
+simulation_interfaces/Result result
+string adapter_version

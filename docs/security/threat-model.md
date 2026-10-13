@@ -22,3 +22,19 @@ deferred. Hosting for hostile tenants requires a separate deployment review.
 SHA-256 digests detect accidental artifact changes when compared with trusted
 metadata. They are not signatures and do not stop an attacker who can rewrite
 both telemetry and its metadata. Replay checks recording consistency, not physics.
+
+The optional ROS/Gazebo fixture launches a fixed executable from the trusted ROS
+installation. Every experiment uses a new namespace, transport partition, private
+temporary working directory, and headless world. Only bounded numbers enter the
+generated SDF. No API input can choose executable paths, native plugins, models,
+ROS namespaces, or remote assets. The child receives an allowlist of runtime
+environment variables; API tokens are not forwarded. Gazebo owns real native
+physics, so installation and resource quotas remain operator responsibilities.
+
+Namespaces and partitions prevent accidental cross-run interference; they are
+not authentication against other processes on the DDS domain. Use trusted local
+ROS networks or isolated workers. Verification runs non-root without external
+networking. RPC deadlines abort uncertain mutations without retries. Closing a
+run terminates and reaps its fixture, escalating to kill after five seconds;
+Linux parent-death signaling terminates the fixture if the worker dies. ROS
+services are not a public SaaS boundary or an OS security sandbox.

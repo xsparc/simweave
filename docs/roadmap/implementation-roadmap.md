@@ -10,10 +10,19 @@ remain reviewable before a maintainer merges them in order.
 | SW002 | MuJoCo, ROS lifecycle bridge, durable worker, tenant-scoped API | Real MuJoCo repeats; queue claims and cancellation are safe; API isolation, quotas, and replay tests pass; ROS transport contract tests pass |
 | SW003 | Dashboard, container, CI, integration docs, operations | Browser launch/run/replay works; portable packaging and full suite pass; actual environment gaps are recorded |
 
-## Next review triggers
+## Approved next slice: SW004
 
-- Full ROS/Gazebo experiment adapter: a named robot model, actuator mapping,
-  sensor contract, and real integration environment become available.
+The maintainer approved development and verification of a complete ROS/Gazebo
+cart experiment, followed by a draft PR. Implement ADR 0002: isolated native
+fixture, standard ROS lifecycle, acknowledged forces, real joint observations,
+existing telemetry/gates/replay, and live MuJoCo comparison. Acceptance is defined
+in that ADR and `docs/governance/ros-gazebo-validation.md`. Additional milestone
+recommendations remain advisory until accepted.
+
+## Later review triggers
+
+- Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,
+  actuator mapping, sensor contract, and real integration environment are agreed.
 - PostgreSQL and object storage: single-host throughput/storage measurements or
   a concrete multi-host deployment requirement justify migration.
 - OIDC and organizations: first internet-facing deployment; token mapping is an
