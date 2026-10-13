@@ -32,3 +32,12 @@ matrices, API isolation, report validation, and the browser inspection/export
 workflow were exercised. The two-minute usability target remains a documented
 follow-up because file-dialog automation delayed the timed check; see the
 regression validation record.
+
+2026-10-14, SW006: after PR10's squash merge, the maintainer approved reproducible
+failure bundles and offline reports. ADR 0004 separates data validation, local
+runtime capture, offline rendering, and explicitly selected container execution.
+Fresh-container checks reproduced all six reference/MuJoCo/Gazebo recordings and
+their intended gate failures. Full telemetry/previews, bounded ZIP input, hostile
+HTML text, and export content were verified. Direct file-open and the two-minute
+end-to-end save target remain documented browser-tool limitations; the evidence
+index retains in-progress status rather than declaring those criteria verified.

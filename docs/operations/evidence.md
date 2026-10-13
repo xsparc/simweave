@@ -77,7 +77,8 @@ docker image save --output simweave-runtime.tar "$image_id"
 PowerShell operators can use `$imageId = docker image inspect --format '{{.Id}}'
 simweave:evidence` on one line and `$revision = git rev-parse HEAD`. The resulting
 image ID has the form `sha256:` followed by 64 hexadecimal characters; it is the
-local image configuration digest, not a mutable tag or registry manifest digest.
+immutable local ID reported by the installed Docker engine. Use exactly its
+`.Id` value; do not substitute a mutable tag or a `RepoDigests` entry.
 Keep the image archive separately with the evidence. On another machine, use
 `docker image load --input simweave-runtime.tar` from a trusted source. Images are
 not automatically pulled, published, or included in the small evidence bundle.

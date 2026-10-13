@@ -3,12 +3,12 @@
 import argparse
 import json
 import subprocess
+import sys
 import uuid
 from pathlib import Path
 
 from simweave.bundles import read_bundle
 from simweave.provenance import capture
-from simweave.rerun import rerun_container
 from simweave.suites import Suite, execute_suite, review
 
 
@@ -81,7 +81,22 @@ def main():
     manifest, original = read_bundle(bundle)
     assert manifest.environment.source_revision == args.source_revision
     assert len(original.cases) == 6
-    assert rerun_container(bundle, args.image, args.output / "rerun") == 0
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simweave.cli",
+            "rerun",
+            str(bundle),
+            "--image",
+            args.image,
+            "--output",
+            str(args.output / "rerun"),
+        ],
+        check=False,
+        timeout=3700,
+    )
+    assert completed.returncode == 0
     verdict = json.loads((args.output / "rerun/reproduction.json").read_text())
     assert verdict["status"] == "reproduced"
     assert verdict["original_exit_code"] == verdict["rerun_exit_code"] == 1
