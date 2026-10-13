@@ -143,3 +143,65 @@ def test_rejected_reset_is_not_ready_and_closes_on_execution_failure():
     with pytest.raises(RuntimeError, match="rejected"):
         execute(Scenario(), lambda s: None, adapter)
     assert not adapter.ready and transport.closed
+
+
+@pytest.mark.parametrize(
+    "service,respond,requests",
+    [
+        ("get_simulator_features", True, 2),
+        ("get_simulator_features", False, 3),
+        ("configure_cart", False, 1),
+        ("step_simulation", False, 1),
+    ],
+)
+def test_discovery_query_retry_is_bounded_and_mutations_are_never_retried(
+    monkeypatch, service, respond, requests
+):
+    from types import SimpleNamespace
+
+    from simweave.adapters.gazebo import GazeboTransport
+
+    now = [0.0]
+    monkeypatch.setattr("simweave.adapters.gazebo.time.monotonic", lambda: now[0])
+    futures = []
+
+    class Future:
+        def __init__(self):
+            self.cancelled = False
+            self.complete = respond and len(futures) > 0
+
+        def done(self):
+            return self.complete
+
+        def result(self):
+            return SimpleNamespace(features=SimpleNamespace(features=[20, 25]))
+
+        def cancel(self):
+            self.cancelled = True
+
+    def call(request):
+        future = Future()
+        futures.append(future)
+        return future
+
+    def spin(node, future, executor, timeout_sec):
+        if not future.done():
+            now[0] += timeout_sec
+
+    transport = GazeboTransport.__new__(GazeboTransport)
+    transport.process = SimpleNamespace(poll=lambda: None)
+    transport.node = transport.executor = None
+    transport.clients = {
+        service: SimpleNamespace(wait_for_service=lambda **k: True, call_async=call)
+    }
+    transport.types = {service: SimpleNamespace(Request=SimpleNamespace)}
+    transport.rclpy = SimpleNamespace(spin_until_future_complete=spin)
+    if respond:
+        assert transport.call(service, {}, 3)["features"] == [20, 25]
+        assert now[0] == 1.0
+    else:
+        with pytest.raises(TimeoutError):
+            transport.call(service, {}, 3)
+        assert now[0] == 3.0
+    assert len(futures) == requests
+    assert all(f.cancelled for f in futures if not f.done())

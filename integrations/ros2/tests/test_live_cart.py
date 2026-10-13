@@ -111,6 +111,27 @@ def test_fixture_exit_fails_cleanly():
         transport.close()
 
 
+def test_feature_discovery_recovers_a_lost_read_only_response(monkeypatch):
+    from rclpy.task import Future
+
+    transport = GazeboTransport()
+    try:
+        client = transport.clients["get_simulator_features"]
+        send = client.call_async
+        attempts = []
+
+        def dropped_first_reply(request):
+            attempts.append(request)
+            return Future() if len(attempts) == 1 else send(request)
+
+        monkeypatch.setattr(client, "call_async", dropped_first_reply)
+        result = transport.call("get_simulator_features", {}, 10)
+        assert {20, 25, 26, 31, 32} <= set(result["features"])
+        assert len(attempts) == 2
+    finally:
+        transport.close()
+
+
 def test_unresponsive_fixture_times_out_and_is_reaped():
     import os
     import signal

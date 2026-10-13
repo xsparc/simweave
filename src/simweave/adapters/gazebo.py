@@ -205,16 +205,26 @@ class GazeboTransport:
                 request.state.state = value
             else:
                 setattr(request, key, value)
-        future = client.call_async(request)
-        self.rclpy.spin_until_future_complete(
-            self.node,
-            future,
-            executor=self.executor,
-            timeout_sec=max(0, deadline - time.monotonic()),
-        )
-        if not future.done():
+        while True:
+            future = client.call_async(request)
+            remaining = max(0, deadline - time.monotonic())
+            # Initial DDS discovery can lose a read-only feature query even after
+            # wait_for_service succeeds. Retry only this side-effect-free query,
+            # within the original deadline. Never retry configuration or stepping.
+            read_only = service == "get_simulator_features"
+            self.rclpy.spin_until_future_complete(
+                self.node,
+                future,
+                executor=self.executor,
+                timeout_sec=min(1.0, remaining) if read_only else remaining,
+            )
+            if future.done():
+                break
             future.cancel()
-            raise TimeoutError("Gazebo call timed out; operation outcome is unknown")
+            if not read_only or time.monotonic() >= deadline:
+                raise TimeoutError("Gazebo call timed out; operation outcome is unknown")
+            if self.process.poll() is not None:
+                raise RuntimeError("Gazebo fixture exited during discovery")
         response = future.result()
         if service == "get_simulator_features":
             return {"result": 1, "features": list(response.features.features)}
