@@ -55,6 +55,20 @@ The reference simulator is a small deterministic test/demo model. Repeatability
 requires the same engine, adapter, dependency versions, platform, and seed;
 different simulators are not expected to be numerically identical.
 
+## Regression workflows
+
+Run a bounded scenario/seed matrix with baseline and candidate controllers:
+`simweave suite examples/cart-regression.json --output .simweave/regression`.
+The supplied example needs both MuJoCo and the ROS/Gazebo fixture; set its
+`adapters` to `["reference"]` for a dependency-light local trial.
+Suites produce JSON/JUnit reports and full recordings; failed quality gates
+return exit 1, and execution errors return exit 2.
+
+In the dashboard, **Baseline & candidate** overlays completed runs and shows
+metric changes and failing gates. Open a suite's `report.json` to review CI
+results and export a selected comparison. Follow the
+[regression guide](docs/operations/regression.md) for limits, CI setup, and replay.
+
 ## Service and simulator integrations
 
 Install `.[dev,mujoco]` for the optional physics engine. Change the scenario's

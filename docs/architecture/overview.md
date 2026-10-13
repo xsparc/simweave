@@ -75,6 +75,15 @@ physics or a signed attestation. Rerunning a scenario is a separate operation.
 
 ## Performance budget
 
+Regression suites expand a closed v1 matrix into baseline/candidate pairs and
+reuse the streaming engine sequentially. They are bounded to 64 runs and 200,000
+total steps and produce full recordings, JSON summaries, and JUnit results. The
+pure comparison layer validates matching physical inputs and computes signed
+metric deltas and explicit increase limits. CLI reports and tenant-scoped API
+comparisons share this logic. The dashboard opens bounded suite reports without
+importing jobs or accessing file paths; imported previews are not replay evidence.
+See ADR 0003 and the regression operations guide.
+
 At most 20,000 steps, 64 disturbance intervals, and 16 gates per run. Workers
 stream samples and flush batches rather than retain a complete trajectory.
 Measure throughput with the supplied benchmark before changing these limits.

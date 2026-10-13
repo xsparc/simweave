@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "name": "Cart controller regression",
+  "scenarios": [
+    {
+      "name": "Disturbance recovery",
+      "world": {"timestep": 0.01, "steps": 600},
+      "sensors": {"position_noise_std": 0.005},
+      "disturbances": [{"start_step": 200, "duration_steps": 30, "force": 3.0}],
+      "gates": [{"metric": "final_error", "op": "lte", "threshold": 0.05}]
+    }
+  ],
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "adapters": ["mujoco", "gazebo"],
+  "baseline": {"target": 1.0, "kp": 8.0, "kd": 4.0, "max_force": 20.0},
+  "candidate": {"target": 1.0, "kp": 8.5, "kd": 4.0, "max_force": 20.0},
+  "regression_gates": [{"metric": "rmse", "max_increase": 0.02}]
+}

@@ -12,6 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 
 from simweave.adapters.gazebo import available as gazebo_available
+from simweave.comparison import Comparison, PreviewPoint, RunSummary, compare, preview_steps
 from simweave.config import Settings
 from simweave.contracts import (
     RunResult,
@@ -24,6 +25,7 @@ from simweave.contracts import (
 )
 from simweave.engine import verify_recording
 from simweave.store import Capacity, Conflict, Store
+from simweave.suites import SuiteReport, SuiteReview, review
 
 
 class BodyLimit:
@@ -35,13 +37,16 @@ class BodyLimit:
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
+        maximum = (
+            4 * 1024 * 1024 if scope["path"] == "/api/v1/suite-reports/compare" else self.maximum
+        )
         body = bytearray()
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
                 return
             chunk = message.get("body", b"")
-            if len(body) + len(chunk) > self.maximum:
+            if len(body) + len(chunk) > maximum:
                 return await JSONResponse({"detail": "request body too large"}, 413)(
                     scope, receive, send
                 )
@@ -148,6 +153,51 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/v1/scenario-schema", tags=["contracts"])
     def scenario_schema(name: Tenant):
         return Scenario.model_json_schema()
+
+    @app.get("/api/v1/comparisons", response_model=Comparison, tags=["comparisons"])
+    def comparison(
+        name: Tenant,
+        baseline: Annotated[str, Query(pattern=r"^[a-f0-9]{32}$")],
+        candidate: Annotated[str, Query(pattern=r"^[a-f0-9]{32}$")],
+    ):
+        # Resolve both through tenant-scoped reads before inspecting status or telemetry.
+        runs = [required(name, identifier) for identifier in (baseline, candidate)]
+        summaries = []
+        for run in runs:
+            if run["status"] != "succeeded":
+                raise HTTPException(409, "comparison requires completed recordings")
+            scenario = Scenario.model_validate(run["scenario"])
+            result = RunResult.model_validate(run["result"])
+            trajectory = []
+            keep = preview_steps(scenario.world.steps)
+
+            def recorded(identifier=run["id"], keep=keep, trajectory=trajectory):
+                for data in store.iter_samples(name, identifier):
+                    sample = Sample.model_validate(data)
+                    if sample.step in keep:
+                        trajectory.append(
+                            PreviewPoint(
+                                step=sample.step, time=sample.time, position=sample.position
+                            )
+                        )
+                    yield sample
+
+            try:
+                verify_recording(scenario, result, recorded())
+            except ValueError:
+                raise HTTPException(409, "recording integrity check failed") from None
+            summaries.append(RunSummary(scenario=scenario, result=result, trajectory=trajectory))
+        try:
+            return compare(*summaries)
+        except ValueError:
+            raise HTTPException(
+                422, "Compare runs with matching inputs except controller tuning and name"
+            ) from None
+
+    @app.post("/api/v1/suite-reports/compare", response_model=SuiteReview, tags=["comparisons"])
+    def compare_report(report: SuiteReport, name: Tenant):
+        # Validate bounded summaries only. No persistence, paths, or execution from imported files.
+        return review(report)
 
     @app.post("/api/v1/runs", status_code=202, response_model=RunView, tags=["runs"])
     def submit(

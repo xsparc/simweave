@@ -19,6 +19,10 @@ def main(argv: list[str] | None = None) -> int:
     init = commands.add_parser("init", help="write an example scenario")
     init.add_argument("path", type=Path)
     commands.add_parser("schema", help="print the scenario JSON Schema")
+    commands.add_parser("suite-schema", help="print the regression suite JSON Schema")
+    suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
+    suite.add_argument("path", type=Path)
+    suite.add_argument("--output", required=True, type=Path)
     validate = commands.add_parser("validate", help="validate a scenario")
     validate.add_argument("path", type=Path)
     run = commands.add_parser("run", help="run an experiment locally")
@@ -42,6 +46,29 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("suite", "suite-schema"):
+            from simweave.suites import Suite, execute_suite, review
+
+            if args.command == "suite-schema":
+                print(json.dumps(Suite.model_json_schema(), indent=2))
+                return 0
+            if args.path.stat().st_size > 65_536:
+                raise ValueError("suite input exceeds 64 KiB")
+            contract = Suite.model_validate_json(args.path.read_bytes())
+            report = execute_suite(contract, args.output)
+            result = review(report)
+            print(
+                canonical(
+                    {
+                        "name": result.name,
+                        "suite_digest": result.suite_digest,
+                        "runs": len(report.cases),
+                        "pairs": len(result.pairs),
+                        "exit_code": result.exit_code,
+                    }
+                )
+            )
+            return result.exit_code
         if args.command == "demo":
             import multiprocessing
             import secrets

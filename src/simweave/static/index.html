@@ -12,6 +12,7 @@
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="/static/app.css" />
     <script src="/static/app.js" defer></script>
+    <script src="/static/comparison.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to experiments</a>
@@ -26,6 +27,7 @@
       <nav aria-label="Workspace">
         <span class="nav-label">WORKSPACE</span
         ><a class="active" href="#main"><span>◈</span> Experiment lab</a
+        ><a href="#comparison-section"><span>⇄</span> Compare runs</a
         ><a href="#runs-section"><span>▤</span> Run history</a
         ><a href="/docs" target="_blank" rel="noopener"
           ><span>⌘</span> API reference <span class="outbound">↗</span></a
@@ -307,6 +309,46 @@
             </p>
           </section>
         </div>
+        <section id="comparison-section" class="card history-card" aria-labelledby="comparison-heading">
+          <div class="card-heading">
+            <div><span class="section-number">03</span><h2 id="comparison-heading">Baseline & candidate</h2></div>
+            <span id="comparison-status" class="status neutral">SELECT TWO RUNS</span>
+          </div>
+          <div class="comparison-body">
+            <p class="hint">Compare controller tuning with the same simulator, seed, physics, and gates. Select completed runs below, or open a suite’s report.json.</p>
+            <form id="comparison-form" class="comparison-controls">
+              <div><label for="comparison-baseline">Baseline run</label><select id="comparison-baseline" required><option value="">Select baseline</option></select></div>
+              <div><label for="comparison-candidate">Candidate run</label><select id="comparison-candidate" required><option value="">Select candidate</option></select></div>
+              <button id="compare-runs" class="primary" disabled>Compare runs</button>
+            </form>
+            <div class="comparison-controls">
+              <div><label for="suite-report">Open suite report · JSON, up to 4 MiB</label><input id="suite-report" type="file" accept=".json,application/json" disabled /></div>
+              <div id="suite-pair-control" hidden><label for="suite-pair">Scenario / simulator / seed</label><select id="suite-pair"></select></div>
+              <button id="next-failed-pair" class="text-button" hidden>Next failing pair →</button>
+            </div>
+            <p id="comparison-source" class="hint" role="status">Connect your workspace to compare runs or open a report.</p>
+            <div id="comparison-content" hidden>
+              <p id="comparison-setup" class="hint"></p>
+              <p id="comparison-warnings" class="hint"></p>
+              <div class="plot comparison-plot">
+                <svg id="comparison-chart" viewBox="0 0 720 270" role="img" aria-label="Baseline and candidate position over simulation time">
+                  <g id="comparison-grid"></g>
+                  <line id="comparison-target" x1="44" x2="700" />
+                  <polyline id="baseline-trajectory" points="" />
+                  <polyline id="candidate-trajectory" points="" />
+                  <text id="comparison-axis" x="44" y="261"></text>
+                  <text x="44" y="16">POSITION / M</text>
+                </svg>
+              </div>
+              <div class="plot-legend"><span><i class="legend-line baseline"></i>Baseline · solid</span><span><i class="legend-line candidate"></i>Candidate · dashed</span></div>
+              <p class="hint">Charts show up to 101 samples per run. Metrics use the full recording. Exported comparison JSON is a summary; use the original recording for replay.</p>
+              <div class="table-scroll"><table aria-label="Metric changes"><thead><tr><th>METRIC</th><th>BASELINE</th><th>CANDIDATE</th><th>CHANGE (C − B)</th></tr></thead><tbody id="comparison-metrics"></tbody></table></div>
+              <div class="comparison-actions"><h3>Quality & regression gates</h3><button id="next-failed-gate" class="text-button">Next failing gate →</button></div>
+              <div id="comparison-gates" class="comparison-gates"></div>
+              <button id="export-comparison" class="secondary">Export comparison JSON ↓</button>
+            </div>
+          </div>
+        </section>
         <section
           id="runs-section"
           class="card history-card"
@@ -314,7 +356,7 @@
         >
           <div class="card-heading">
             <div>
-              <span class="section-number">03</span>
+              <span class="section-number">04</span>
               <h2 id="history-heading">Run history</h2>
               <span id="history-count" class="count">0</span>
             </div>

@@ -23,3 +23,12 @@ both transports now own matching executors. Verification distinguishes seeded
 repeatability from tolerance-based cross-engine agreement. The delivery includes
 PR3's existing changes as a separate prerequisite because its squash merge did
 not target main. New work targets main directly.
+
+SW005: after PR4 was squash-merged to main, the maintainer approved regression
+suites and the comparison dashboard. ADR 0003 keeps bounded local execution and
+pure comparison logic separate from the service. JSON/JUnit reports retain full
+recordings while the browser uses bounded previews. Native positive/negative
+matrices, API isolation, report validation, and the browser inspection/export
+workflow were exercised. The two-minute usability target remains a documented
+follow-up because file-dialog automation delayed the timed check; see the
+regression validation record.

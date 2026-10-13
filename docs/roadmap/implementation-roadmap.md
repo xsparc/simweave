@@ -19,6 +19,14 @@ existing telemetry/gates/replay, and live MuJoCo comparison. Acceptance is defin
 in that ADR and `docs/governance/ros-gazebo-validation.md`. Additional milestone
 recommendations remain advisory until accepted.
 
+## Approved next slice: SW005
+
+The maintainer approved regression suites/CI gates and the comparison dashboard,
+followed by verification and a draft PR. ADR 0003 defines the bounded matrix,
+portable reports, same-input comparison rules, and browser acceptance. Deliver
+both as one regression workflow, with sequential local execution and read-only
+dashboard review. Future recommendations remain advisory.
+
 ## Later review triggers
 
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,

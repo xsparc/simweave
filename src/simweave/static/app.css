@@ -943,3 +943,19 @@ footer .dot {
     scroll-behavior: auto !important;
   }
 }
+.comparison-body { padding: 0 20px 20px; }
+.comparison-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: end; margin-bottom: 15px; }
+.comparison-controls > div { flex: 1 1 250px; min-width: 0; }
+.comparison-controls select, .comparison-controls input { width: 100%; }
+.comparison-controls label { margin-top: 12px; }
+.comparison-plot { margin: 15px 0; }
+#baseline-trajectory { fill: none; stroke: var(--accent); stroke-width: 2; }
+#candidate-trajectory { fill: none; stroke: #efbc73; stroke-width: 2; stroke-dasharray: 7 4; }
+#comparison-target { stroke: #789394; stroke-dasharray: 3 5; }
+.legend-line.candidate { background: #efbc73; }
+.comparison-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 20px; }
+.comparison-actions h3 { font-size: 13px; margin: 0; }
+.comparison-gates { font: 11px/1.7 var(--mono); margin-bottom: 18px; }
+.comparison-gates p { padding: 8px; border-left: 2px solid #365147; }
+.comparison-gates .failed { color: var(--danger); border-left-color: var(--danger); }
+.comparison-gates p:focus { outline: 2px solid var(--accent); outline-offset: 2px; }

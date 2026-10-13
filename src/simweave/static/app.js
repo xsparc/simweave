@@ -119,6 +119,7 @@ async function connect(value) {
   samples = [];
   runs = [];
   nextBefore = null;
+  document.dispatchEvent(new Event("workspace-reset"));
   renderHistory();
   renderSelected();
   try {
@@ -143,6 +144,7 @@ async function connect(value) {
     $("connection-toggle").setAttribute("aria-expanded", "false");
     $("launch").disabled = false;
     $("refresh").disabled = false;
+    document.dispatchEvent(new Event("workspace-connected"));
     $("run-hint").textContent =
       "Seeded execution · Recorded telemetry · Explicit gates";
     notice("");
@@ -211,6 +213,7 @@ async function refresh(older = false) {
   runs = older ? [...runs, ...page.items] : page.items;
   nextBefore = page.next_before;
   renderHistory();
+  document.dispatchEvent(new CustomEvent("runs-changed", { detail: runs }));
 }
 function renderHistory() {
   $("history").replaceChildren();
