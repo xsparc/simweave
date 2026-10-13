@@ -9,6 +9,8 @@
 !tests/**
 !examples/
 !examples/**
+!scripts/
+!scripts/check_regression_ci.py
 !integrations/
 !integrations/ros2/
 !integrations/ros2/**

@@ -25,6 +25,7 @@ RUN uv sync --frozen --active --extra dev --extra mujoco
 COPY tests ./tests
 COPY integrations/ros2/tests ./integrations/ros2/tests
 COPY examples ./examples
+COPY scripts/check_regression_ci.py ./scripts/check_regression_ci.py
 COPY integrations/ros2/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && useradd --create-home --uid 10001 runner && \
     chown -R runner:runner /workspace

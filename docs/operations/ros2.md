@@ -91,8 +91,10 @@ applies to the finite step batch and is then cleared. Sample zero describes the
 configured initial state; later samples read Gazebo joint state after physics.
 Controller and sensor noise remain in SimWeave.
 
-Each RPC has a deadline. Timeouts have an unknown mutation outcome and abort
-without retries. Closing the adapter terminates and reaps its child; Linux
+Each RPC has a deadline. Only the read-only feature-discovery query may retry
+unanswered requests, in one-second windows within that same deadline. Mutations
+have an unknown outcome on timeout and abort without retries. Closing the adapter
+terminates and reaps its child; Linux
 parent-death signaling handles abrupt worker exit. ROS/DDS is a trusted local
 transport, not a public authentication boundary. Dedicated processes prevent
 accidental interference, but are not a security sandbox.

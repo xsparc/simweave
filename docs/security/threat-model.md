@@ -38,3 +38,12 @@ networking. RPC deadlines abort uncertain mutations without retries. Closing a
 run terminates and reaps its fixture, escalating to kill after five seconds;
 Linux parent-death signaling terminates the fixture if the worker dies. ROS
 services are not a public SaaS boundary or an OS security sandbox.
+
+Suite documents cannot select executable code, artifact paths, or remote assets.
+Output case paths are generated internally in a new operator-selected directory.
+Reports are unsigned user-controlled summaries. The authenticated report endpoint
+accepts at most 4 MiB, 64 matrix cases, and 101 preview points per completed case;
+other request bodies retain the 64 KiB limit. It validates consistency without
+reading local files, executing scenarios, or inserting runs. Comparison queries
+resolve both tenant-owned IDs before accessing telemetry. Browser text uses safe
+DOM text assignment; JSON exports contain no session token.

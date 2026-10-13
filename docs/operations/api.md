@@ -62,7 +62,17 @@ fail replay verification. Do not delete a run during export.
 
 ## Limits and operations
 
-Request bodies: 64 KiB. Runs: 20 active and 1,000 retained per tenant, 64 active
+`GET /api/v1/comparisons?baseline={id}&candidate={id}` checks both tenant-owned
+completed recordings and returns trajectory previews, signed metric deltas,
+newly failing gate indices, and runtime warnings. Incomplete/corrupt recordings
+return 409; different physical inputs return 422; hidden IDs return 404.
+
+`POST /api/v1/suite-reports/compare` validates a bounded CLI `report.json` and
+returns per-pair comparisons without persisting runs or executing physics. This
+endpoint alone accepts up to 4 MiB. Imported summaries cannot verify omitted
+telemetry. See the [regression guide](regression.md) for the contract and workflow.
+
+Other request bodies: 64 KiB. Runs: 20 active and 1,000 retained per tenant, 64 active
 globally. Scenarios: 20,000 steps. Up to 100 configured tokens. Use a gateway for
 connection/read timeouts and request-rate limits. Per-tenant quotas protect queue
 admission; scheduling is FIFO, not weighted tenant fairness.

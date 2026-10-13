@@ -45,3 +45,13 @@ validation, lifecycle context handling, process faults, and CLI/API recording
 replay. Ruff, JavaScript syntax, static/dated strict governance, source/wheel
 builds, and wheel asset inspection passed. See `ros-gazebo-validation.md` for
 the tested runtime, tolerance budgets, exact commands, and remaining limits.
+
+## SW005
+
+2026-10-13: 109 portable tests passed, along with the native two-controller,
+ten-seed MuJoCo/Gazebo positive/negative matrix and all 16 live checks (the 15
+original conformance tests plus an injected lost-discovery-response check).
+The browser exercised comparison, imported suite review, failure navigation,
+and JSON export. Ruff, JavaScript syntax, packaging, and governance checks passed.
+The two-minute end-to-end usability target remains unverified due to file-dialog
+automation delays. See `regression-validation.md` for actual evidence and gaps.
