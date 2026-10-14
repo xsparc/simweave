@@ -55,3 +55,13 @@ The browser exercised comparison, imported suite review, failure navigation,
 and JSON export. Ruff, JavaScript syntax, packaging, and governance checks passed.
 The two-minute end-to-end usability target remains unverified due to file-dialog
 automation delays. See `regression-validation.md` for actual evidence and gaps.
+
+## SW006
+
+2026-10-14: 129 portable tests passed. A known controller failure reproduced
+exactly across fresh containers for reference, MuJoCo, and Gazebo (six original
+and six rerun recordings). Offline static-preview navigation, hostile input, and
+export contents were exercised; the actual downloaded JSON validated. Ruff,
+JavaScript syntax, source/wheel builds, wheel asset inspection, and both governance
+gates passed. Direct file-open and the two-minute end-to-end save target remain
+unverified; see `evidence-validation.md` for the precise scope and limitations.

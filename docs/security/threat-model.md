@@ -47,3 +47,24 @@ other request bodies retain the 64 KiB limit. It validates consistency without
 reading local files, executing scenarios, or inserting runs. Comparison queries
 resolve both tenant-owned IDs before accessing telemetry. Browser text uses safe
 DOM text assignment; JSON exports contain no session token.
+## Portable evidence and reruns
+
+Evidence ZIPs are untrusted data. Bound the central directory before ZIP parsing,
+then enforce member counts, sizes, compression methods, exact filenames, SHA-256
+checksums, recording integrity, and preview fidelity. Never extract archive paths.
+Reject symlinks, duplicates, extra entries, and executable payloads. Checksums and
+operator-supplied revision/image labels are not signatures or authentication.
+
+Offline HTML escapes data and uses text-only DOM construction plus hash-based
+script/style CSP with no network access. It contains bounded previews, not raw
+telemetry, tokens, or an API connection. A modified HTML file can also modify its
+CSP; treat untrusted producers accordingly. Review scenario names/inputs before
+sharing because they are deliberately part of the artifact.
+
+The local CLI container rerun is separate from the service. It requires a trusted
+operator-selected full local image ID matching recorded provenance, never pulls,
+and uses a fixed command with no host mounts or socket. Containers run unprivileged
+with network disabled, dropped capabilities, resource limits, and an execution
+deadline. The image/entrypoint and Docker daemon remain trusted. Validate actual
+installed code/dependencies before executing and report numerical divergence even
+when fingerprints match. No source or script from the bundle is executed.

@@ -27,6 +27,14 @@ portable reports, same-input comparison rules, and browser acceptance. Deliver
 both as one regression workflow, with sequential local execution and read-only
 dashboard review. Future recommendations remain advisory.
 
+## Approved next slice: SW006
+
+After PR10 was squash-merged, the maintainer approved reproducible failure bundles
+and offline reports/onboarding. ADR 0004 defines portable checked recordings,
+explicit retained-image reruns, self-contained review/export, CI artifacts, and
+three observed workflow checks. Record browser/file-dialog limitations separately
+from functional verification. Later milestone recommendations remain advisory.
+
 ## Later review triggers
 
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,

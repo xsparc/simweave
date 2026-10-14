@@ -61,13 +61,22 @@ Run a bounded scenario/seed matrix with baseline and candidate controllers:
 `simweave suite examples/cart-regression.json --output .simweave/regression`.
 The supplied example needs both MuJoCo and the ROS/Gazebo fixture; set its
 `adapters` to `["reference"]` for a dependency-light local trial.
-Suites produce JSON/JUnit reports and full recordings; failed quality gates
+Suites produce JSON/JUnit reports, a standalone `report.html`, an `evidence.zip`
+bundle, and full recordings; failed quality gates
 return exit 1, and execution errors return exit 2.
 
 In the dashboard, **Baseline & candidate** overlays completed runs and shows
 metric changes and failing gates. Open a suite's `report.json` to review CI
 results and export a selected comparison. Follow the
 [regression guide](docs/operations/regression.md) for limits, CI setup, and replay.
+
+Open `report.html` to review a suite without the API or simulator. Inspect the
+first failure, navigate gates, and export a selected pair as JSON. Use
+`simweave bundle-check results/evidence.zip` to verify full recordings, or
+`simweave rerun results/evidence.zip --image sha256:YOUR_64_HEX_IMAGE_ID --output rerun`
+to reproduce a suite in its retained trusted container image. Follow the
+[evidence guide](docs/operations/evidence.md) to capture source/image provenance
+and retain the runtime. The bundle contains data; it never supplies executable code.
 
 ## Service and simulator integrations
 
