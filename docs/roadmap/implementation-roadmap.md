@@ -35,6 +35,15 @@ explicit retained-image reruns, self-contained review/export, CI artifacts, and
 three observed workflow checks. Record browser/file-dialog limitations separately
 from functional verification. Later milestone recommendations remain advisory.
 
+## Approved next slice: SW007
+
+After PR11 was squash-merged, the maintainer approved statistical regression
+summaries and immutable baseline history/promotion, verification and a draft PR.
+ADR 0005 defines 30 paired seeds per adapter, reproducible practical-threshold
+decisions, explicit approval/rollback events and 20 candidate comparisons against
+one pinned baseline. This slice adds a local decision workflow, not hosted baseline
+management or automatic promotion. Future milestone recommendations remain advisory.
+
 ## Later review triggers
 
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,

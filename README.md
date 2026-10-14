@@ -78,6 +78,16 @@ to reproduce a suite in its retained trusted container image. Follow the
 [evidence guide](docs/operations/evidence.md) to capture source/image provenance
 and retain the runtime. The bundle contains data; it never supplies executable code.
 
+Try `simweave suite examples/cart-statistics.json --output results` for a portable
+reference example with 30 paired seeds. Analyze it with
+`simweave statistics results/evidence.zip --policy examples/decision-policy.json --output decision`.
+The JSON and standalone HTML report show paired mean changes, 95% bootstrap
+intervals, explicit tolerances, quality failures, and inconclusive evidence.
+The `simweave history` commands record immutable builds, explicit baseline
+approvals, pinned comparisons, and rollback. See the
+[decision guide](docs/operations/decisions.md) for assumptions, approval commands,
+local storage limits and portable CI outputs.
+
 ## Service and simulator integrations
 
 Install `.[dev,mujoco]` for the optional physics engine. Change the scenario's

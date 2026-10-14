@@ -12,6 +12,7 @@
 !scripts/
 !scripts/check_regression_ci.py
 !scripts/check_evidence_ci.py
+!scripts/check_decisions_ci.py
 !integrations/
 !integrations/ros2/
 !integrations/ros2/**

@@ -41,3 +41,11 @@ their intended gate failures. Full telemetry/previews, bounded ZIP input, hostil
 HTML text, and export content were verified. Direct file-open and the two-minute
 end-to-end save target remain documented browser-tool limitations; the evidence
 index retains in-progress status rather than declaring those criteria verified.
+
+2026-10-14, SW007: the maintainer approved statistical regression summaries and
+baseline history after PR11's squash merge. ADR 0005 preserves existing suite
+contracts and adds a pure bounded paired analysis with explicit practical
+tolerances. A separate local catalog imports verified evidence and records
+immutable builds, policies, approval generations and rollback events. Cross-build
+decisions pin approved evidence rather than the candidate suite's internal
+baseline. Actual checks and limits are recorded in `decisions-validation.md`.

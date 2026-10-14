@@ -68,3 +68,22 @@ with network disabled, dropped capabilities, resource limits, and an execution
 deadline. The image/entrypoint and Docker daemon remain trusted. Validate actual
 installed code/dependencies before executing and report numerical divergence even
 when fingerprints match. No source or script from the bundle is executed.
+
+## Regression decisions and baseline approvals
+
+Statistical work is bounded by validated policies and matrix limits. Decisions
+cannot execute arbitrary estimators or promote builds. Missing seeds, incompatible
+inputs, constant differences and small populations cannot silently become a pass.
+Marginal intervals assume representative independent seeds and do not correct for
+repeated testing. A misleading population or dishonest producer can still create
+misleading evidence; recording verification does not validate experiment design.
+
+The local history CLI snapshots and validates bundles before import. Parameterized
+SQL, immediate transactions and expected generations prevent accidental injection
+and stale approval updates. Immutable rows, pinned policies and content digests
+preserve the application history, not resistance to a malicious local administrator.
+Approval labels/reasons are explicit input and not authenticated identities. Keep
+private operator information out of artifacts intended for sharing. No catalog
+HTTP endpoint exists; never accept arbitrary SQLite database uploads. Original
+recordings require separate retention. New script-free reports escape evidence
+text and restrict scripts, network requests and external assets through CSP.

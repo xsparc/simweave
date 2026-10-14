@@ -93,6 +93,16 @@ runner checks an explicitly selected retained image and installed runtime before
 executing the suite, then compares full telemetry/results. This runner has no API
 endpoint or Docker socket in the service. See ADR 0004 and the evidence guide.
 
+The pure statistics layer analyzes paired mean changes within a scenario/adapter
+using an explicit policy and bounded seeded resampling. Incomplete, degenerate,
+small or confounded populations remain inconclusive. A separate local catalog
+imports verified build summaries and records immutable baseline/policy approvals,
+comparisons and rollback events. Generation checks serialize competing approvals;
+comparison outputs pin an event and content digests. Script-free HTML and versioned
+JSON keep review portable without adding a service mutation or statistical runtime
+dependency. The catalog is trusted single-host operator state, not a tenant-facing
+identity service. See ADR 0005 and the decision guide for assumptions and limits.
+
 At most 20,000 steps, 64 disturbance intervals, and 16 gates per run. Workers
 stream samples and flush batches rather than retain a complete trajectory.
 Measure throughput with the supplied benchmark before changing these limits.
