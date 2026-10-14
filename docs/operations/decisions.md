@@ -102,11 +102,11 @@ changes on read. A local operator with database access can bypass these controls
 the catalog is not a signed audit log or a hostile-tenant security boundary.
 
 Retain original bundles separately: the catalog stores verified summaries and
-bundle digests, not full telemetry. Stop catalog writers before copying its SQLite
-file for backup. Keep the database and its journal together during recovery. Do not
-use network-mounted SQLite or use this database as an upload format. Exported JSON
-and HTML are portable read-only evidence; future hosted integration needs separate
-tenant authorization, transactional storage and artifact retention.
+bundle digests, not full telemetry. Use the versioned archive commands in the
+[team evidence guide](team-evidence.md) for portable recovery. Do not use
+network-mounted SQLite or database files as an upload format. JSON/HTML review
+exports remain read-only; the separate catalog archive contains restorable records.
+The tenant baseline API uses explicit credentials and server-selected catalogs.
 
 Limits: 100 builds, 1,000 approval events, 1,000 saved comparisons per catalog,
 approximately 4 MiB per build snapshot, existing 128 MiB bundle limits, and at most

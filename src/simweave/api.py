@@ -12,6 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 
 from simweave.adapters.gazebo import available as gazebo_available
+from simweave.catalog_api import install as install_catalog
 from simweave.comparison import Comparison, PreviewPoint, RunSummary, compare, preview_steps
 from simweave.config import Settings
 from simweave.contracts import (
@@ -36,6 +37,9 @@ class BodyLimit:
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        if scope["method"] == "PUT" and scope["path"].startswith("/api/v1/catalog/builds/"):
+            # Authenticated route streams to bounded temporary storage, not this memory buffer.
             return await self.app(scope, receive, send)
         maximum = (
             4 * 1024 * 1024 if scope["path"] == "/api/v1/suite-reports/compare" else self.maximum
@@ -78,6 +82,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if auth and auth.scheme.lower() == "bearer" and auth.credentials.isascii():
             for token, name in settings.tokens.items():
                 if secrets.compare_digest(auth.credentials, token):
+                    if not isinstance(name, str):
+                        raise HTTPException(403, "run permission required")
                     return name
         raise HTTPException(
             401, "valid bearer token required", headers={"WWW-Authenticate": "Bearer"}
@@ -298,6 +304,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             headers={"Content-Disposition": f'attachment; filename="{identifier}.jsonl"'},
         )
 
+    install_catalog(app, settings)
     static = Path(__file__).with_name("static")
     app.mount("/static", StaticFiles(directory=static), name="static")
 

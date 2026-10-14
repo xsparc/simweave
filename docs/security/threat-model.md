@@ -82,8 +82,32 @@ The local history CLI snapshots and validates bundles before import. Parameteriz
 SQL, immediate transactions and expected generations prevent accidental injection
 and stale approval updates. Immutable rows, pinned policies and content digests
 preserve the application history, not resistance to a malicious local administrator.
-Approval labels/reasons are explicit input and not authenticated identities. Keep
-private operator information out of artifacts intended for sharing. No catalog
-HTTP endpoint exists; never accept arbitrary SQLite database uploads. Original
+Local CLI approval labels/reasons are assertions, not authenticated identities. Keep
+private operator information out of artifacts intended for sharing. Never accept
+arbitrary SQLite database uploads. Original
 recordings require separate retention. New script-free reports escape evidence
 text and restrict scripts, network requests and external assets through CSP.
+
+## Team evidence boundary
+
+The catalog API derives tenant, subject and role from operator-controlled bearer
+configuration. Each tenant has a separate server-selected catalog. Reader cannot
+mutate; importer cannot approve; approver cannot import. Catalog credentials cannot
+use the run API. Old string token mappings cannot access catalogs. Every object
+lookup uses the caller's catalog, and request bodies cannot override identity.
+Subjects remain static operator assignments, not OIDC identities or signed human
+approvals. Shared credentials lose individual attribution; restart after rotation.
+
+Uploads stream to temporary storage, enforce 128 MiB, and verify full recordings.
+Two imports/comparisons per process bound expensive concurrency; multiple processes
+multiply the bound. A reverse proxy must constrain duration, rate and TLS for remote
+deployment. Catalog quotas and 64 KiB JSON limits constrain growth. Authenticated
+users can still consume their quotas, and a compromised importer can submit
+misleading evidence. Explicit approver review remains necessary.
+
+Archive restore never executes SQL or extracts paths. Canonical records, checksums,
+quotas, generation/reference checks and fresh staging prevent accidental corruption
+from becoming an active catalog. Hard-link publication rejects existing destinations.
+Checksums are not signatures; a malicious custodian can forge records and decisions.
+Restore does not authenticate original approvals or rerun statistical computation.
+Catalog filesystem access remains trusted operator authority. No HTTP restore exists.

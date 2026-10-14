@@ -99,9 +99,12 @@ small or confounded populations remain inconclusive. A separate local catalog
 imports verified build summaries and records immutable baseline/policy approvals,
 comparisons and rollback events. Generation checks serialize competing approvals;
 comparison outputs pin an event and content digests. Script-free HTML and versioned
-JSON keep review portable without adding a service mutation or statistical runtime
-dependency. The catalog is trusted single-host operator state, not a tenant-facing
-identity service. See ADR 0005 and the decision guide for assumptions and limits.
+JSON keep review portable without a statistical runtime dependency. ADR 0005
+defines the local catalog; ADR 0006 adds canonical archives and explicit tenant
+baseline API permissions. Server configuration selects separate catalogs and
+approval identities. Legacy run tokens do not gain catalog access. Restoration
+remains an operator action into a fresh database; no API accepts database paths
+or replaces approval history. See the team evidence guide for limits.
 
 At most 20,000 steps, 64 disturbance intervals, and 16 gates per run. Workers
 stream samples and flush batches rather than retain a complete trajectory.

@@ -124,6 +124,20 @@ volume. Both run as an unprivileged user; no privileged mode or host Docker sock
 is required. `docker compose down` stops the service and retains recordings.
 See [operations](docs/operations/api.md) for backup, retention, and scaling limits.
 
+## Shared baseline evidence
+
+Export and restore complete decision catalogs without copying SQLite files:
+
+```sh
+simweave history export --database history.sqlite3 catalog.ndjson
+simweave history restore --database restored.sqlite3 catalog.ndjson
+```
+
+The [team evidence guide](docs/operations/team-evidence.md) covers tenant-scoped
+reader/importer/approver credentials, API routes, recovery limits and the
+[example client](examples/catalog_client.py). Legacy run tokens keep their existing
+permissions; catalog access requires explicit operator configuration.
+
 ## Engineering
 
 ```sh

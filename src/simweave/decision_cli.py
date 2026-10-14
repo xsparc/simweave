@@ -15,9 +15,11 @@ def register(commands):
     stats.add_argument("--output", required=True, type=Path)
     history = commands.add_parser("history", help="manage a local immutable baseline catalog")
     actions = history.add_subparsers(dest="action", required=True)
-    for name in ("init", "add", "promote", "rollback", "compare", "show"):
+    for name in ("init", "add", "promote", "rollback", "compare", "show", "export", "restore"):
         command = actions.add_parser(name)
         command.add_argument("--database", required=True, type=Path)
+        if name in ("export", "restore"):
+            command.add_argument("path", type=Path, help="portable catalog archive")
         if name == "add":
             command.add_argument("path", type=Path)
             command.add_argument("--build", required=True)
@@ -73,6 +75,15 @@ def dispatch(args) -> int:
     if args.action == "init":
         history.initialize(args.database)
         print(canonical({"schema_version": 1, "initialized": True}))
+    elif args.action in ("export", "restore"):
+        from simweave.catalog_archive import export_catalog, restore_catalog
+
+        result = (
+            export_catalog(args.database, args.path)
+            if args.action == "export"
+            else restore_catalog(args.path, args.database)
+        )
+        print(canonical(result))
     elif args.action == "add":
         build = history.add_build(args.database, args.path, args.build, args.role)
         print(canonical({"build": build.label, "digest": history.digest(build)}))

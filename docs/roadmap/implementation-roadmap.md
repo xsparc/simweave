@@ -44,6 +44,14 @@ decisions, explicit approval/rollback events and 20 candidate comparisons agains
 one pinned baseline. This slice adds a local decision workflow, not hosted baseline
 management or automatic promotion. Future milestone recommendations remain advisory.
 
+## Approved next slice: SW008
+
+After PR12 was squash-merged, the maintainer approved portable catalog archives
+and a tenant-scoped baseline API, verification and a draft PR. ADR 0006 defines
+100-build cross-platform recovery, digest preservation, corrupt-input rejection,
+two-tenant reader/importer/approver isolation and an example client. Future milestone
+recommendations remain advisory; no merge or deployment is authorized.
+
 ## Later review triggers
 
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,
