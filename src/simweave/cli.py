@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -16,6 +17,9 @@ from simweave.engine import execute, verify_recording
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="simweave")
     commands = parser.add_subparsers(dest="command", required=True)
+    from simweave.decision_cli import dispatch, register
+
+    register(commands)
     init = commands.add_parser("init", help="write an example scenario")
     init.add_argument("path", type=Path)
     commands.add_parser("schema", help="print the scenario JSON Schema")
@@ -62,6 +66,8 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("statistics", "statistics-schema", "history"):
+            return dispatch(args)
         if args.command == "report":
             from simweave.bundles import MAX_REPORT
             from simweave.offline import write_report
@@ -235,6 +241,7 @@ def main(argv: list[str] | None = None) -> int:
         print(result.model_dump_json())
         return 0 if result.passed else 1
     except (
+        sqlite3.Error,
         OSError,
         ValueError,
         ValidationError,

@@ -2,6 +2,34 @@ schema_version = 1
 project = "simweave"
 
 [[research_decisions]]
+id = "RD-REGRESSION-DECISIONS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-14-regression-decisions.md"]
+design_refs = ["docs/architecture/decisions/0005-regression-decisions.md"]
+
+[[requirements]]
+id = "REQ-REGRESSION-DECISIONS"
+statement = "Analyze paired statistical changes and record explicit immutable baseline approvals and rollback."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0005-regression-decisions.md"]
+implementation_refs = ["src/simweave/statistics.py", "src/simweave/history.py", "src/simweave/decision_cli.py", "src/simweave/decision_reports.py"]
+verification_refs = ["tests/test_decisions.py", "scripts/check_decisions_ci.py", ".github/workflows/ci.yml"]
+validation_refs = ["docs/governance/decisions-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW007-REGRESSION-DECISIONS"
+title = "Statistical regression summaries and immutable baseline history"
+status = "verified"
+requirement_ids = ["REQ-REGRESSION-DECISIONS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-14-statistics-baseline-history-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0005-regression-decisions.md"]
+evidence_refs = ["tests/test_decisions.py", "scripts/check_decisions_ci.py", "docs/governance/decisions-validation.md"]
+
+[[research_decisions]]
 id = "RD-REPRODUCIBLE-EVIDENCE"
 disposition = "adopted"
 source_refs = ["docs/research/2026-10-14-reproducible-evidence.md"]

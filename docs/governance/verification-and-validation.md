@@ -1,5 +1,16 @@
 # Verification and validation
 
+## SW007
+
+2026-10-14: 163 portable tests and 16 live ROS/Gazebo conformance tests passed.
+Reference, MuJoCo and Gazebo each completed positive and degraded 30-pair matrices
+with repeatable intervals and expected decision exit codes. Twenty independently
+recorded controller candidates remained pinned to one approved baseline; promotion,
+rollback and reopened history passed. Lint, formatting, static/dated governance,
+source/wheel packaging and installed-wheel checks passed. Browser static previews
+showed the decision and approval history without console errors. See
+`decisions-validation.md` for numerical results, runtime fingerprints and limits.
+
 ## SW001
 
 Run `python -m pytest tests/test_core.py` for strict inputs, seed isolation,

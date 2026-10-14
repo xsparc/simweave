@@ -36,11 +36,15 @@ jobs:
       - run: uv run --frozen --extra dev --extra mujoco python -m pytest tests/test_adapters.py
       - name: MuJoCo regression CLI and negative control
         run: uv run --frozen --extra dev --extra mujoco python scripts/check_regression_ci.py --output .simweave/mujoco-regression --adapters mujoco --source-revision ${{ github.sha }}
+      - name: Thirty paired seeds and twenty immutable build comparisons
+        run: uv run --frozen --extra dev --extra mujoco python scripts/check_decisions_ci.py --output .simweave/decisions --source-revision ${{ github.sha }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mujoco-regression
-          path: .simweave/mujoco-regression
+          path: |
+            .simweave/mujoco-regression
+            .simweave/decisions
           include-hidden-files: true
           retention-days: 7
   container:
@@ -57,7 +61,7 @@ jobs:
           assert execute(Scenario.model_validate({'adapter':'mujoco'}),lambda s:None).passed"
   ros-gazebo:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - run: docker build -f integrations/ros2/Dockerfile -t simweave:ros-cart .
@@ -84,6 +88,17 @@ jobs:
       - name: Collect regression reports and recordings
         if: always() && steps.regression.outcome != 'skipped'
         run: docker cp simweave-regression-ci:/workspace/suite-artifacts suite-artifacts
+      - name: Thirty paired Gazebo seeds and statistical negative control
+        id: decisions
+        run: >-
+          docker run --name simweave-decisions-ci --network none
+          --pids-limit 256 --memory 4g --cpus 2 simweave:ros-cart
+          python scripts/check_decisions_ci.py --output /workspace/decision-artifacts
+          --adapters gazebo --history-builds 0
+          --source-revision ${{ github.sha }} --image-id ${{ steps.image.outputs.id }}
+      - name: Collect statistical decisions
+        if: always() && steps.decisions.outcome != 'skipped'
+        run: docker cp simweave-decisions-ci:/workspace/decision-artifacts decision-artifacts
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -102,5 +117,6 @@ jobs:
             ros-results.xml
             suite-artifacts
             evidence-artifacts
+            decision-artifacts
           if-no-files-found: warn
           retention-days: 7
