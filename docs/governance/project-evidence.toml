@@ -2,6 +2,34 @@ schema_version = 1
 project = "simweave"
 
 [[research_decisions]]
+id = "RD-TEAM-EVIDENCE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-14-team-evidence.md"]
+design_refs = ["docs/architecture/decisions/0006-team-evidence.md"]
+
+[[requirements]]
+id = "REQ-TEAM-EVIDENCE"
+statement = "Restore portable decision catalogs and authorize tenant-scoped reader, importer and approver workflows."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0006-team-evidence.md"]
+implementation_refs = ["src/simweave/catalog_archive.py", "src/simweave/catalog_api.py", "src/simweave/config.py", "examples/catalog_client.py"]
+verification_refs = ["tests/test_team_evidence.py", "scripts/check_catalog_portability.py", ".github/workflows/ci.yml"]
+validation_refs = ["docs/governance/team-evidence-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW008-TEAM-EVIDENCE"
+title = "Portable catalogs and tenant baseline API"
+status = "verified"
+requirement_ids = ["REQ-TEAM-EVIDENCE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-14-portable-catalogs-tenant-api-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0006-team-evidence.md"]
+evidence_refs = ["tests/test_team_evidence.py", "scripts/check_catalog_portability.py", "docs/governance/team-evidence-validation.md"]
+
+[[research_decisions]]
 id = "RD-REGRESSION-DECISIONS"
 disposition = "adopted"
 source_refs = ["docs/research/2026-10-14-regression-decisions.md"]

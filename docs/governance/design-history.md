@@ -49,3 +49,9 @@ tolerances. A separate local catalog imports verified evidence and records
 immutable builds, policies, approval generations and rollback events. Cross-build
 decisions pin approved evidence rather than the candidate suite's internal
 baseline. Actual checks and limits are recorded in `decisions-validation.md`.
+
+2026-10-14, SW008: the maintainer approved portable catalog archives and tenant
+baseline permissions after PR12's squash merge. ADR 0006 adds data-only bounded
+recovery with atomic fresh publication, and server-selected catalogs with separate
+reader/importer/approver roles. Existing run credentials gain no catalog access.
+Verification is recorded in `team-evidence-validation.md`.

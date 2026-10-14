@@ -76,3 +76,10 @@ export contents were exercised; the actual downloaded JSON validated. Ruff,
 JavaScript syntax, source/wheel builds, wheel asset inspection, and both governance
 gates passed. Direct file-open and the two-minute end-to-end save target remain
 unverified; see `evidence-validation.md` for the precise scope and limitations.
+
+## SW008
+
+2026-10-14: archive and tenant API verification is recorded in
+`team-evidence-validation.md`, including the 100-build Windows/Linux recovery,
+role isolation, approval concurrency and live example-client workflow. Existing
+simulator and browser limitations remain explicitly separate.
