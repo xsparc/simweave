@@ -111,3 +111,35 @@ from becoming an active catalog. Hard-link publication rejects existing destinat
 Checksums are not signatures; a malicious custodian can forge records and decisions.
 Restore does not authenticate original approvals or rerun statistical computation.
 Catalog filesystem access remains trusted operator authority. No HTTP restore exists.
+
+## OIDC and provenance trust
+
+Optional OIDC catalog authentication accepts only the configured issuer, audience,
+approved clients, subject bindings, access-token type and RS256 public keys.
+Signature/lifetime checks precede authorization. Token roles and tenant claims
+cannot override server mappings; role scopes narrow authority. ID tokens cannot
+be substituted for access tokens. OIDC does not grant run API permissions. Raw
+claims/tokens and key-fetch exceptions are excluded from API diagnostics.
+
+HTTPS JWKS retrieval disables redirects and ambient proxy discovery, uses only an
+operator-configured URI, and bounds time/bytes/key count/key size. Single-flight
+refresh and cooldown constrain unknown-key traffic. Expired-cache failures deny
+access, but a removed key can remain valid until cache expiry; this is not immediate
+revocation. Issuer compromise, stolen valid bearer tokens and unsafe operator
+bindings remain material risks. Loopback HTTP is opt-in for synthetic integration
+tests, not a production transport. No provider credentials are read or stored.
+
+The operator attestation command delegates cryptographic verification to GitHub CLI
+under repository, workflow, source-ref and commit constraints. The verifier binary,
+GitHub/Sigstore trust roots and selected producer are trusted. Input snapshots bind
+verification and restore; errors/timeouts/malformed results fail closed. Raw verifier
+output is not returned. Input sizes, accepted result size and execution time are
+bounded. The verifier writes stdout to temporary disk before its result-size check.
+There is no externally callable subprocess route or arbitrary command parameter.
+
+Only synthetic catalogs are signed by the CI verification workflow. Signing runs
+on repository push events with pinned privileged actions and job-scoped rights,
+not pull-request events or forks. Trust policy must independently pin the intended
+ref and commit; a valid development-branch signature is not a release approval.
+Signatures do not authenticate historic human approval labels or establish physical
+correctness. A compromised trusted builder can still issue misleading provenance.

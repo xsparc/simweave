@@ -52,14 +52,22 @@ and a tenant-scoped baseline API, verification and a draft PR. ADR 0006 defines
 two-tenant reader/importer/approver isolation and an example client. Future milestone
 recommendations remain advisory; no merge or deployment is authorized.
 
+## Approved next slice: SW009
+
+After PR13's squash merge, the maintainer approved OIDC-backed identity and signed
+evidence provenance, verification and a draft PR. ADR 0007 defines catalog access
+tokens with two-tenant role/scope isolation and key rotation, plus policy-pinned
+GitHub attestation verification and snapshot-safe recovery. Synthetic CI signing
+is verification, not release or deployment. Future recommendations remain advisory.
+
 ## Later review triggers
 
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,
   actuator mapping, sensor contract, and real integration environment are agreed.
 - PostgreSQL and object storage: single-host throughput/storage measurements or
   a concrete multi-host deployment requirement justify migration.
-- OIDC and organizations: first internet-facing deployment; token mapping is an
-  MVP integration mechanism, not a complete identity product.
+- Organizations and login UX: first internet-facing deployment; the OIDC resource
+  server is not a complete identity product or provider provisioning workflow.
 - Isaac Sim, Webots, more robot types: an explicit scenario and adapter conformance
   suite for the requested environment are available.
 

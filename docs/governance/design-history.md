@@ -55,3 +55,10 @@ baseline permissions after PR12's squash merge. ADR 0006 adds data-only bounded
 recovery with atomic fresh publication, and server-selected catalogs with separate
 reader/importer/approver roles. Existing run credentials gain no catalog access.
 Verification is recorded in `team-evidence-validation.md`.
+
+2026-10-14, SW009: after PR13's squash merge, the maintainer approved OIDC-backed
+catalog identity and signed evidence provenance. ADR 0007 defines a pinned access
+token profile, server-bound subjects and role scopes, bounded JWKS refresh, and
+policy-constrained GitHub attestation verification. Restore consumes the exact
+verified snapshot. Synthetic CI signing tests provenance without publishing a
+release. Evidence is recorded in `trusted-evidence-validation.md`.

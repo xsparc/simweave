@@ -17,9 +17,12 @@ from simweave.engine import execute, verify_recording
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="simweave")
     commands = parser.add_subparsers(dest="command", required=True)
+    from simweave.attestation import dispatch as attestation_dispatch
+    from simweave.attestation import register as attestation_register
     from simweave.decision_cli import dispatch, register
 
     register(commands)
+    attestation_register(commands)
     init = commands.add_parser("init", help="write an example scenario")
     init.add_argument("path", type=Path)
     commands.add_parser("schema", help="print the scenario JSON Schema")
@@ -66,6 +69,8 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command == "attestation":
+            return attestation_dispatch(args)
         if args.command in ("statistics", "statistics-schema", "history"):
             return dispatch(args)
         if args.command == "report":
