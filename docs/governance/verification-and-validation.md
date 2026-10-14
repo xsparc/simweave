@@ -87,6 +87,7 @@ simulator and browser limitations remain explicitly separate.
 ## SW009
 
 2026-10-14: 253 local tests passed, including RSA-signed OIDC authorization and
-loopback JWKS lifecycle tests. Source/wheel builds passed. Cryptographic GitHub
-attestation results are tracked separately from mocked verifier boundary tests in
-`trusted-evidence-validation.md`.
+loopback JWKS lifecycle tests. Source/wheel builds and installed-wheel checks passed.
+A real GitHub-attested 100-build catalog restored on Linux and Windows, with five
+provenance/tampering negative controls rejected on both. Cryptographic results are
+tracked separately from mocked boundary tests in `trusted-evidence-validation.md`.

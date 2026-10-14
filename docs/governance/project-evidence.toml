@@ -22,7 +22,7 @@ risk_refs = ["docs/security/threat-model.md"]
 [[work_items]]
 id = "SW009-TRUSTED-EVIDENCE"
 title = "OIDC catalog identity and signed evidence provenance"
-status = "in-progress"
+status = "verified"
 requirement_ids = ["REQ-TRUSTED-EVIDENCE"]
 roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-14-oidc-signed-provenance-development-verification-draft-pr"
