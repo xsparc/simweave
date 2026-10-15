@@ -223,13 +223,15 @@ class RecordingWriteError(OSError):
 
 
 def execute_suite(
-    suite: Suite, output: Path, *, environment: Environment | None = None
+    suite: Suite, output: Path, *, environment: Environment | None = None, checkpoint=None
 ) -> SuiteReport:
     environment = environment or capture()
     output.mkdir(parents=True, exist_ok=False)
     (output / "suite.json").write_text(suite.model_dump_json(indent=2), encoding="utf-8")
     cases = []
     for identifier, role, scenario in suite.expand():
+        if checkpoint:
+            checkpoint()
         directory = output / identifier
         directory.mkdir()
         (directory / "scenario.json").write_text(scenario.model_dump_json(), encoding="utf-8")
@@ -239,6 +241,8 @@ def execute_suite(
         with (directory / "telemetry.jsonl").open("w", encoding="utf-8", newline="\n") as stream:
 
             def sink(sample, stream=stream, keep=keep, trajectory=trajectory):
+                if checkpoint:
+                    checkpoint()
                 try:
                     stream.write(canonical(sample.model_dump()) + "\n")
                 except OSError as exc:
@@ -250,7 +254,7 @@ def execute_suite(
 
             try:
                 result = execute(scenario, sink)
-            except RecordingWriteError:
+            except (RecordingWriteError, SuiteInterrupted):
                 raise  # Storage failures must not masquerade as simulator failures.
             except Exception as exc:
                 error = (
@@ -283,3 +287,7 @@ def execute_suite(
     write_report(report, output / "report.html", environment)
     write_bundle(report, environment, output)
     return report
+
+
+class SuiteInterrupted(Exception):
+    """An execution owner withdrew permission to continue this suite."""

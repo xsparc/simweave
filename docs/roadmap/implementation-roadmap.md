@@ -62,9 +62,15 @@ is verification, not release or deployment. Future recommendations remain adviso
 
 ## Later review triggers
 
+SW010 is approved after PR14's squash merge: durable filesystem/S3 bundle storage
+and worker-scheduled suites. ADR 0008 targets 1,000 retained/recovered bundles and
+100 jobs across four local workers/two tenants, including cancellation and explicit
+recovery from worker loss. Verification and a draft PR are authorized; subsequent
+milestone recommendations remain advisory.
+
 - Additional ROS/Gazebo robot fixtures beyond the built-in cart: a named model,
   actuator mapping, sensor contract, and real integration environment are agreed.
-- PostgreSQL and object storage: single-host throughput/storage measurements or
+- PostgreSQL and multi-host workers: single-host throughput/storage measurements or
   a concrete multi-host deployment requirement justify migration.
 - Organizations and login UX: first internet-facing deployment; the OIDC resource
   server is not a complete identity product or provider provisioning workflow.

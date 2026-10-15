@@ -120,3 +120,11 @@ stream samples and flush batches rather than retain a complete trajectory.
 Measure throughput with the supplied benchmark before changing these limits.
 No real-time or hard latency guarantee is made. See the operations guide for
 deployment constraints and storage retention.
+
+ADR 0008 adds a separate leased suite queue and immutable tenant-scoped artifact
+index with filesystem/S3 backends. Four local processes can execute complete
+suites; cancellation, lease expiry and attempt claims fence stale completions.
+Explicit retry is required after worker loss. Bundle publication precedes metadata
+and job completion; interrupted publications may leave conservatively retained
+objects. The engine remains independent. See the durable operations guide for
+capacity, recovery, credentials and the single-host scheduling boundary.
