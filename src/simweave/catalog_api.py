@@ -38,6 +38,11 @@ class Compare(Versioned):
     generation: int | None = Field(default=None, ge=1, le=history.MAX_EVENTS)
 
 
+class FromJob(Versioned):
+    job: str = Field(pattern=r"^[a-f0-9]{32}$")
+    role: Role = "candidate"
+
+
 def install(app, settings: Settings):
     root = settings.database.parent / (settings.database.name + ".catalogs")
     catalogs = {}
@@ -102,7 +107,7 @@ def install(app, settings: Settings):
     def call(operation, *args, **kwargs):
         try:
             return operation(*args, **kwargs)
-        except (ValueError, sqlite3.Error, OSError):
+        except (ValueError, sqlite3.Error, OSError, RuntimeError, KeyError):
             raise HTTPException(
                 409, "catalog operation rejected; check evidence, limits and generation"
             ) from None
@@ -180,11 +185,42 @@ def install(app, settings: Settings):
                             raise HTTPException(413, "evidence bundle exceeds limit")
                         stream.write(chunk)
                 build = await run_in_threadpool(
-                    call, history.add_build, catalogs[identity.tenant], upload, label, role
+                    call, retain_build, identity.tenant, upload, label, role
                 )
                 return {"schema_version": 1, "build": build.label, "digest": history.digest(build)}
         finally:
             slots.release()
+
+    def retain_build(tenant, upload, label, role):
+        app.state.artifacts.put(tenant, upload)
+        return history.add_build(catalogs[tenant], upload, label, role)
+
+    @router.post("/builds/{label}/from-job", status_code=201)
+    def from_job(label: history.Label, body: FromJob, identity: Principal):
+        require(identity, "importer")
+        job = app.state.suite_jobs.get(identity.tenant, body.job)
+        if job is None:
+            raise HTTPException(404, "suite job not found")
+        if job["status"] != "succeeded" or not job["artifact"]:
+            raise HTTPException(409, "job has no completed evidence")
+        if not slots.acquire(blocking=False):
+            raise HTTPException(429, "catalog import capacity reached")
+        try:
+            with tempfile.TemporaryDirectory(dir=root) as folder:
+                upload = Path(folder) / "evidence.zip"
+                call(app.state.artifacts.get, identity.tenant, job["artifact"], upload)
+                build = call(history.add_build, catalogs[identity.tenant], upload, label, body.role)
+                return {"schema_version": 1, "build": build.label, "digest": history.digest(build)}
+        finally:
+            slots.release()
+
+    @router.get("/builds/{label}/artifact")
+    def download_build(label: history.Label, identity: Principal):
+        path = catalogs[identity.tenant]
+        build_exists(path, label)
+        with history._connect(path) as connection:
+            build = call(history._build, connection, label)
+        return app.state.downloads.response(identity.tenant, build.bundle_digest)
 
     @router.get("/events")
     def events(

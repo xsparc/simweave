@@ -1,39 +1,12 @@
 """Explicit operator configuration and machine-readable durable operations."""
 
-import os
 from pathlib import Path
 
-from simweave.artifacts import S3, Artifacts, Filesystem, backup_database
-from simweave.contracts import Contract, canonical
+from simweave.artifacts import Artifacts, backup_database
+from simweave.contracts import canonical
+from simweave.storage_config import artifact_database, backend
 from simweave.suite_jobs import SuiteJobs, work_forever, work_once
 from simweave.suites import Suite
-
-
-class BackendConfig(Contract):
-    schema_version: int = 1
-    root: str | None = None
-    endpoint: str | None = None
-    bucket: str | None = None
-    region: str = "us-east-1"
-
-
-def backend(path: Path):
-    if path.stat().st_size > 4096:
-        raise ValueError("backend configuration exceeds 4 KiB")
-    config = BackendConfig.model_validate_json(path.read_bytes())
-    if config.schema_version != 1:
-        raise ValueError("unsupported backend configuration")
-    if config.root and config.endpoint is None and config.bucket is None:
-        return Filesystem(Path(config.root))
-    if config.root is None and config.endpoint and config.bucket:
-        return S3(
-            endpoint=config.endpoint,
-            bucket=config.bucket,
-            region=config.region,
-            access_key=os.environ["SIMWEAVE_S3_ACCESS_KEY"],
-            secret=os.environ["SIMWEAVE_S3_SECRET_KEY"],
-        )
-    raise ValueError("configure exactly one storage backend")
 
 
 def register(commands):
@@ -53,6 +26,17 @@ def register(commands):
     worker = sub.add_parser("worker")
     worker.add_argument("--once", action="store_true")
     worker.add_argument("--backend", type=Path, required=True)
+    metrics = sub.add_parser("metrics", help="operator-wide metrics without tenant labels")
+    metrics.add_argument("--backend", type=Path, required=True)
+    metrics.add_argument("--prometheus", action="store_true")
+    checkpoint = sub.add_parser("checkpoint", help="snapshot quiesced suites, catalogs and bytes")
+    checkpoint.add_argument("--backend", type=Path, required=True)
+    checkpoint.add_argument("--catalogs", type=Path, required=True)
+    checkpoint.add_argument("--quiesced", action="store_true", required=True)
+    checkpoint.add_argument("path", type=Path)
+    restore = sub.add_parser("restore-checkpoint", help="verify and restore into a fresh directory")
+    restore.add_argument("source", type=Path)
+    restore.add_argument("path", type=Path)
     for action in ("put", "get", "recover", "backup"):
         command = sub.add_parser(action)
         command.add_argument("--backend", type=Path, required=True)
@@ -63,11 +47,12 @@ def register(commands):
             command.add_argument("--digest", required=True)
 
 
-def artifact_database(queue: Path):
-    return queue.with_name(queue.name + ".artifacts")
-
-
 def dispatch(args):
+    if args.operation == "restore-checkpoint":
+        from simweave.recovery import restore
+
+        print(canonical(restore(args.source, args.path)))
+        return 0
     jobs = SuiteJobs(args.database)
     action = args.operation
     if action == "submit":
@@ -84,7 +69,18 @@ def dispatch(args):
         result = jobs.list(args.tenant, args.after)
     else:
         artifacts = Artifacts(artifact_database(args.database), backend(args.backend))
-        if action == "worker":
+        if action == "metrics":
+            from simweave.observability import prometheus, snapshot
+
+            result = snapshot(jobs, artifacts)
+            if args.prometheus:
+                print(prometheus(result), end="")
+                return 0
+        elif action == "checkpoint":
+            from simweave.recovery import checkpoint
+
+            result = checkpoint(jobs, artifacts, args.catalogs, args.path)
+        elif action == "worker":
             if not args.once:
                 work_forever(jobs, artifacts)
                 return 0

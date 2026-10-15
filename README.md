@@ -179,3 +179,7 @@ bundles to filesystem or S3-compatible storage, with explicit retry after worker
 loss. See [durable operations](docs/operations/durable-operations.md) for setup,
 tenant permissions, limits and recovery. S3 support is optional (`simweave[s3]`);
 the scheduler remains single-host.
+
+Catalog uploads retain original bundles, and completed jobs can be imported into
+review without manual downloads. See [connected operations](docs/operations/connected-operations.md)
+for authenticated artifact downloads, metrics and coordinated checkpoint recovery.

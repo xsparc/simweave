@@ -151,6 +151,34 @@ design_refs = ["docs/architecture/decisions/0002-isolated-ros-gazebo-cart.md"]
 source_priority = ["docs/architecture/overview.md", "docs/roadmap/implementation-roadmap.md", "docs/architecture/decisions/", "code-and-tests", "supporting-documentation"]
 dhf_is_authoritative = false
 
+[[research_decisions]]
+id = "RD-CONNECTED-OPERATIONS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-15-connected-operations.md"]
+design_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
+
+[[requirements]]
+id = "REQ-CONNECTED-OPERATIONS"
+statement = "Connect retained suite artifacts to tenant review and verify observable coordinated recovery."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
+implementation_refs = ["src/simweave/catalog_api.py", "src/simweave/artifact_http.py", "src/simweave/observability.py", "src/simweave/recovery.py"]
+verification_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py"]
+validation_refs = ["docs/governance/connected-operations-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW011-CONNECTED-OPERATIONS"
+title = "Connected artifact review, metrics and coordinated recovery"
+status = "verified"
+requirement_ids = ["REQ-CONNECTED-OPERATIONS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-15-connected-operations-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
+evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
+
 [review]
 last_reviewed = "2026-10-15"
 review_due = "2026-11-14"
