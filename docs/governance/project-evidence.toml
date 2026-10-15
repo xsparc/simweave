@@ -152,8 +152,36 @@ source_priority = ["docs/architecture/overview.md", "docs/roadmap/implementation
 dhf_is_authoritative = false
 
 [review]
-last_reviewed = "2026-10-14"
+last_reviewed = "2026-10-15"
 review_due = "2026-11-14"
+
+[[research_decisions]]
+id = "RD-DURABLE-OPERATIONS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-15-durable-operations.md"]
+design_refs = ["docs/architecture/decisions/0008-durable-operations.md"]
+
+[[requirements]]
+id = "REQ-DURABLE-OPERATIONS"
+statement = "Retain verified bundles and execute leased, tenant-scoped suites with explicit recovery."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0008-durable-operations.md"]
+implementation_refs = ["src/simweave/artifacts.py", "src/simweave/suite_jobs.py", "src/simweave/suite_api.py", "src/simweave/operations_cli.py"]
+verification_refs = ["tests/test_durable_operations.py", "scripts/check_durable_operations.py"]
+validation_refs = ["docs/governance/durable-operations-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW010-DURABLE-OPERATIONS"
+title = "Immutable artifact storage and durable suite workers"
+status = "verified"
+requirement_ids = ["REQ-DURABLE-OPERATIONS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-15-durable-operations-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0008-durable-operations.md"]
+evidence_refs = ["tests/test_durable_operations.py", "scripts/check_durable_operations.py", "docs/governance/durable-operations-validation.md"]
 
 [[requirements]]
 id = "REQ-ROS-GAZEBO-CART"

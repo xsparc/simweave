@@ -12,6 +12,7 @@ from pydantic import ValidationError
 
 from simweave.contracts import RunResult, Sample, Scenario, canonical
 from simweave.engine import execute, verify_recording
+from simweave.store import Capacity, Conflict
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -20,9 +21,12 @@ def main(argv: list[str] | None = None) -> int:
     from simweave.attestation import dispatch as attestation_dispatch
     from simweave.attestation import register as attestation_register
     from simweave.decision_cli import dispatch, register
+    from simweave.operations_cli import dispatch as operations_dispatch
+    from simweave.operations_cli import register as operations_register
 
     register(commands)
     attestation_register(commands)
+    operations_register(commands)
     init = commands.add_parser("init", help="write an example scenario")
     init.add_argument("path", type=Path)
     commands.add_parser("schema", help="print the scenario JSON Schema")
@@ -69,6 +73,8 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command == "operations":
+            return operations_dispatch(args)
         if args.command == "attestation":
             return attestation_dispatch(args)
         if args.command in ("statistics", "statistics-schema", "history"):
@@ -246,6 +252,8 @@ def main(argv: list[str] | None = None) -> int:
         print(result.model_dump_json())
         return 0 if result.passed else 1
     except (
+        Capacity,
+        Conflict,
         sqlite3.Error,
         OSError,
         ValueError,

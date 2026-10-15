@@ -90,6 +90,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
 
     Tenant = Annotated[str, Depends(tenant)]
+    from simweave.suite_api import install as install_suites
+
+    install_suites(app, settings.database.with_name(settings.database.name + ".suites"), tenant)
 
     @app.exception_handler(RequestValidationError)
     async def invalid(request, exc):

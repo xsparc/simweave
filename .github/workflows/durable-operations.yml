@@ -1,0 +1,49 @@
+name: Durable operations
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            backend: filesystem
+          - os: ubuntu-latest
+            backend: filesystem
+          - os: ubuntu-latest
+            backend: s3
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - run: python -m pip install uv==0.11.16
+      - run: uv sync --frozen --extra dev --extra s3
+      - if: matrix.backend == 'filesystem'
+        run: uv run --frozen --extra dev --extra s3 python scripts/check_durable_operations.py --output .simweave/durable
+      - if: matrix.backend == 's3'
+        shell: bash
+        env:
+          SIMWEAVE_S3_ACCESS_KEY: simweave-test
+          SIMWEAVE_S3_SECRET_KEY: simweave-synthetic-test-secret
+        run: |
+          docker run -d --name simweave-s3 -p 127.0.0.1:19010:9000 \
+            -e RUSTFS_ACCESS_KEY=simweave-test -e RUSTFS_SECRET_KEY=simweave-synthetic-test-secret \
+            rustfs/rustfs@sha256:8cc9801755448b71a786705ce76692c77e14936cccd87cf2fc31842e58f4d1ff
+          mkdir -p .simweave
+          printf '%s\n' '{"schema_version":1,"endpoint":"http://127.0.0.1:19010","bucket":"simweave-test"}' > .simweave/s3.json
+          uv run --frozen --extra s3 python -c "import time; from pathlib import Path; from simweave.operations_cli import backend; time.sleep(10); s=backend(Path('.simweave/s3.json')); s.client.create_bucket(Bucket=s.bucket)"
+          uv run --frozen --extra dev --extra s3 python scripts/check_durable_operations.py --output .simweave/durable --s3-config .simweave/s3.json
+      - if: always() && matrix.backend == 's3'
+        run: docker rm -f simweave-s3
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: durable-${{ matrix.os }}-${{ matrix.backend }}
+          path: .simweave/durable/verification.json
+          include-hidden-files: true
+          retention-days: 7

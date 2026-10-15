@@ -143,3 +143,14 @@ not pull-request events or forks. Trust policy must independently pin the intend
 ref and commit; a valid development-branch signature is not a release approval.
 Signatures do not authenticate historic human approval labels or establish physical
 correctness. A compromised trusted builder can still issue misleading provenance.
+# Durable suite storage boundary
+
+Suite execution retains fixed adapter registration and bounded contracts. Run
+tokens schedule only their configured tenant; catalog identity grants no execution
+authority. Unique attempt claims and expiry fence cancelled/stale workers. Artifact
+keys derive only from validated tenants and content digests; upload verification
+uses a bounded snapshot. Operators select backends, never HTTP clients. S3 uses
+explicit credentials, HTTPS outside loopback and conditional create-only writes.
+No delete/GC path exists. External lifecycle policies, disk exhaustion, backend
+loss and orphaned uploads remain operational risks. Quiesce workers/submissions
+for paired metadata backups; independently protect artifact bytes and metadata.
