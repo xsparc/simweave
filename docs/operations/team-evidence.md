@@ -79,3 +79,7 @@ python examples/catalog_client.py --url http://127.0.0.1:8765 promote --build bu
 Switch credentials between operations. The example bounds inputs but reads one
 bundle into memory. Use a streaming client for larger workflows. OpenAPI is at
 `/openapi.json`, interactive documentation at `/docs`.
+
+For short-lived identity-provider credentials and signed archive recovery, see
+[trusted evidence](trusted-evidence.md). Static credentials and unsigned local
+recovery remain compatible; the new paths enforce separate explicit trust policies.

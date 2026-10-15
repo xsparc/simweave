@@ -16,6 +16,7 @@ from pydantic import Field
 from simweave import history
 from simweave.bundles import MAX_TOTAL
 from simweave.config import CatalogPrincipal, Settings
+from simweave.oidc import InsufficientScope, InvalidToken, OIDCVerifier
 from simweave.statistics import DecisionPolicy, Role, Versioned
 
 
@@ -40,7 +41,11 @@ class Compare(Versioned):
 def install(app, settings: Settings):
     root = settings.database.parent / (settings.database.name + ".catalogs")
     catalogs = {}
-    for principal in settings.tokens.values():
+    identities = list(settings.tokens.values())
+    if settings.oidc:
+        identities.extend(settings.oidc.principals.values())
+    verifier = OIDCVerifier(settings.oidc) if settings.oidc else None
+    for principal in identities:
         if isinstance(principal, CatalogPrincipal) and principal.tenant not in catalogs:
             root.mkdir(parents=True, exist_ok=True)
             # Prefix also makes Windows device names (e.g. tenant "con") safe filenames.
@@ -69,6 +74,21 @@ def install(app, settings: Settings):
                     if isinstance(identity, CatalogPrincipal):
                         return identity
                     raise HTTPException(403, "catalog permission required")
+            if verifier:
+                try:
+                    return verifier.verify(auth.credentials)
+                except InsufficientScope:
+                    raise HTTPException(
+                        403,
+                        "catalog scope required",
+                        headers={"WWW-Authenticate": 'Bearer error="insufficient_scope"'},
+                    ) from None
+                except InvalidToken:
+                    raise HTTPException(
+                        401,
+                        "invalid access token",
+                        headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+                    ) from None
         raise HTTPException(
             401, "valid bearer token required", headers={"WWW-Authenticate": "Bearer"}
         )

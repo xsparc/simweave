@@ -138,6 +138,12 @@ reader/importer/approver credentials, API routes, recovery limits and the
 [example client](examples/catalog_client.py). Legacy run tokens keep their existing
 permissions; catalog access requires explicit operator configuration.
 
+Catalogs also support [OIDC access tokens and signed recovery](docs/operations/trusted-evidence.md).
+Configure an existing issuer and server-side subject bindings, or verify a catalog's
+GitHub attestation against an explicit repository/workflow/ref/commit policy before
+restoring it. The synthetic CI signing workflow demonstrates provenance verification;
+it does not publish a release or certify human approvals.
+
 ## Engineering
 
 ```sh

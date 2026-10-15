@@ -2,6 +2,34 @@ schema_version = 1
 project = "simweave"
 
 [[research_decisions]]
+id = "RD-TRUSTED-EVIDENCE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-14-trusted-evidence.md"]
+design_refs = ["docs/architecture/decisions/0007-trusted-evidence.md"]
+
+[[requirements]]
+id = "REQ-TRUSTED-EVIDENCE"
+statement = "Authenticate scoped catalog access tokens and verify pinned signed provenance before catalog recovery."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0007-trusted-evidence.md"]
+implementation_refs = ["src/simweave/oidc.py", "src/simweave/config.py", "src/simweave/attestation.py", ".github/workflows/trusted-evidence.yml"]
+verification_refs = ["tests/test_oidc.py", "tests/test_attestation.py", "scripts/check_attestation_ci.py"]
+validation_refs = ["docs/governance/trusted-evidence-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW009-TRUSTED-EVIDENCE"
+title = "OIDC catalog identity and signed evidence provenance"
+status = "verified"
+requirement_ids = ["REQ-TRUSTED-EVIDENCE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-14-oidc-signed-provenance-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0007-trusted-evidence.md"]
+evidence_refs = ["tests/test_oidc.py", "tests/test_attestation.py", "docs/governance/trusted-evidence-validation.md"]
+
+[[research_decisions]]
 id = "RD-TEAM-EVIDENCE"
 disposition = "adopted"
 source_refs = ["docs/research/2026-10-14-team-evidence.md"]

@@ -51,11 +51,11 @@ local filesystem. No network-mounted SQLite volumes and no multi-host scaling
 claim. Worker leases detect abandoned runs; expired work fails explicitly instead
 of silently repeating simulator side effects. Completed recordings are immutable.
 
-Tenant identity comes from a server-side bearer-token mapping, never request JSON.
+Tenant identity comes from server-side credential/subject mappings, never request JSON.
 Repository queries scope reads and mutations to the authenticated tenant. Quotas,
 request limits, and cancellation constrain work. API and worker processes can be
 replaced separately. Hosted evolution replaces the repository with PostgreSQL job
-claims and object storage for telemetry; OIDC, billing, per-tenant scheduling,
+claims and object storage for telemetry; billing, per-tenant scheduling,
 distributed tracing, and isolation of third-party simulators are later work.
 
 ## Determinism and replay
@@ -105,6 +105,15 @@ baseline API permissions. Server configuration selects separate catalogs and
 approval identities. Legacy run tokens do not gain catalog access. Restoration
 remains an operator action into a fresh database; no API accepts database paths
 or replaces approval history. See the team evidence guide for limits.
+
+ADR 0007 adds optional catalog access tokens from one pinned OIDC issuer. Verified
+subjects map to tenant roles and stable audit aliases; scopes restrict that mapping.
+RS256 signature, audience, issuer, lifetime and key-cache bounds fail closed. Static
+tokens remain supported. The run API does not gain OIDC catalog authority.
+Operator-only attestation verification delegates cryptographic provenance checks to
+GitHub CLI with explicit repository/workflow/ref/commit policy. Verified restore
+uses the exact snapshotted archive bytes. CI signs synthetic evidence only; signatures
+do not establish human approval or physics correctness.
 
 At most 20,000 steps, 64 disturbance intervals, and 16 gates per run. Workers
 stream samples and flush batches rather than retain a complete trajectory.

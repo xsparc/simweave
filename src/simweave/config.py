@@ -5,8 +5,10 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Annotated
+from urllib.parse import urlsplit
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from simweave.contracts import Contract
 
@@ -17,13 +19,53 @@ class CatalogPrincipal(Contract):
     role: str = Field(pattern=r"^(reader|importer|approver)$")
 
 
+Subject = Annotated[str, Field(min_length=1, max_length=200, pattern=r"^[\x21-\x7e]+$")]
+
+
+class OIDCSettings(Contract):
+    issuer: str = Field(min_length=1, max_length=2048)
+    jwks_uri: str = Field(min_length=1, max_length=2048)
+    audience: str = Field(min_length=1, max_length=200)
+    client_ids: list[Subject] = Field(min_length=1, max_length=20)
+    principals: dict[Subject, CatalogPrincipal] = Field(min_length=1, max_length=100)
+    cache_seconds: int = Field(default=300, ge=5, le=3600)
+    max_token_seconds: int = Field(default=900, ge=60, le=3600)
+    clock_skew_seconds: int = Field(default=30, ge=0, le=30)
+    allow_insecure_loopback: bool = False
+
+    @model_validator(mode="after")
+    def secure_endpoints(self):
+        for value in (self.issuer, self.jwks_uri):
+            url = urlsplit(value)
+            loopback = self.allow_insecure_loopback and url.hostname in ("127.0.0.1", "::1")
+            if (
+                not url.hostname
+                or url.username
+                or url.password
+                or url.query
+                or url.fragment
+                or (url.scheme != "https" and not (loopback and url.scheme == "http"))
+            ):
+                raise ValueError("OIDC endpoints require HTTPS or explicitly enabled loopback")
+        return self
+
+
 @dataclass(frozen=True)
 class Settings:
     database: Path
     tokens: dict[str, str | dict | CatalogPrincipal]
+    oidc: OIDCSettings | None = None
 
     def __post_init__(self):
-        if not isinstance(self.tokens, dict) or not self.tokens or len(self.tokens) > 100:
+        if isinstance(self.oidc, dict):
+            object.__setattr__(self, "oidc", OIDCSettings.model_validate(self.oidc))
+        if self.oidc is not None and not isinstance(self.oidc, OIDCSettings):
+            raise ValueError("invalid OIDC configuration")
+        if (
+            not isinstance(self.tokens, dict)
+            or (not self.tokens and self.oidc is None)
+            or len(self.tokens) > 100
+        ):
             raise ValueError("configure between 1 and 100 API tokens")
         for token, tenant in self.tokens.items():
             if isinstance(tenant, dict):
@@ -44,6 +86,9 @@ class Settings:
             return cls(
                 Path(os.environ.get("SIMWEAVE_DB", ".simweave/runs.sqlite3")),
                 json.loads(os.environ.get("SIMWEAVE_TOKENS", "{}")),
+                OIDCSettings.model_validate_json(os.environ["SIMWEAVE_OIDC"])
+                if os.environ.get("SIMWEAVE_OIDC")
+                else None,
             )
         except (ValueError, TypeError):
-            raise ValueError("SIMWEAVE_TOKENS must map secure tokens to tenant names") from None
+            raise ValueError("invalid SIMWEAVE_TOKENS or SIMWEAVE_OIDC configuration") from None
