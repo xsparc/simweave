@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 
 from simweave.bundles import MAX_TOTAL as MAX_BUNDLE
 from simweave.bundles import read_bundle
+from simweave.observability import counted
 from simweave.store import Capacity, Store
 
 
@@ -51,6 +52,7 @@ def backup_database(store: Store, target: Path):
         staged = Path(temporary) / "metadata.sqlite3"
         with store.connect() as source, closing(sqlite3.connect(staged)) as destination:
             source.backup(destination)
+            destination.execute("PRAGMA journal_mode=DELETE")
         publish(staged, target)
 
 
@@ -166,6 +168,8 @@ class S3:
                     if size > MAX_BUNDLE:
                         raise ValueError("artifact exceeds bundle limit")
                     stream.write(chunk)
+        except BotoCoreError:
+            raise RuntimeError("S3 retrieval failed") from None
         finally:
             body.close()
 
@@ -176,10 +180,15 @@ class Artifacts:
         self.backend = backend
         with self.db.connect() as db:
             db.execute(
+                "CREATE TABLE IF NOT EXISTS operation_counters "
+                "(name TEXT PRIMARY KEY, value INTEGER NOT NULL)"
+            )
+            db.execute(
                 "CREATE TABLE IF NOT EXISTS artifacts (tenant TEXT, digest TEXT, "
                 "size INTEGER NOT NULL, PRIMARY KEY(tenant,digest))"
             )
 
+    @counted("artifact_put")
     def put(self, tenant: str, source: Path) -> str:
         key(tenant, "0" * 64)
         # Snapshot before verification; publish precisely the verified bytes.
@@ -216,6 +225,7 @@ class Artifacts:
                 db.execute("INSERT OR IGNORE INTO artifacts VALUES(?,?,?)", (tenant, digest, size))
             return digest
 
+    @counted("artifact_get")
     def get(self, tenant: str, digest: str, target: Path):
         name = key(tenant, digest)
         with self.db.connect() as db:

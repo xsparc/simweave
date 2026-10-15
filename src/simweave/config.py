@@ -55,6 +55,7 @@ class Settings:
     database: Path
     tokens: dict[str, str | dict | CatalogPrincipal]
     oidc: OIDCSettings | None = None
+    artifact_backend: Path | None = None
 
     def __post_init__(self):
         if isinstance(self.oidc, dict):
@@ -88,6 +89,9 @@ class Settings:
                 json.loads(os.environ.get("SIMWEAVE_TOKENS", "{}")),
                 OIDCSettings.model_validate_json(os.environ["SIMWEAVE_OIDC"])
                 if os.environ.get("SIMWEAVE_OIDC")
+                else None,
+                Path(os.environ["SIMWEAVE_ARTIFACT_BACKEND"])
+                if os.environ.get("SIMWEAVE_ARTIFACT_BACKEND")
                 else None,
             )
         except (ValueError, TypeError):

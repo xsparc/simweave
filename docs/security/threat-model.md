@@ -154,3 +154,12 @@ explicit credentials, HTTPS outside loopback and conditional create-only writes.
 No delete/GC path exists. External lifecycle policies, disk exhaustion, backend
 loss and orphaned uploads remain operational risks. Quiesce workers/submissions
 for paired metadata backups; independently protect artifact bytes and metadata.
+
+Connected review retains artifact bytes before committing new catalog references.
+Downloads verify a temporary snapshot and hold one of two per-process slots until
+response cleanup. No endpoint accepts a storage path. Operator metrics omit tenant,
+subject and job labels; authenticated tenant metrics exclude global worker/storage
+statistics. Coordinated checkpoints require stopped writers, reject active jobs,
+hold metadata write reservations and validate every artifact reference. Checkpoint
+hashes are corruption checks, not signatures; restore trusts operator-local SQLite
+inputs, rejects links/path escapes and publishes only into a fresh directory.

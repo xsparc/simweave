@@ -31,7 +31,29 @@ class SuiteJobs:
                 );
                 CREATE INDEX IF NOT EXISTS suite_queue ON suite_jobs_v1(status,created,id);
                 CREATE INDEX IF NOT EXISTS suite_tenant ON suite_jobs_v1(tenant,created,id);
+                CREATE TABLE IF NOT EXISTS suite_workers (
+                    id TEXT PRIMARY KEY, updated REAL NOT NULL, state TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS suite_counters (
+                    name TEXT PRIMARY KEY, value INTEGER NOT NULL
+                );
             """)
+
+    def worker_ping(self, worker, state):
+        now = time.time()
+        with self.db.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("DELETE FROM suite_workers WHERE updated<?", (now - 3600,))
+            if db.execute("SELECT count(*) FROM suite_workers").fetchone()[0] >= 1024:
+                db.execute(
+                    "DELETE FROM suite_workers WHERE id IN "
+                    "(SELECT id FROM suite_workers ORDER BY updated LIMIT 1)"
+                )
+            db.execute(
+                "INSERT INTO suite_workers VALUES(?,?,?) ON CONFLICT(id) "
+                "DO UPDATE SET updated=excluded.updated,state=excluded.state",
+                (worker, now, state),
+            )
 
     @staticmethod
     def public(row):
@@ -116,11 +138,18 @@ class SuiteJobs:
     def expire(self):
         now = time.time()
         with self.db.connect() as db:
-            return db.execute(
+            db.execute("BEGIN IMMEDIATE")
+            count = db.execute(
                 "UPDATE suite_jobs_v1 SET status='failed',error='worker_lost',"
                 "updated=? WHERE status='running' AND lease<=?",
                 (now, now),
             ).rowcount
+            db.execute(
+                "INSERT INTO suite_counters VALUES('lease_losses',?) "
+                "ON CONFLICT(name) DO UPDATE SET value=value+excluded.value",
+                (count,),
+            )
+            return count
 
     def claim(self):
         self.expire()
@@ -210,7 +239,16 @@ class SuiteJobs:
         return self.get(tenant, identifier)
 
 
-def work_once(jobs: SuiteJobs, artifacts: Artifacts) -> bool:
+def work_once(jobs: SuiteJobs, artifacts: Artifacts, worker_id=None) -> bool:
+    worker = worker_id or uuid.uuid4().hex
+    jobs.worker_ping(worker, "idle")
+    try:
+        return _work_once(jobs, artifacts, worker)
+    finally:
+        jobs.worker_ping(worker, "idle" if worker_id else "offline")
+
+
+def _work_once(jobs: SuiteJobs, artifacts: Artifacts, worker) -> bool:
     job = jobs.claim()
     if job is None:
         return False
@@ -221,6 +259,7 @@ def work_once(jobs: SuiteJobs, artifacts: Artifacts) -> bool:
         if time.monotonic() - last >= 0.25:
             try:
                 jobs.heartbeat(job["id"], job["claim"])
+                jobs.worker_ping(worker, "busy")
             except LostClaim:
                 raise SuiteInterrupted() from None
             last = time.monotonic()
@@ -239,6 +278,7 @@ def work_once(jobs: SuiteJobs, artifacts: Artifacts) -> bool:
                 while not stopped.wait(1) and time.monotonic() < deadline:
                     try:
                         jobs.heartbeat(job["id"], job["claim"])
+                        jobs.worker_ping(worker, "busy")
                     except Exception:
                         return  # Failure is fenced by finish(), never a stale success.
 
@@ -258,9 +298,12 @@ def work_once(jobs: SuiteJobs, artifacts: Artifacts) -> bool:
 
 
 def work_forever(jobs: SuiteJobs, artifacts: Artifacts):
+    worker = uuid.uuid4().hex
     try:
         while True:
-            if not work_once(jobs, artifacts):
+            if not work_once(jobs, artifacts, worker):
                 time.sleep(0.5)
     except KeyboardInterrupt:
         return
+    finally:
+        jobs.worker_ping(worker, "offline")

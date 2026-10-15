@@ -128,3 +128,11 @@ Explicit retry is required after worker loss. Bundle publication precedes metada
 and job completion; interrupted publications may leave conservatively retained
 objects. The engine remains independent. See the durable operations guide for
 capacity, recovery, credentials and the single-host scheduling boundary.
+
+ADR 0009 connects verified artifact bytes to catalog uploads and completed suite
+jobs, with separate run/catalog download authorities. Snapshot downloads are
+bounded and verified before sending. Durable fixed-name metrics report queue
+state, lease loss, worker freshness and artifact operations. Operator-quiesced
+checkpoints include queue/catalog/index snapshots plus verified object bytes;
+fresh-directory restore validates references and resets worker presence. The
+connected operations guide defines the recovery boundary and legacy backfill.

@@ -75,6 +75,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     store = Store(settings.database)
     app = FastAPI(title="SimWeave", version="0.1.0", docs_url="/docs", redoc_url=None)
     app.state.store = store
+    from simweave.artifact_http import Downloads
+    from simweave.artifacts import Artifacts, Filesystem
+    from simweave.storage_config import artifact_database, backend
+
+    queue = settings.database.with_name(settings.database.name + ".suites")
+    artifacts = Artifacts(
+        artifact_database(queue),
+        backend(settings.artifact_backend)
+        if settings.artifact_backend
+        else Filesystem(queue.with_name(queue.name + ".objects")),
+    )
+    app.state.artifacts = artifacts
+    app.state.downloads = Downloads(artifacts)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 

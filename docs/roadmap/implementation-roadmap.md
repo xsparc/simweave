@@ -62,6 +62,12 @@ is verification, not release or deployment. Future recommendations remain adviso
 
 ## Later review triggers
 
+SW011 is approved after PR15's squash merge: connect retained artifacts to catalog
+review and add operational metrics/coordinated recovery. ADR 0009 targets 100
+authenticated job-to-comparison flows and verified recovery of 1,000 bundles and
+100 jobs within five minutes on the bounded reference fixture. Verification and
+a draft PR are authorized. Subsequent recommendations remain advisory.
+
 SW010 is approved after PR14's squash merge: durable filesystem/S3 bundle storage
 and worker-scheduled suites. ADR 0008 targets 1,000 retained/recovered bundles and
 100 jobs across four local workers/two tenants, including cancellation and explicit

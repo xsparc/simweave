@@ -13,6 +13,19 @@ def install(app, database, tenant):
     app.state.suite_jobs = jobs
     Tenant = Annotated[str, Depends(tenant)]
 
+    @app.get("/api/v1/suite-metrics", tags=["operations"])
+    def metrics(name: Tenant):
+        from simweave.observability import snapshot
+
+        return snapshot(jobs, app.state.artifacts, name)
+
+    @app.get("/api/v1/suite-jobs/{identifier}/artifact", tags=["suites"])
+    def artifact(identifier: str, name: Tenant):
+        job = required(jobs.get(name, identifier))
+        if not job["artifact"]:
+            raise HTTPException(409, "job has no retained artifact")
+        return app.state.downloads.response(name, job["artifact"])
+
     def required(result):
         if result is None:
             raise HTTPException(404, "suite job not found")
