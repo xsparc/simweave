@@ -136,3 +136,13 @@ state, lease loss, worker freshness and artifact operations. Operator-quiesced
 checkpoints include queue/catalog/index snapshots plus verified object bytes;
 fresh-directory restore validates references and resets worker presence. The
 connected operations guide defines the recovery boundary and legacy backfill.
+
+
+## Operator workflows
+
+ADR 0010 adds a browser suite workspace using the existing tenant APIs, plus a
+persistent rollback-journal admission fence beside the suite queue. Claims and
+catalog mutations hold read reservations; pause commits after admitted mutations
+finish. Worker completion remains permitted so drain can finish. Checkpoint holds
+the paused fence and publishes verified state; restores begin paused. Resume and
+acknowledgement of terminated workers are explicit operator CLI actions.

@@ -86,3 +86,12 @@ milestone recommendations remain advisory.
 Ongoing stewardship reviews bugs, dependencies, compatibility, and this evidence
 weekly. It may prepare bounded draft maintenance PRs; consequential product scope,
 merges, paid execution, releases, and deployments require maintainer decisions.
+
+
+## Approved next slice: SW012
+
+After PR16's squash merge, the maintainer approved browser suite review and
+maintenance/recovery automation. ADR 0010 targets 30 browser cases across two
+tenants, four-worker drain, 10 GiB recovery, three interruption points and measured
+recovery time. Verification and a draft PR are authorized. Next recommendations
+remain advisory and do not authorize implementation or deployment.

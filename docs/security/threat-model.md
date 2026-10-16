@@ -163,3 +163,20 @@ statistics. Coordinated checkpoints require stopped writers, reject active jobs,
 hold metadata write reservations and validate every artifact reference. Checkpoint
 hashes are corruption checks, not signatures; restore trusts operator-local SQLite
 inputs, rejects links/path escapes and publishes only into a fresh directory.
+
+
+### Operator maintenance and browser sessions
+
+The suite workspace keeps credentials in memory, clears credential inputs after
+connect, renders evidence as text, and invalidates pending responses on disconnect.
+Existing server role and tenant checks remain authoritative. It does not provide
+login, token refresh, or cross-origin credential forwarding.
+
+Maintenance coordinates cooperating local processes through a SQLite admission
+fence. Direct legacy catalog CLI writes, raw database access, object-store admins
+and old worker versions can bypass it: stop those writers before maintenance.
+Timeouts and stale busy workers leave admission paused. Only after stopping every
+worker may an operator acknowledge stale worker records; unexpired running leases
+still block that acknowledgement. Checkpoints are trusted local recovery artifacts,
+not signed interchange. Hash checks do not establish power-loss durability or
+protect against a malicious operator rewriting both metadata and manifests.

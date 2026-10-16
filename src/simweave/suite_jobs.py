@@ -10,6 +10,7 @@ import uuid
 from pathlib import Path
 
 from simweave.artifacts import Artifacts, key
+from simweave.maintenance import Gate, admitted
 from simweave.store import Capacity, Conflict, LostClaim, Store
 from simweave.suites import Suite, SuiteInterrupted, execute_suite, review
 
@@ -19,6 +20,7 @@ class SuiteJobs:
 
     def __init__(self, path: Path):
         self.db = Store(path)
+        self.gate = Gate(path)
         with self.db.connect() as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS suite_jobs_v1 (
@@ -43,17 +45,24 @@ class SuiteJobs:
         now = time.time()
         with self.db.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            db.execute("DELETE FROM suite_workers WHERE updated<?", (now - 3600,))
+            db.execute("DELETE FROM suite_workers WHERE updated<? AND state!='busy'", (now - 3600,))
+            self._worker_record(db, worker, state, now)
+
+    @staticmethod
+    def _worker_record(db, worker, state, now):
+        if not db.execute("SELECT 1 FROM suite_workers WHERE id=?", (worker,)).fetchone():
             if db.execute("SELECT count(*) FROM suite_workers").fetchone()[0] >= 1024:
                 db.execute(
                     "DELETE FROM suite_workers WHERE id IN "
-                    "(SELECT id FROM suite_workers ORDER BY updated LIMIT 1)"
+                    "(SELECT id FROM suite_workers WHERE state!='busy' ORDER BY updated LIMIT 1)"
                 )
-            db.execute(
-                "INSERT INTO suite_workers VALUES(?,?,?) ON CONFLICT(id) "
-                "DO UPDATE SET updated=excluded.updated,state=excluded.state",
-                (worker, now, state),
-            )
+            if db.execute("SELECT count(*) FROM suite_workers").fetchone()[0] >= 1024:
+                raise Capacity("worker presence capacity reached; inspect stale busy workers")
+        db.execute(
+            "INSERT INTO suite_workers VALUES(?,?,?) ON CONFLICT(id) "
+            "DO UPDATE SET updated=excluded.updated,state=excluded.state",
+            (worker, now, state),
+        )
 
     @staticmethod
     def public(row):
@@ -75,6 +84,7 @@ class SuiteJobs:
             "suite_digest": row["digest"],
         }
 
+    @admitted
     def submit(self, tenant: str, suite: Suite, request_key: str):
         key(tenant, "0" * 64)
         if not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", request_key):
@@ -151,7 +161,14 @@ class SuiteJobs:
             )
             return count
 
-    def claim(self):
+    def claim(self, worker=None):
+        try:
+            with self.gate.hold():
+                return self._claim(worker)
+        except Conflict:
+            return None
+
+    def _claim(self, worker):
         self.expire()
         now, claim = time.time(), uuid.uuid4().hex
         with self.db.connect() as db:
@@ -166,6 +183,8 @@ class SuiteJobs:
                 "lease=?,updated=? WHERE id=?",
                 (claim, now + self.lease_seconds, now, row["id"]),
             )
+            if worker:
+                self._worker_record(db, worker, "busy", now)
             return {
                 "id": row["id"],
                 "tenant": row["tenant"],
@@ -213,6 +232,7 @@ class SuiteJobs:
             )
         return self.get(tenant, identifier)
 
+    @admitted
     def retry(self, tenant: str, identifier: str):
         self.expire()
         with self.db.connect() as db:
@@ -240,6 +260,8 @@ class SuiteJobs:
 
 
 def work_once(jobs: SuiteJobs, artifacts: Artifacts, worker_id=None) -> bool:
+    if jobs.gate.paused():
+        return False
     worker = worker_id or uuid.uuid4().hex
     jobs.worker_ping(worker, "idle")
     try:
@@ -249,7 +271,7 @@ def work_once(jobs: SuiteJobs, artifacts: Artifacts, worker_id=None) -> bool:
 
 
 def _work_once(jobs: SuiteJobs, artifacts: Artifacts, worker) -> bool:
-    job = jobs.claim()
+    job = jobs.claim(worker)
     if job is None:
         return False
     last = 0.0

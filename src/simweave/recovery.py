@@ -245,6 +245,9 @@ def restore(source: Path, target: Path):
         os.rename(staged / "artifacts.sqlite3", staged / "runs.sqlite3.suites.artifacts")
         os.rename(staged / "catalogs", staged / "runs.sqlite3.catalogs")
         os.rename(staged / "objects", staged / "runs.sqlite3.suites.objects")
+        from simweave.maintenance import Gate
+
+        Gate(staged / "runs.sqlite3.suites").set(True)
         (staged / "manifest.json").unlink()
         if target.exists():
             raise FileExistsError("restore target exists")
