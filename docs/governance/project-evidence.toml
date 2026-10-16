@@ -180,8 +180,8 @@ acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
 evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
 
 [review]
-last_reviewed = "2026-10-15"
-review_due = "2026-11-14"
+last_reviewed = "2026-10-16"
+review_due = "2026-11-15"
 
 [[research_decisions]]
 id = "RD-DURABLE-OPERATIONS"
@@ -305,3 +305,32 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-13-public-simweave-three-pr-mvp"
 acceptance_refs = ["docs/roadmap/implementation-roadmap.md"]
 evidence_refs = ["tests/test_delivery.py", "docs/governance/mvp-validation.md"]
+
+
+[[research_decisions]]
+id = "RD-OPERATOR-WORKFLOWS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-16-operator-workflows.md"]
+design_refs = ["docs/architecture/decisions/0010-operator-workflows.md"]
+
+[[requirements]]
+id = "REQ-OPERATOR-WORKFLOWS"
+statement = "Review suites in a tenant-scoped browser workspace and drain, checkpoint and recover with persistent admission fencing."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0010-operator-workflows.md"]
+implementation_refs = ["src/simweave/static/workspace.js", "src/simweave/maintenance.py", "src/simweave/suite_jobs.py", "src/simweave/catalog_api.py", "src/simweave/recovery.py"]
+verification_refs = ["tests/test_operator_workflows.py", "scripts/check_browser_workspace.py", "scripts/check_operator_recovery.py", "scripts/check_operator_workers.py"]
+validation_refs = ["docs/governance/operator-workflows-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW012-OPERATOR-WORKFLOWS"
+title = "Browser suite review and automated maintenance recovery"
+status = "verified"
+requirement_ids = ["REQ-OPERATOR-WORKFLOWS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-16-operator-workflows-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0010-operator-workflows.md"]
+evidence_refs = ["tests/test_operator_workflows.py", "scripts/check_browser_workspace.py", "scripts/check_operator_recovery.py", "scripts/check_operator_workers.py", "docs/governance/operator-workflows-validation.md"]

@@ -60,6 +60,12 @@ survive explicit retries, while the lost-job gauge decreases on retry.
 
 ## Coordinated checkpoint and restore
 
+The [operator workflow](operator-workflows.md) now offers a persistent admission
+pause and automatic worker drain before checkpoint. The manual quiesced command
+below remains supported. All fresh restores now start paused; explicitly run
+`maintenance resume` against the restored suite queue after configuration checks.
+
+
 Stop the API and workers, then resolve running jobs (expire/retry or cancel).
 The explicit `--quiesced` flag acknowledges this operator prerequisite; the tool
 also refuses running jobs and holds write reservations across existing catalogs,

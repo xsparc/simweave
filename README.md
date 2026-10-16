@@ -183,3 +183,8 @@ the scheduler remains single-host.
 Catalog uploads retain original bundles, and completed jobs can be imported into
 review without manual downloads. See [connected operations](docs/operations/connected-operations.md)
 for authenticated artifact downloads, metrics and coordinated checkpoint recovery.
+
+
+The [suite workspace and maintenance guide](docs/operations/operator-workflows.md)
+covers browser submission/review, persistent admission pause, worker drain and
+verified fresh-directory recovery. Open **Suite workspace** in the dashboard.

@@ -68,7 +68,17 @@ def install(app, settings: Settings):
             with history._connect(path):
                 pass
             catalogs[principal.tenant] = path
-    router = APIRouter(prefix="/api/v1/catalog", tags=["baseline catalog"])
+
+    def admission(request: Request):
+        if request.method in ("POST", "PUT"):
+            with app.state.suite_jobs.gate.hold():
+                yield
+        else:
+            yield
+
+    router = APIRouter(
+        prefix="/api/v1/catalog", tags=["baseline catalog"], dependencies=[Depends(admission)]
+    )
     bearer = HTTPBearer(auto_error=False)
     slots = BoundedSemaphore(2)
 

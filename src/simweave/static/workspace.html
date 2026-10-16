@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>SimWeave - Suite workspace</title>
+    <link rel="stylesheet" href="/static/app.css" />
+    <link rel="stylesheet" href="/static/workspace.css" />
+    <script src="/static/workspace.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#review">Skip to suite review</a>
+    <header class="suite-header">
+      <a href="/">SimWeave / Experiment lab</a><span>SUITE WORKSPACE</span>
+    </header>
+    <main id="review" class="suite-workspace">
+      <h1>From experiment to evidence</h1>
+      <p class="muted">
+        Run a suite, retain its evidence, and compare a candidate against an
+        approved baseline.
+      </p>
+      <section aria-labelledby="access-title">
+        <h2 id="access-title">01 / Connect</h2>
+        <form id="access">
+          <label
+            >Run token
+            <input id="run-token" type="password" autocomplete="off" /></label
+          ><label
+            >Catalog token
+            <input
+              id="catalog-token"
+              type="password"
+              autocomplete="off" /></label
+          ><button>Connect</button
+          ><button type="button" id="disconnect">Disconnect</button>
+        </form>
+        <p id="identity">
+          Disconnected. Tokens stay in memory until disconnect or reload.
+        </p>
+      </section>
+      <p id="status" role="status" aria-live="polite">Ready to connect.</p>
+      <p id="error" role="alert" hidden></p>
+      <div class="suite-columns">
+        <section aria-labelledby="submit-title">
+          <h2 id="submit-title">02 / Submit a suite</h2>
+          <form id="submit">
+            <label
+              >Suite JSON (64 KiB maximum)<textarea
+                id="suite"
+                rows="14"
+                spellcheck="false"
+                required
+              ></textarea></label
+            ><label
+              >Load suite file
+              <input
+                id="suite-file"
+                type="file"
+                accept=".json,application/json" /></label
+            ><label
+              >Idempotency key
+              <input
+                id="request-key"
+                required
+                maxlength="128"
+                pattern="[A-Za-z0-9_-]{1,128}" /></label
+            ><button>Submit suite</button>
+          </form>
+          <p class="muted">
+            Use the same key to safely retry an uncertain submission. Edit the
+            key for a new job.
+          </p>
+        </section>
+        <section aria-labelledby="jobs-title">
+          <h2 id="jobs-title">03 / Inspect jobs</h2>
+          <div class="actions">
+            <button id="refresh-jobs">Refresh jobs</button
+            ><button id="more-jobs" disabled>Next job page</button>
+          </div>
+          <label
+            >Suite job
+            <select id="jobs">
+              <option value="">Select a job</option>
+            </select></label
+          >
+          <div class="actions">
+            <button id="inspect-job">Inspect job</button
+            ><button id="cancel-job" disabled>Cancel job</button
+            ><button id="retry-job" disabled>Retry failed job</button
+            ><button id="download-job" disabled>Download job evidence</button>
+          </div>
+          <pre id="job-detail">No job selected.</pre>
+        </section>
+      </div>
+      <section aria-labelledby="catalog-title">
+        <h2 id="catalog-title">04 / Retain and review</h2>
+        <form id="import">
+          <label
+            >Build label
+            <input
+              id="build-label"
+              required
+              maxlength="64"
+              pattern="[A-Za-z0-9][A-Za-z0-9._-]*" /></label
+          ><label
+            >Build role
+            <select id="build-role">
+              <option value="candidate">Candidate</option>
+              <option value="baseline">Baseline</option>
+            </select></label
+          ><button id="import-job" type="submit" disabled>
+            Import selected job</button
+          ><label
+            >Evidence ZIP (128 MiB maximum)<input
+              id="bundle"
+              type="file"
+              accept=".zip,application/zip" /></label
+          ><button id="upload" type="button">Import bundle</button>
+        </form>
+        <p class="muted">
+          Importing a baseline does not approve it. An approver must explicitly
+          promote it using the catalog API.
+        </p>
+        <div class="actions">
+          <button id="refresh-builds">Refresh catalog</button
+          ><button id="more-builds" disabled>Next build page</button>
+        </div>
+        <label
+          >Catalog build
+          <select id="builds">
+            <option value="">Select a build</option>
+          </select></label
+        >
+        <div class="actions">
+          <button id="inspect-build">Inspect build</button
+          ><button id="download-build">Download build evidence</button
+          ><button id="compare">Compare to approved baseline</button>
+        </div>
+        <p id="baseline">No catalog connected.</p>
+        <pre id="build-detail">No build selected.</pre>
+        <h3>Comparison</h3>
+        <p id="verdict">No comparison requested.</p>
+        <pre id="comparison-detail"></pre>
+      </section>
+    </main>
+  </body>
+</html>

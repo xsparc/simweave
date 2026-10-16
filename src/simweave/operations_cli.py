@@ -37,6 +37,18 @@ def register(commands):
     restore = sub.add_parser("restore-checkpoint", help="verify and restore into a fresh directory")
     restore.add_argument("source", type=Path)
     restore.add_argument("path", type=Path)
+    maintenance = sub.add_parser(
+        "maintenance", help="pause, drain, checkpoint and explicitly resume"
+    )
+    maintenance.add_argument(
+        "action",
+        choices=("status", "pause", "drain", "resume", "checkpoint", "acknowledge-stopped"),
+    )
+    maintenance.add_argument("--workers-stopped", action="store_true")
+    maintenance.add_argument("--timeout", type=float, default=300)
+    maintenance.add_argument("--backend", type=Path)
+    maintenance.add_argument("--catalogs", type=Path)
+    maintenance.add_argument("--output", type=Path)
     for action in ("put", "get", "recover", "backup"):
         command = sub.add_parser(action)
         command.add_argument("--backend", type=Path, required=True)
@@ -55,7 +67,25 @@ def dispatch(args):
         return 0
     jobs = SuiteJobs(args.database)
     action = args.operation
-    if action == "submit":
+    if action == "maintenance":
+        from simweave import maintenance
+
+        if args.action == "status":
+            result = {"schema_version": 1, "paused": jobs.gate.paused()}
+        elif args.action in ("pause", "resume"):
+            result = jobs.gate.set(args.action == "pause")
+        elif args.action == "acknowledge-stopped":
+            result = maintenance.acknowledge_stopped(jobs, args.workers_stopped)
+        elif args.action == "drain":
+            result = maintenance.drain(jobs, args.timeout)
+        else:
+            if not all((args.backend, args.catalogs, args.output)):
+                raise ValueError("checkpoint requires backend, catalogs and output")
+            artifacts = Artifacts(artifact_database(args.database), backend(args.backend))
+            result = maintenance.checkpoint(
+                jobs, artifacts, args.catalogs, args.output, args.timeout
+            )
+    elif action == "submit":
         if args.path.stat().st_size > 65536:
             raise ValueError("suite exceeds 64 KiB")
         result = jobs.submit(
@@ -86,7 +116,8 @@ def dispatch(args):
                 return 0
             result = {"worked": work_once(jobs, artifacts)}
         elif action == "put":
-            result = {"digest": artifacts.put(args.tenant, args.path)}
+            with jobs.gate.hold():
+                result = {"digest": artifacts.put(args.tenant, args.path)}
         elif action == "get":
             artifacts.get(args.tenant, args.digest, args.path)
             result = {"retrieved": True}
