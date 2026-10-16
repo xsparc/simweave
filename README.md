@@ -178,7 +178,10 @@ Schedule complete regression suites through `/api/v1/suite-jobs` or the
 bundles to filesystem or S3-compatible storage, with explicit retry after worker
 loss. See [durable operations](docs/operations/durable-operations.md) for setup,
 tenant permissions, limits and recovery. S3 support is optional (`simweave[s3]`);
-the scheduler remains single-host.
+the default SQLite scheduler remains single-host. The optional
+[PostgreSQL and Keycloak integration](docs/operations/provider-distributed.md)
+adds a shared suite queue and real-provider token profile (`simweave[postgres,s3]`).
+Catalog storage still uses one API authority.
 
 Catalog uploads retain original bundles, and completed jobs can be imported into
 review without manual downloads. See [connected operations](docs/operations/connected-operations.md)

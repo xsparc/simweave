@@ -180,8 +180,8 @@ acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
 evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
 
 [review]
-last_reviewed = "2026-10-16"
-review_due = "2026-11-15"
+last_reviewed = "2026-10-17"
+review_due = "2026-11-16"
 
 [[research_decisions]]
 id = "RD-DURABLE-OPERATIONS"
@@ -334,3 +334,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-16-operator-workflows-development-verification-draft-pr"
 acceptance_refs = ["docs/architecture/decisions/0010-operator-workflows.md"]
 evidence_refs = ["tests/test_operator_workflows.py", "scripts/check_browser_workspace.py", "scripts/check_operator_recovery.py", "scripts/check_operator_workers.py", "docs/governance/operator-workflows-validation.md"]
+
+[[research_decisions]]
+id = "RD-PROVIDER-DISTRIBUTED"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-17-provider-distributed.md"]
+design_refs = ["docs/architecture/decisions/0011-provider-distributed-queue.md"]
+
+[[requirements]]
+id = "REQ-PROVIDER-DISTRIBUTED"
+statement = "Validate real provider identities and coordinate tenant-scoped suites through PostgreSQL and S3."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0011-provider-distributed-queue.md"]
+implementation_refs = ["src/simweave/postgres.py", "src/simweave/oidc.py", "src/simweave/api.py"]
+verification_refs = ["tests/test_postgres.py", "tests/test_oidc.py", "scripts/check_keycloak.py", "scripts/check_distributed.py"]
+validation_refs = ["docs/governance/provider-distributed-validation.md"]
+risk_refs = ["docs/security/threat-model.md"]
+
+[[work_items]]
+id = "SW013-PROVIDER-DISTRIBUTED"
+title = "Real identity provider and distributed suite queue"
+status = "verified"
+requirement_ids = ["REQ-PROVIDER-DISTRIBUTED"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-17-provider-distributed-development-verification-draft-pr"
+acceptance_refs = ["docs/architecture/decisions/0011-provider-distributed-queue.md"]
+evidence_refs = ["docs/governance/provider-distributed-validation.md", "tests/test_postgres.py", "scripts/check_keycloak.py", "scripts/check_distributed.py"]

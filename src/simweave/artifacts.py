@@ -90,7 +90,16 @@ class Filesystem:
 
 
 class S3:
-    def __init__(self, *, endpoint: str, bucket: str, region: str, access_key: str, secret: str):
+    def __init__(
+        self,
+        *,
+        endpoint: str,
+        bucket: str,
+        region: str,
+        access_key: str,
+        secret: str,
+        ca_bundle: str | None = None,
+    ):
         from boto3.session import Session
         from botocore.config import Config
 
@@ -117,6 +126,7 @@ class S3:
         ).client(
             "s3",
             endpoint_url=endpoint,
+            verify=ca_bundle if ca_bundle else True,
             config=Config(
                 connect_timeout=5,
                 read_timeout=30,
@@ -178,6 +188,7 @@ class Artifacts:
     def __init__(self, database: Path, backend):
         self.db = Store(database)
         self.backend = backend
+        self.scratch = database.parent
         with self.db.connect() as db:
             db.execute(
                 "CREATE TABLE IF NOT EXISTS operation_counters "
@@ -192,53 +203,29 @@ class Artifacts:
     def put(self, tenant: str, source: Path) -> str:
         key(tenant, "0" * 64)
         # Snapshot before verification; publish precisely the verified bytes.
-        with tempfile.TemporaryDirectory(dir=self.db.path.parent) as temporary:
+        with tempfile.TemporaryDirectory(dir=self.scratch) as temporary:
             staged = Path(temporary) / "bundle.zip"
             Filesystem(source.parent).get(source.name, staged)
             read_bundle(staged)
             digest, size = digest_file(staged)
             name = key(tenant, digest)
-            with self.db.connect() as db:
-                count = db.execute("SELECT COUNT(*) FROM artifacts WHERE tenant=?", (tenant,))
-                if (
-                    count.fetchone()[0] >= 10000
-                    and not db.execute(
-                        "SELECT 1 FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
-                    ).fetchone()
-                ):
-                    raise Capacity("artifact retention capacity reached")
-            # Keep slow I/O outside metadata transactions so workers do not block one another.
+            self.check_capacity(tenant, digest)
+            # Slow object I/O stays outside metadata transactions.
             self.backend.put(name, staged)
-            with self.db.connect() as db:
-                db.execute("BEGIN IMMEDIATE")
-                existing = db.execute(
-                    "SELECT size FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
-                ).fetchone()
-                if (
-                    not existing
-                    and db.execute(
-                        "SELECT COUNT(*) FROM artifacts WHERE tenant=?", (tenant,)
-                    ).fetchone()[0]
-                    >= 10000
-                ):
-                    raise Capacity("artifact retention capacity reached")
-                db.execute("INSERT OR IGNORE INTO artifacts VALUES(?,?,?)", (tenant, digest, size))
+            self.retain(tenant, digest, size)
             return digest
 
     @counted("artifact_get")
     def get(self, tenant: str, digest: str, target: Path):
         name = key(tenant, digest)
-        with self.db.connect() as db:
-            row = db.execute(
-                "SELECT size FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
-            ).fetchone()
-        if row is None:
+        size = self.size(tenant, digest)
+        if size is None:
             raise KeyError("artifact not found")
         target.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=target.parent) as temporary:
             staged = Path(temporary) / "bundle.zip"
             self.backend.get(name, staged)
-            if digest_file(staged) != (digest, row[0]):
+            if digest_file(staged) != (digest, size):
                 raise ValueError("artifact integrity failure")
             publish(staged, target)
 
@@ -249,7 +236,7 @@ class Artifacts:
                 "SELECT digest FROM artifacts WHERE tenant=? ORDER BY digest", (tenant,)
             ).fetchall()
         for row in rows:
-            with tempfile.TemporaryDirectory(dir=self.db.path.parent) as temporary:
+            with tempfile.TemporaryDirectory(dir=self.scratch) as temporary:
                 staged = Path(temporary) / "bundle.zip"
                 self.get(tenant, row[0], staged)
                 destination.put(key(tenant, row[0]), staged)
@@ -257,3 +244,48 @@ class Artifacts:
 
     def backup(self, target: Path):
         backup_database(self.db, target)
+
+    def check_capacity(self, tenant, digest):
+        with self.db.connect() as db:
+            if (
+                db.execute("SELECT count(*) FROM artifacts WHERE tenant=?", (tenant,)).fetchone()[0]
+                >= 10000
+                and not db.execute(
+                    "SELECT 1 FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
+                ).fetchone()
+            ):
+                raise Capacity("artifact retention capacity reached")
+
+    def retain(self, tenant, digest, size):
+        with self.db.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            existing = db.execute(
+                "SELECT size FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
+            ).fetchone()
+            if (
+                not existing
+                and db.execute(
+                    "SELECT count(*) FROM artifacts WHERE tenant=?", (tenant,)
+                ).fetchone()[0]
+                >= 10000
+            ):
+                raise Capacity("artifact retention capacity reached")
+            db.execute("INSERT OR IGNORE INTO artifacts VALUES(?,?,?)", (tenant, digest, size))
+
+    def size(self, tenant, digest):
+        with self.db.connect() as db:
+            row = db.execute(
+                "SELECT size FROM artifacts WHERE tenant=? AND digest=?", (tenant, digest)
+            ).fetchone()
+            return row[0] if row else None
+
+    def count_operation(self, name):
+        try:
+            with self.db.connect() as db:
+                db.execute(
+                    "INSERT INTO operation_counters VALUES(?,1) ON CONFLICT(name) DO "
+                    "UPDATE SET value=value+1",
+                    (name,),
+                )
+        except sqlite3.Error:
+            pass

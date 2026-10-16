@@ -2,6 +2,7 @@
 
 import importlib.util
 import secrets
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 
@@ -73,19 +74,52 @@ class BodyLimit:
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     store = Store(settings.database)
-    app = FastAPI(title="SimWeave", version="0.1.0", docs_url="/docs", redoc_url=None)
+    shared = None
+
+    @asynccontextmanager
+    async def lifespan(app):
+        try:
+            yield
+        finally:
+            if shared is not None:
+                shared.close()
+
+    app = FastAPI(
+        title="SimWeave", version="0.1.0", docs_url="/docs", redoc_url=None, lifespan=lifespan
+    )
     app.state.store = store
     from simweave.artifact_http import Downloads
     from simweave.artifacts import Artifacts, Filesystem
     from simweave.storage_config import artifact_database, backend
 
     queue = settings.database.with_name(settings.database.name + ".suites")
-    artifacts = Artifacts(
-        artifact_database(queue),
-        backend(settings.artifact_backend)
-        if settings.artifact_backend
-        else Filesystem(queue.with_name(queue.name + ".objects")),
-    )
+    if settings.postgres:
+        from simweave.postgres import Database, Jobs, SharedArtifacts, Unavailable
+
+        if settings.artifact_backend is None:
+            raise ValueError("distributed suites require explicit shared S3 storage")
+        shared = Database(queue.parent)
+        try:
+            artifacts = SharedArtifacts(shared, backend(settings.artifact_backend))
+        except Exception:
+            shared.close()
+            raise
+        suite_jobs = Jobs(shared)
+
+        @app.exception_handler(Unavailable)
+        async def postgres_unavailable(request, exc):
+            return JSONResponse({"detail": "suite storage unavailable"}, status_code=503)
+
+    else:
+        from simweave.suite_jobs import SuiteJobs
+
+        suite_jobs = SuiteJobs(queue)
+        artifacts = Artifacts(
+            artifact_database(queue),
+            backend(settings.artifact_backend)
+            if settings.artifact_backend
+            else Filesystem(queue.with_name(queue.name + ".objects")),
+        )
     app.state.artifacts = artifacts
     app.state.downloads = Downloads(artifacts)
     app.add_middleware(BodyLimit)
@@ -105,7 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     Tenant = Annotated[str, Depends(tenant)]
     from simweave.suite_api import install as install_suites
 
-    install_suites(app, settings.database.with_name(settings.database.name + ".suites"), tenant)
+    install_suites(app, queue, tenant, jobs=suite_jobs)
 
     @app.exception_handler(RequestValidationError)
     async def invalid(request, exc):

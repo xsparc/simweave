@@ -353,3 +353,33 @@ def test_oidc_import_approval_and_tenant_isolation(verifier, keys, tmp_path, mon
         client.get("/api/v1/catalog/events", headers=headers("beta", "reader")).json()["items"]
         == []
     )
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {},
+        {"typ": "ID"},
+        {"azp": "unapproved"},
+        {"azp": None},
+        {"aud": ["other"]},
+        {"sub": "unmapped"},
+        {"scope": "catalog:approve"},
+    ],
+)
+def test_keycloak_profile_explicit_access_tokens(keys, monkeypatch, changes):
+    monkeypatch.setattr(
+        oidc, "fetch_keys", lambda uri: json.dumps({"keys": [jwk(keys[0])]}).encode()
+    )
+    check = oidc.OIDCVerifier(config(token_profile="keycloak"))
+    claims = {"typ": "Bearer", "azp": "test-client", "aud": ["account", "simweave-catalog"]}
+    claims.update(changes)
+    signed = token(keys[0], headers={"typ": "JWT"}, **claims)
+    if changes:
+        error = oidc.InsufficientScope if "scope" in changes else oidc.InvalidToken
+        with pytest.raises(error):
+            check.verify(signed)
+    else:
+        assert check.verify(signed).tenant == "alpha"
+        with pytest.raises(oidc.InvalidToken):
+            oidc.OIDCVerifier(config()).verify(signed)

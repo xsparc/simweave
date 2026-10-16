@@ -20,6 +20,7 @@ class SuiteJobs:
 
     def __init__(self, path: Path):
         self.db = Store(path)
+        self.scratch = path.parent
         self.gate = Gate(path)
         with self.db.connect() as db:
             db.executescript("""
@@ -287,7 +288,7 @@ def _work_once(jobs: SuiteJobs, artifacts: Artifacts, worker) -> bool:
             last = time.monotonic()
 
     try:
-        with tempfile.TemporaryDirectory(dir=jobs.db.path.parent) as temporary:
+        with tempfile.TemporaryDirectory(dir=jobs.scratch) as temporary:
             output = Path(temporary) / "suite"
             report = execute_suite(job["suite"], output, checkpoint=checkpoint)
             jobs.heartbeat(job["id"], job["claim"])

@@ -8,8 +8,8 @@ from simweave.suite_jobs import SuiteJobs
 from simweave.suites import Suite
 
 
-def install(app, database, tenant):
-    jobs = SuiteJobs(database)
+def install(app, database, tenant, jobs=None):
+    jobs = jobs if jobs is not None else SuiteJobs(database)
     app.state.suite_jobs = jobs
     Tenant = Annotated[str, Depends(tenant)]
 

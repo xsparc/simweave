@@ -47,15 +47,15 @@ The API submits durable jobs; a separate worker claims them transactionally.
 Each run stores its normalized scenario, digest, engine and simulator versions,
 metrics, gate results, and ordered telemetry. Batched inserts and cursor pagination
 bound memory and response sizes. SQLite WAL is the single-host MVP store on a
-local filesystem. No network-mounted SQLite volumes and no multi-host scaling
-claim. Worker leases detect abandoned runs; expired work fails explicitly instead
+local filesystem. Do not network-mount SQLite. The optional PostgreSQL suite
+queue supports separate workers; legacy run storage remains single-host. Worker leases detect abandoned runs; expired work fails explicitly instead
 of silently repeating simulator side effects. Completed recordings are immutable.
 
 Tenant identity comes from server-side credential/subject mappings, never request JSON.
 Repository queries scope reads and mutations to the authenticated tenant. Quotas,
 request limits, and cancellation constrain work. API and worker processes can be
-replaced separately. Hosted evolution replaces the repository with PostgreSQL job
-claims and object storage for telemetry; billing, per-tenant scheduling,
+replaced separately. PostgreSQL suite claims and S3 bundles are optional;
+legacy telemetry migration, billing, per-tenant scheduling,
 distributed tracing, and isolation of third-party simulators are later work.
 
 ## Determinism and replay
@@ -127,7 +127,8 @@ suites; cancellation, lease expiry and attempt claims fence stale completions.
 Explicit retry is required after worker loss. Bundle publication precedes metadata
 and job completion; interrupted publications may leave conservatively retained
 objects. The engine remains independent. See the durable operations guide for
-capacity, recovery, credentials and the single-host scheduling boundary.
+capacity, recovery, credentials and the default SQLite scheduling boundary.
+The optional distributed suite boundary is described below.
 
 ADR 0009 connects verified artifact bytes to catalog uploads and completed suite
 jobs, with separate run/catalog download authorities. Snapshot downloads are
@@ -146,3 +147,12 @@ catalog mutations hold read reservations; pause commits after admitted mutations
 finish. Worker completion remains permitted so drain can finish. Checkpoint holds
 the paused fence and publishes verified state; restores begin paused. Resume and
 acknowledgement of terminated workers are explicit operator CLI actions.
+
+## Optional provider/distributed boundary
+
+ADR 0011 adds an explicit Keycloak access-token profile and PostgreSQL suite queue
+with shared S3 artifact metadata. Database-time leases, attempt fences, bounded
+pools and transactional admission preserve the existing suite contracts. Catalogs
+and legacy runs still belong to a single API host. SQLite defaults and recovery
+remain supported; PostgreSQL recovery/migration is not implemented. See
+[operator setup](../operations/provider-distributed.md) for configuration and limits.

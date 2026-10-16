@@ -57,13 +57,16 @@ def drain(jobs, timeout=300):
     deadline = time.monotonic() + timeout
     with jobs.gate.hold(paused=True):
         while True:
-            with jobs.db.connect() as db:
-                running = db.execute(
-                    "SELECT count(*) FROM suite_jobs_v1 WHERE status='running'"
-                ).fetchone()[0]
-                busy = db.execute(
-                    "SELECT count(*) FROM suite_workers WHERE state='busy'"
-                ).fetchone()[0]
+            if hasattr(jobs, "activity"):
+                running, busy = jobs.activity()
+            else:
+                with jobs.db.connect() as db:
+                    running = db.execute(
+                        "SELECT count(*) FROM suite_jobs_v1 WHERE status='running'"
+                    ).fetchone()[0]
+                    busy = db.execute(
+                        "SELECT count(*) FROM suite_workers WHERE state='busy'"
+                    ).fetchone()[0]
             if not running and not busy:
                 return {"schema_version": 1, "paused": True, "drained": True}
             if time.monotonic() >= deadline:
@@ -74,6 +77,8 @@ def drain(jobs, timeout=300):
 def checkpoint(jobs, artifacts, catalogs, target, timeout=300):
     from simweave.recovery import checkpoint as snapshot
 
+    if hasattr(jobs, "database"):
+        raise ValueError("use PostgreSQL-native and object-store backup after drain")
     drain(jobs, timeout)
     with jobs.gate.hold(paused=True):
         result = snapshot(jobs, artifacts, catalogs, target)
@@ -85,6 +90,12 @@ def acknowledge_stopped(jobs, workers_stopped=False):
     if not workers_stopped:
         raise ValueError("stop all workers and supply --workers-stopped")
     with jobs.gate.hold(paused=True):
+        if hasattr(jobs, "acknowledge_stopped"):
+            return {
+                "schema_version": 1,
+                "paused": True,
+                "cleared_workers": jobs.acknowledge_stopped(),
+            }
         jobs.expire()
         with jobs.db.connect() as db:
             db.execute("BEGIN IMMEDIATE")
