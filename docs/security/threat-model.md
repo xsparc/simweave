@@ -180,3 +180,15 @@ worker may an operator acknowledge stale worker records; unexpired running lease
 still block that acknowledgement. Checkpoints are trusted local recovery artifacts,
 not signed interchange. Hash checks do not establish power-loss durability or
 protect against a malicious operator rewriting both metadata and manifests.
+
+## PostgreSQL and provider boundary
+
+The PostgreSQL DSN and S3 trust bundle are trusted operator configuration. Use a
+dedicated database role and verified TLS outside the isolated fixture. PostgreSQL
+advisory locks fence admission; row locks and attempt tokens fence claims and
+completion. This does not guarantee exactly-once execution or tenant fairness.
+Single-host catalogs, native database recovery and cross-store cutover remain
+operational limitations. The explicit Keycloak profile rejects ID tokens and
+unmapped subjects; signed tenant claims cannot alter the local mapping. Offline
+verification cannot immediately observe provider logout/revocation. The local
+fixture validates that limitation rather than claiming immediate invalidation.

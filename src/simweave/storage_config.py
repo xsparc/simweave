@@ -13,6 +13,7 @@ class BackendConfig(Contract):
     endpoint: str | None = None
     bucket: str | None = None
     region: str = "us-east-1"
+    ca_bundle: str | None = None
 
 
 def backend(path: Path):
@@ -30,6 +31,7 @@ def backend(path: Path):
             region=config.region,
             access_key=os.environ["SIMWEAVE_S3_ACCESS_KEY"],
             secret=os.environ["SIMWEAVE_S3_SECRET_KEY"],
+            ca_bundle=config.ca_bundle,
         )
     raise ValueError("configure exactly one storage backend")
 

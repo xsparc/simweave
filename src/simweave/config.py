@@ -5,7 +5,7 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
 from pydantic import Field, model_validator
@@ -23,6 +23,7 @@ Subject = Annotated[str, Field(min_length=1, max_length=200, pattern=r"^[\x21-\x
 
 
 class OIDCSettings(Contract):
+    token_profile: Literal["rfc9068", "keycloak"] = "rfc9068"
     issuer: str = Field(min_length=1, max_length=2048)
     jwks_uri: str = Field(min_length=1, max_length=2048)
     audience: str = Field(min_length=1, max_length=200)
@@ -56,6 +57,7 @@ class Settings:
     tokens: dict[str, str | dict | CatalogPrincipal]
     oidc: OIDCSettings | None = None
     artifact_backend: Path | None = None
+    postgres: bool = False
 
     def __post_init__(self):
         if isinstance(self.oidc, dict):
@@ -84,6 +86,8 @@ class Settings:
     @classmethod
     def from_env(cls):
         try:
+            if os.environ.get("SIMWEAVE_SUITE_BACKEND", "sqlite") not in ("sqlite", "postgres"):
+                raise ValueError("invalid suite backend")
             return cls(
                 Path(os.environ.get("SIMWEAVE_DB", ".simweave/runs.sqlite3")),
                 json.loads(os.environ.get("SIMWEAVE_TOKENS", "{}")),
@@ -93,6 +97,7 @@ class Settings:
                 Path(os.environ["SIMWEAVE_ARTIFACT_BACKEND"])
                 if os.environ.get("SIMWEAVE_ARTIFACT_BACKEND")
                 else None,
+                os.environ.get("SIMWEAVE_SUITE_BACKEND", "sqlite") == "postgres",
             )
         except (ValueError, TypeError):
             raise ValueError("invalid SIMWEAVE_TOKENS or SIMWEAVE_OIDC configuration") from None

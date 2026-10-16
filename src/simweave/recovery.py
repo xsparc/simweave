@@ -69,6 +69,8 @@ def inventory(root):
 
 def checkpoint(jobs, artifacts, catalogs: Path, target: Path):
     """Caller must stop API/workers first; lock reservations enforce metadata stability."""
+    if hasattr(jobs, "database"):
+        raise ValueError("SQLite checkpoint cannot snapshot PostgreSQL")
     if target.exists():
         raise FileExistsError("checkpoint target exists")
     target.parent.mkdir(parents=True, exist_ok=True)

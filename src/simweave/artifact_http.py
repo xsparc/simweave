@@ -38,7 +38,7 @@ class Downloads:
                 self.slots.release()
 
         try:
-            temporary = tempfile.TemporaryDirectory(dir=self.artifacts.db.path.parent)
+            temporary = tempfile.TemporaryDirectory(dir=self.artifacts.scratch)
             target = Path(temporary.name) / "evidence.zip"
             self.artifacts.get(tenant, digest, target)
             return Download(target, cleanup)

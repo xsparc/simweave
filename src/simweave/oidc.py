@@ -115,11 +115,14 @@ class OIDCVerifier:
             header = json.loads(jwt.utils.base64url_decode(parts[0]), object_pairs_hook=_unique)
             # Reject duplicate payload keys before the library verifies the signed bytes.
             json.loads(jwt.utils.base64url_decode(parts[1]), object_pairs_hook=_unique)
+            keycloak = self.settings.token_profile == "keycloak"
+            types = ("jwt",) if keycloak else ("at+jwt", "application/at+jwt")
+            client_claim = "azp" if keycloak else "client_id"
             if (
                 not isinstance(header, dict)
                 or set(header) != {"alg", "typ", "kid"}
                 or header["alg"] != "RS256"
-                or header["typ"].lower() not in ("at+jwt", "application/at+jwt")
+                or header["typ"].lower() not in types
                 or not isinstance(header["kid"], str)
                 or not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", header["kid"])
             ):
@@ -132,18 +135,19 @@ class OIDCVerifier:
                 audience=self.settings.audience,
                 leeway=self.settings.clock_skew_seconds,
                 options={
-                    "require": ["iss", "sub", "aud", "exp", "iat", "jti", "client_id"],
-                    "strict_aud": True,
+                    "require": ["iss", "sub", "aud", "exp", "iat", "jti", client_claim],
+                    "strict_aud": not keycloak,
                 },
             )
             if (
                 any(type(claims.get(field)) is not int for field in ("exp", "iat"))
                 or ("nbf" in claims and type(claims["nbf"]) is not int)
                 or not 0 < claims["exp"] - claims["iat"] <= self.settings.max_token_seconds
-                or claims["client_id"] not in self.settings.client_ids
+                or claims[client_claim] not in self.settings.client_ids
+                or (keycloak and claims.get("typ") != "Bearer")
                 or any(
                     not isinstance(claims.get(field), str) or not 1 <= len(claims[field]) <= 200
-                    for field in ("sub", "jti", "client_id")
+                    for field in ("sub", "jti", client_claim)
                 )
             ):
                 raise InvalidToken("invalid access token claims")

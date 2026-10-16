@@ -1,6 +1,5 @@
 """Fixed-cardinality durable counters and operational snapshots."""
 
-import sqlite3
 import time
 from functools import wraps
 
@@ -15,15 +14,7 @@ def counted(operation):
                 suffix = "successes_total"
                 return result
             finally:
-                try:
-                    with self.db.connect() as db:
-                        db.execute(
-                            "INSERT INTO operation_counters VALUES(?,1) "
-                            "ON CONFLICT(name) DO UPDATE SET value=value+1",
-                            (operation + "_" + suffix,),
-                        )
-                except sqlite3.Error:
-                    pass  # Telemetry failure must not change storage semantics.
+                self.count_operation(operation + "_" + suffix)
 
         return invoke
 
@@ -31,6 +22,8 @@ def counted(operation):
 
 
 def snapshot(jobs, artifacts, tenant=None):
+    if hasattr(jobs, "metrics"):
+        return jobs.metrics(artifacts, tenant)
     now = time.time()
     where, args = ("WHERE tenant=?", (tenant,)) if tenant else ("", ())
     with jobs.db.connect() as db:

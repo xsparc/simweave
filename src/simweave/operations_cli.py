@@ -12,7 +12,11 @@ from simweave.suites import Suite
 def register(commands):
     operation = commands.add_parser("operations", help="durable suites and immutable artifacts")
     operation.add_argument("--database", type=Path, required=True, help="suite queue database")
+    operation.add_argument(
+        "--postgres", action="store_true", help="use explicit PostgreSQL DSN from environment"
+    )
     sub = operation.add_subparsers(dest="operation", required=True)
+    sub.add_parser("initialize", help="initialize fresh PostgreSQL schema version 1")
     for action in ("submit", "show", "list", "cancel", "retry"):
         command = sub.add_parser(action)
         command.add_argument("--tenant", required=True)
@@ -61,12 +65,38 @@ def register(commands):
 
 def dispatch(args):
     if args.operation == "restore-checkpoint":
+        if args.postgres:
+            raise ValueError("SQLite restore cannot target PostgreSQL")
         from simweave.recovery import restore
 
         print(canonical(restore(args.source, args.path)))
         return 0
-    jobs = SuiteJobs(args.database)
+    if args.postgres:
+        from simweave.postgres import Database, Jobs
+
+        database = Database(args.database.parent, initialize=args.operation == "initialize")
+        try:
+            return dispatch_jobs(args, Jobs(database))
+        finally:
+            database.close()
+    return dispatch_jobs(args, SuiteJobs(args.database))
+
+
+def artifacts_for(args, jobs):
+    if args.postgres:
+        from simweave.postgres import SharedArtifacts
+
+        return SharedArtifacts(jobs.database, backend(args.backend))
+    return Artifacts(artifact_database(args.database), backend(args.backend))
+
+
+def dispatch_jobs(args, jobs):
     action = args.operation
+    if action == "initialize":
+        if not args.postgres:
+            raise ValueError("initialize requires --postgres")
+        print(canonical({"schema_version": 1, "initialized": True}))
+        return 0
     if action == "maintenance":
         from simweave import maintenance
 
@@ -81,7 +111,7 @@ def dispatch(args):
         else:
             if not all((args.backend, args.catalogs, args.output)):
                 raise ValueError("checkpoint requires backend, catalogs and output")
-            artifacts = Artifacts(artifact_database(args.database), backend(args.backend))
+            artifacts = artifacts_for(args, jobs)
             result = maintenance.checkpoint(
                 jobs, artifacts, args.catalogs, args.output, args.timeout
             )
@@ -98,7 +128,7 @@ def dispatch(args):
     elif action == "list":
         result = jobs.list(args.tenant, args.after)
     else:
-        artifacts = Artifacts(artifact_database(args.database), backend(args.backend))
+        artifacts = artifacts_for(args, jobs)
         if action == "metrics":
             from simweave.observability import prometheus, snapshot
 
@@ -124,6 +154,8 @@ def dispatch(args):
         elif action == "recover":
             result = {"recovered": artifacts.recover(args.tenant, backend(args.path))}
         else:
+            if args.postgres:
+                raise ValueError("use PostgreSQL-native backup")
             # Separate snapshots: stop workers/submissions for a consistent recovery point.
             args.path.mkdir(parents=True, exist_ok=False)
             artifacts.backup(args.path / "artifacts.sqlite3")

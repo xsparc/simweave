@@ -101,3 +101,8 @@ the 100-job/four-worker/two-tenant and 1,000-bundle recovery workload. Add
 `--s3-config CONFIG` for an already provisioned local test bucket. CI uses a pinned
 RustFS 1.0.0 container, synthetic credentials and loopback binding. No paid cloud
 service is required, and compatibility with every S3 vendor is not claimed.
+
+
+For explicitly configured PostgreSQL suite workers, see the
+[provider/distributed guide](provider-distributed.md). The single-host restrictions
+and SQLite backup commands above apply to the default SQLite backend.

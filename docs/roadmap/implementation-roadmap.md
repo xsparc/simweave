@@ -95,3 +95,12 @@ maintenance/recovery automation. ADR 0010 targets 30 browser cases across two
 tenants, four-worker drain, 10 GiB recovery, three interruption points and measured
 recovery time. Verification and a draft PR are authorized. Next recommendations
 remain advisory and do not authorize implementation or deployment.
+
+## SW013: provider and distributed suite boundary
+
+After PR17's squash merge, recommendations #3 and #4 are approved for development,
+verification and a draft PR. ADR 0011 defines real Keycloak role/rotation/expiry
+checks and PostgreSQL suite scheduling with 1,000 jobs and eight workers across
+two isolated container hosts. The fixture has one physical host. SQLite remains
+the default and the catalog retains one API authority. Subsequent milestone
+recommendations remain advisory; no merge, deployment or release is authorized.
