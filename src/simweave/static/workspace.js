@@ -1,6 +1,16 @@
 "use strict";
 (() => {
   const el = (id) => document.getElementById(id);
+  const defaultPolicy = JSON.stringify(
+    {
+      schema_version: 1,
+      metrics: [{ metric: "rmse", max_increase: 0.1 }],
+      resamples: 5000,
+      random_seed: 1729,
+    },
+    null,
+    2,
+  );
   let run = "",
     catalog = "",
     epoch = 0,
@@ -11,6 +21,10 @@
     jobAfter = "",
     buildAfter = null;
   const controllers = new Set();
+  let pendingApproval = null,
+    eventRows = [],
+    eventAfter = null,
+    decisionAfter = null;
   const show = (id, value) => {
     el(id).textContent =
       typeof value === "string" ? value : JSON.stringify(value, null, 2);
@@ -31,6 +45,13 @@
       busy || role !== "importer" || !generation || !el("builds").value;
     el("more-jobs").disabled = busy || !jobAfter;
     el("more-builds").disabled = busy || buildAfter === null;
+    el("promote").disabled =
+      busy || role !== "approver" || generation === null || !el("builds").value;
+    el("rollback").disabled =
+      busy || role !== "approver" || generation === null || !el("events").value;
+    el("more-events").disabled = busy || eventAfter === null;
+    el("more-decisions").disabled = busy || decisionAfter === null;
+    for (const id of ["events", "decisions"]) el(id).disabled = busy;
   }
   function reset() {
     epoch++;
@@ -41,6 +62,17 @@
     jobAfter = "";
     buildAfter = null;
     busy = false;
+    pendingApproval = null;
+    eventRows = [];
+    eventAfter = decisionAfter = null;
+    el("approval-dialog").close();
+    el("approval-reason").value = "";
+    el("policy").value = defaultPolicy;
+    show("approval-preview", "");
+    show("event-detail", "No approval selected.");
+    el("metric-summary").replaceChildren();
+    for (const id of ["events", "decisions"])
+      el(id).replaceChildren(new Option("Select an item", ""));
     for (const id of [
       "run-token",
       "catalog-token",
@@ -89,7 +121,9 @@
           typeof data.detail === "string"
             ? data.detail
             : "Check the input contract and permissions.";
-        throw new Error(`${response.status}: ${detail}`);
+        const error = new Error(`${response.status}: ${detail}`);
+        error.status = response.status;
+        throw error;
       }
       return data;
     } finally {
@@ -157,6 +191,7 @@
     jobAfter = data.items.length === 50 ? data.items.at(-1).id : "";
   }
   async function builds(after = 0) {
+    el("metric-summary").replaceChildren();
     const overview = await request("/api/v1/catalog", "catalog");
     const data = await request(
       `/api/v1/catalog/builds?limit=50&after=${after}`,
@@ -305,6 +340,7 @@
   action("refresh-builds", "click", () => builds());
   action("more-builds", "click", () => builds(buildAfter));
   el("builds").addEventListener("change", () => {
+    el("metric-summary").replaceChildren();
     show("build-detail", "Inspect the selected build.");
     show("verdict", "No comparison requested.");
     show("comparison-detail", "");
@@ -329,7 +365,184 @@
       `${result.statistics.status} / baseline generation ${result.baseline_generation}. Inconclusive is not a pass.`,
     );
     show("comparison-detail", result);
+    renderMetrics(result);
   });
+  function renderMetrics(result) {
+    const container = el("metric-summary");
+    container.replaceChildren();
+    const heading = document.createElement("p");
+    heading.textContent = `${result.candidate_build} versus ${result.baseline_build}, generation ${result.baseline_generation}: ${result.statistics.status}. Inconclusive is not a pass.`;
+    container.append(heading);
+    for (const group of result.statistics.groups) {
+      const title = document.createElement("p");
+      title.textContent = `${group.name} / ${group.adapter}: ${group.complete_pairs} complete pairs. ${group.issues.join("; ")}`;
+      container.append(title);
+      const table = document.createElement("table");
+      const header = table.createTHead().insertRow();
+      for (const text of [
+        "Metric",
+        "Mean change",
+        "95% interval",
+        "Allowed increase",
+        "Decision",
+      ]) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = text;
+        header.append(th);
+      }
+      const body = table.createTBody();
+      for (const metric of group.metrics) {
+        const row = body.insertRow(),
+          interval = metric.interval;
+        for (const value of [
+          metric.metric,
+          interval?.mean ?? "Unavailable",
+          interval ? `${interval.low} to ${interval.high}` : "Unavailable",
+          metric.max_increase,
+          metric.verdict,
+        ]) {
+          row.insertCell().textContent = String(value);
+        }
+      }
+      const wrapper = document.createElement("div");
+      wrapper.className = "metric-table";
+      wrapper.append(table);
+      container.append(wrapper);
+    }
+    const warnings = document.createElement("p");
+    warnings.textContent = result.statistics.warnings.join("; ");
+    container.append(warnings);
+  }
+  async function events(after = 0) {
+    const data = await request(
+      `/api/v1/catalog/events?limit=50&after=${after}`,
+      "catalog",
+    );
+    eventRows = data.items;
+    eventAfter = data.next_after;
+    el("events").replaceChildren(
+      new Option("Select an approval", ""),
+      ...eventRows.map(
+        (e) =>
+          new Option(
+            `${e.generation}: ${e.action} / ${e.build}`,
+            String(e.generation),
+          ),
+      ),
+    );
+    show(
+      "event-detail",
+      "Select an approval to inspect its policy and audit identity.",
+    );
+  }
+  async function decisions(after = 0) {
+    const data = await request(
+      `/api/v1/catalog/comparisons?limit=50&after=${after}`,
+      "catalog",
+    );
+    decisionAfter = data.next_after;
+    el("decisions").replaceChildren(
+      new Option("Select a comparison", ""),
+      ...data.items.map((d) => new Option(String(d.id), String(d.id))),
+    );
+  }
+  action("refresh-events", "click", () => events());
+  action("more-events", "click", () => events(eventAfter));
+  action("refresh-decisions", "click", () => decisions());
+  action("more-decisions", "click", () => decisions(decisionAfter));
+  el("events").addEventListener("change", () => {
+    show(
+      "event-detail",
+      eventRows.find((e) => String(e.generation) === el("events").value) ||
+        "No approval selected.",
+    );
+    controls();
+  });
+  action("inspect-decision", "click", async () => {
+    if (!el("decisions").value) throw new Error("Select a comparison first.");
+    const result = await request(
+      "/api/v1/catalog/comparisons/" +
+        encodeURIComponent(el("decisions").value),
+      "catalog",
+    );
+    show("comparison-detail", result);
+    renderMetrics(result);
+  });
+  for (const verb of ["promote", "rollback"])
+    action(verb, "click", async () => {
+      if (role !== "approver" || generation === null)
+        throw new Error("Refresh the catalog with an approver token first.");
+      if (!el("approval-form").reportValidity())
+        throw new Error("Provide a policy and reason.");
+      const reason = el("approval-reason").value.trim();
+      if (!reason) throw new Error("Provide a visible reason.");
+      const body = {
+        schema_version: 1,
+        expected_generation: generation,
+        reason,
+      };
+      let restored = null;
+      if (verb === "promote") {
+        pathBuild();
+        if (new TextEncoder().encode(el("policy").value).length > 8192)
+          throw new Error("Policy exceeds 8 KiB.");
+        body.build = el("builds").value;
+        body.policy = JSON.parse(el("policy").value);
+      } else {
+        restored = eventRows.find(
+          (e) => String(e.generation) === el("events").value,
+        );
+        if (!restored) throw new Error("Select an earlier approval first.");
+        body.to_generation = restored.generation;
+      }
+      pendingApproval = { verb, body, epoch };
+      show("approval-preview", {
+        action: verb,
+        ...body,
+        ...(restored
+          ? { restored_build: restored.build, restored_policy: restored.policy }
+          : {}),
+      });
+      el("approval-dialog").showModal();
+      el("cancel-approval").disabled = false;
+      el("cancel-approval").focus();
+    });
+  function cancelApproval() {
+    pendingApproval = null;
+    el("approval-dialog").close();
+    show("approval-preview", "");
+  }
+  el("cancel-approval").addEventListener("click", cancelApproval);
+  el("approval-dialog").addEventListener("cancel", cancelApproval);
+  action("confirm-approval", "click", async () => {
+    const snapshot = pendingApproval;
+    cancelApproval();
+    if (!snapshot || snapshot.epoch !== epoch || role !== "approver")
+      throw new Error("Approval expired; review it again.");
+    try {
+      const result = await request(
+        "/api/v1/catalog/" + snapshot.verb,
+        "catalog",
+        { method: "POST", body: JSON.stringify(snapshot.body) },
+      );
+      await builds();
+      await events();
+      show("event-detail", result);
+      el("approval-reason").value = "";
+    } catch (error) {
+      if (snapshot.epoch === epoch) generation = null;
+      if (error.status === 409)
+        throw new Error(
+          "Approval rejected: the generation may have changed. Refresh catalog and approval history, review the latest evidence, and confirm again. Nothing is retried automatically.",
+        );
+      throw error;
+    }
+  });
+  el("approval-form").addEventListener("submit", (event) =>
+    event.preventDefault(),
+  );
+  el("policy").value = defaultPolicy;
   el("suite").value = JSON.stringify(
     {
       schema_version: 1,

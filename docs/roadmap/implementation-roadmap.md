@@ -1,5 +1,12 @@
 # Implementation roadmap
 
+## SW014: guided baseline review
+
+The 2026-10-18 request delegates research, scope selection, delivery and a draft PR.
+After SW013's merge, ADR 0012 selects explicit browser promotion/rollback, recorded
+decision summaries and paginated history. Acceptance includes 20 two-tenant browser
+cases, a 30-pair fixture and generation-conflict handling. No merge is authorized.
+
 The initial request authorizes exactly three MVP delivery slices. The initial
 MIT license/bootstrap commit is outside the feature slices. PRs form a stack and
 remain reviewable before a maintainer merges them in order.

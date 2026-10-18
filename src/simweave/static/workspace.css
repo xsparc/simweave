@@ -87,6 +87,31 @@
   color: var(--accent);
   min-height: 24px;
 }
+.suite-workspace dialog {
+  width: min(600px, 90vw);
+  max-height: 85vh;
+  overflow: auto;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+}
+.suite-workspace dialog::backdrop {
+  background: rgb(0 0 0 / 70%);
+}
+.metric-table {
+  overflow-x: auto;
+}
+.metric-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.metric-table th,
+.metric-table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
 @media (max-width: 850px) {
   .suite-columns {
     grid-template-columns: 1fr;

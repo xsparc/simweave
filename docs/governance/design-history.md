@@ -1,5 +1,10 @@
 # Design history
 
+2026-10-18, SW014: delegated next-scope research selects guided baseline review.
+ADR 0012 reuses existing catalog role and generation contracts, adds explicit
+browser confirmation and readable recorded decisions, and preserves immutable
+approval history. See guided-review-validation.md for executed checks and limits.
+
 2026-10-13: established a standalone SimWeave repository and MIT license. Scoped
 the first delivery to three stacked PRs with contracts/core, execution/API, then
 dashboard/operations. ADR 0001 records the architectural tradeoffs. The roadmap
