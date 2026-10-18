@@ -148,6 +148,12 @@ finish. Worker completion remains permitted so drain can finish. Checkpoint hold
 the paused fence and publishes verified state; restores begin paused. Resume and
 acknowledgement of terminated workers are explicit operator CLI actions.
 
+ADR 0012 extends the workspace with explicit approver confirmation and recorded
+decision/history review. Requests capture the expected generation, build or rollback
+target, policy and reason. Existing server roles and immutable catalog transactions
+remain authoritative; failures require refreshed review, never automatic retries.
+See [guided review](../operations/guided-review.md).
+
 ## Optional provider/distributed boundary
 
 ADR 0011 adds an explicit Keycloak access-token profile and PostgreSQL suite queue

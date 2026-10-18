@@ -180,7 +180,7 @@ acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
 evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
 
 [review]
-last_reviewed = "2026-10-17"
+last_reviewed = "2026-10-18"
 review_due = "2026-11-16"
 
 [[research_decisions]]
@@ -362,3 +362,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-17-provider-distributed-development-verification-draft-pr"
 acceptance_refs = ["docs/architecture/decisions/0011-provider-distributed-queue.md"]
 evidence_refs = ["docs/governance/provider-distributed-validation.md", "tests/test_postgres.py", "scripts/check_keycloak.py", "scripts/check_distributed.py"]
+
+[[research_decisions]]
+id = "RD-GUIDED-REVIEW"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-18-guided-review.md"]
+design_refs = ["docs/architecture/decisions/0012-guided-baseline-review.md"]
+
+[[requirements]]
+id = "REQ-GUIDED-REVIEW"
+statement = "Explicitly confirm browser baseline changes and review immutable decisions with tenant isolation."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0012-guided-baseline-review.md"]
+implementation_refs = ["src/simweave/static/workspace.js", "src/simweave/static/workspace.html"]
+verification_refs = ["scripts/check_guided_review.py", "scripts/check_browser_workspace.py", "tests/test_team_evidence.py"]
+validation_refs = ["docs/governance/guided-review-validation.md"]
+risk_refs = ["docs/security/threat-model.md", "docs/operations/guided-review.md"]
+
+[[work_items]]
+id = "SW014-GUIDED-REVIEW"
+title = "Guided baseline approval and recorded decision review"
+status = "verified"
+requirement_ids = ["REQ-GUIDED-REVIEW"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-18-research-select-next-scopes-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0012-guided-baseline-review.md"]
+evidence_refs = ["scripts/check_guided_review.py", "docs/governance/guided-review-validation.md"]

@@ -120,7 +120,7 @@
         </form>
         <p class="muted">
           Importing a baseline does not approve it. An approver must explicitly
-          promote it using the catalog API.
+          promote it after reviewing the evidence and policy below.
         </p>
         <div class="actions">
           <button id="refresh-builds">Refresh catalog</button
@@ -142,6 +142,65 @@
         <h3>Comparison</h3>
         <p id="verdict">No comparison requested.</p>
         <pre id="comparison-detail"></pre>
+        <h3>Recorded decisions</h3>
+        <button id="refresh-decisions">Refresh decisions</button>
+        <button id="more-decisions" disabled>Next decision page</button>
+        <label
+          >Recorded comparison<select id="decisions">
+            <option value="">Select a comparison</option>
+          </select></label
+        >
+        <button id="inspect-decision">Review comparison</button>
+        <div id="metric-summary" aria-live="polite"></div>
+      </section>
+      <section aria-labelledby="approval-title">
+        <h2 id="approval-title">05 / Approve a baseline</h2>
+        <p>
+          Only catalog approvers can append an approval. A statistical result
+          never approves a build automatically.
+        </p>
+        <p class="muted">
+          The initial policy is an example. Set tolerances appropriate to your
+          experiment before promotion. Rollback restores the selected approval's
+          policy instead.
+        </p>
+        <form id="approval-form">
+          <label
+            >Decision policy JSON<textarea
+              id="policy"
+              rows="7"
+              required
+            ></textarea>
+          </label>
+          <label
+            >Reason for approval or rollback<input
+              id="approval-reason"
+              required
+              maxlength="500"
+          /></label>
+          <button id="promote" type="button" disabled>Review promotion</button>
+          <label
+            >Earlier approval<select id="events">
+              <option value="">Select an approval</option>
+            </select></label
+          >
+          <button id="rollback" type="button" disabled>Review rollback</button>
+        </form>
+        <button id="refresh-events">Refresh approval history</button>
+        <button id="more-events" disabled>Next approval page</button>
+        <pre id="event-detail">No approval selected.</pre>
+        <dialog id="approval-dialog" aria-labelledby="confirm-title">
+          <h3 id="confirm-title">Confirm baseline change</h3>
+          <p>
+            This appends an immutable audit event with your authenticated
+            identity.
+          </p>
+          <pre id="approval-preview"></pre>
+          <button id="cancel-approval" type="button" autofocus>Cancel</button>
+          <button id="confirm-approval" type="button">
+            Confirm baseline change
+          </button>
+        </dialog>
       </section>
     </main>
   </body>
