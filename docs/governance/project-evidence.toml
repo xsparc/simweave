@@ -2,6 +2,34 @@ schema_version = 1
 project = "simweave"
 
 [[research_decisions]]
+id = "RD-INCREMENTAL-CHECKPOINTS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-19-incremental-checkpoints.md"]
+design_refs = ["docs/architecture/decisions/0014-incremental-checkpoints.md"]
+
+[[requirements]]
+id = "REQ-INCREMENTAL-CHECKPOINTS"
+statement = "Reuse verified immutable checkpoint objects and safely retry interrupted transfers."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0014-incremental-checkpoints.md"]
+implementation_refs = ["src/simweave/checkpoint_objects.py", "src/simweave/recovery.py", "src/simweave/maintenance.py", "src/simweave/operations_cli.py"]
+verification_refs = ["tests/test_incremental_checkpoints.py", "scripts/check_operator_recovery.py", ".github/workflows/operator-workflows.yml"]
+validation_refs = ["docs/governance/incremental-checkpoint-validation.md", "docs/governance/incremental-checkpoint-sample.json"]
+risk_refs = ["docs/operations/incremental-checkpoints.md"]
+
+[[work_items]]
+id = "SW016-INCREMENTAL-CHECKPOINTS"
+title = "Verified incremental checkpoint object reuse"
+status = "verified"
+requirement_ids = ["REQ-INCREMENTAL-CHECKPOINTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-19-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0014-incremental-checkpoints.md"]
+evidence_refs = ["tests/test_incremental_checkpoints.py", "docs/governance/incremental-checkpoint-validation.md"]
+
+[[research_decisions]]
 id = "RD-TRUSTED-EVIDENCE"
 disposition = "adopted"
 source_refs = ["docs/research/2026-10-14-trusted-evidence.md"]

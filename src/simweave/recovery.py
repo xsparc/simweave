@@ -67,14 +67,20 @@ def inventory(root):
     return objects, references, jobs
 
 
-def checkpoint(jobs, artifacts, catalogs: Path, target: Path):
+def checkpoint(jobs, artifacts, catalogs: Path, target: Path, *, object_cache: Path | None = None):
     """Caller must stop API/workers first; lock reservations enforce metadata stability."""
     if hasattr(jobs, "database"):
         raise ValueError("SQLite checkpoint cannot snapshot PostgreSQL")
     if target.exists():
         raise FileExistsError("checkpoint target exists")
+    from simweave.checkpoint_objects import materialize, validate_cache
+
+    if object_cache is not None:
+        validate_cache(object_cache, target, artifacts, catalogs, jobs.db.path)
     target.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
+    transferred = 0
+    reused = 0
     with tempfile.TemporaryDirectory(dir=target.parent) as temporary:
         staged = Path(temporary) / "checkpoint"
         staged.mkdir()
@@ -104,12 +110,16 @@ def checkpoint(jobs, artifacts, catalogs: Path, target: Path):
                 ):
                     source.backup(destination)
             objects, references, count = inventory(staged)
+            transfer_started = time.monotonic()
             for (tenant, digest), size in objects.items():
                 destination = staged / "objects" / key(tenant, digest)
                 destination.parent.mkdir(parents=True, exist_ok=True)
-                artifacts.backend.get(key(tenant, digest), destination)
-                if digest_file(destination) != (digest, size):
-                    raise ValueError("checkpoint object failed verification")
+                copied = materialize(
+                    artifacts.backend, key(tenant, digest), digest, size, destination, object_cache
+                )
+                transferred += copied
+                reused += int(copied == 0)
+            transfer_seconds = time.monotonic() - transfer_started
             files = {
                 str(path.relative_to(staged)).replace("\\", "/"): {
                     "sha256": sha(path),
@@ -135,6 +145,9 @@ def checkpoint(jobs, artifacts, catalogs: Path, target: Path):
         "jobs": count,
         "artifacts": len(objects),
         "references": len(references),
+        "transferred_bytes": transferred,
+        "reused_objects": reused,
+        "transfer_seconds": round(transfer_seconds, 3),
         "seconds": round(time.monotonic() - started, 3),
     }
 

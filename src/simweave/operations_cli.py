@@ -38,6 +38,7 @@ def register(commands):
     checkpoint.add_argument("--catalogs", type=Path, required=True)
     checkpoint.add_argument("--quiesced", action="store_true", required=True)
     checkpoint.add_argument("path", type=Path)
+    checkpoint.add_argument("--object-cache", type=Path, help="immutable same-volume object cache")
     restore = sub.add_parser("restore-checkpoint", help="verify and restore into a fresh directory")
     restore.add_argument("source", type=Path)
     restore.add_argument("path", type=Path)
@@ -53,6 +54,7 @@ def register(commands):
     maintenance.add_argument("--backend", type=Path)
     maintenance.add_argument("--catalogs", type=Path)
     maintenance.add_argument("--output", type=Path)
+    maintenance.add_argument("--object-cache", type=Path, help="immutable same-volume object cache")
     for action in ("put", "get", "recover", "backup"):
         command = sub.add_parser(action)
         command.add_argument("--backend", type=Path, required=True)
@@ -113,7 +115,12 @@ def dispatch_jobs(args, jobs):
                 raise ValueError("checkpoint requires backend, catalogs and output")
             artifacts = artifacts_for(args, jobs)
             result = maintenance.checkpoint(
-                jobs, artifacts, args.catalogs, args.output, args.timeout
+                jobs,
+                artifacts,
+                args.catalogs,
+                args.output,
+                args.timeout,
+                object_cache=args.object_cache,
             )
     elif action == "submit":
         if args.path.stat().st_size > 65536:
@@ -139,7 +146,9 @@ def dispatch_jobs(args, jobs):
         elif action == "checkpoint":
             from simweave.recovery import checkpoint
 
-            result = checkpoint(jobs, artifacts, args.catalogs, args.path)
+            result = checkpoint(
+                jobs, artifacts, args.catalogs, args.path, object_cache=args.object_cache
+            )
         elif action == "worker":
             if not args.once:
                 work_forever(jobs, artifacts)

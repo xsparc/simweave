@@ -19,6 +19,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--gib", type=float, default=10)
+    parser.add_argument(
+        "--incremental", action="store_true", help="checkpoint then add 1% new objects"
+    )
     args = parser.parse_args()
     if not 0 < args.gib <= 10:
         raise ValueError("fixture size must be in (0,10] GiB")
@@ -50,8 +53,21 @@ def main():
             archive.writestr(name, data)
     read_bundle(base)  # Semantic recording verification once; only ZIP dates vary below.
     count = math.ceil(args.gib * 2**30 / base.stat().st_size)
+    original_count = count
+    cache = root / "cache" if args.incremental else None
+    initial = None
+    initial_bytes = 0
+    if args.incremental:
+        count += max(1, math.ceil(count * 0.01))
     retained = 0
     for index in range(count):
+        if args.incremental and index == original_count:
+            initial_bytes = retained
+            initial = maintenance.checkpoint(
+                jobs, artifacts, root / "catalogs", root / "initial", object_cache=cache
+            )
+            assert initial["transferred_bytes"] == initial_bytes
+            jobs.gate.set(False)
         with zipfile.ZipFile(base, "w", compression=zipfile.ZIP_STORED) as archive:
             for name, data in members.items():
                 info = zipfile.ZipInfo(
@@ -85,13 +101,20 @@ def main():
 
     artifacts.backend.get = interrupted
     try:
-        maintenance.checkpoint(jobs, artifacts, root / "catalogs", root / "checkpoint")
+        maintenance.checkpoint(
+            jobs, artifacts, root / "catalogs", root / "checkpoint", object_cache=cache
+        )
         raise AssertionError("interruption did not fire")
     except OSError:
         assert jobs.gate.paused() and not (root / "checkpoint").exists()
     artifacts.backend.get = original
     print(json.dumps({"stage": "checkpoint", "retained_bytes": retained}), flush=True)
-    saved = maintenance.checkpoint(jobs, artifacts, root / "catalogs", root / "checkpoint")
+    saved = maintenance.checkpoint(
+        jobs, artifacts, root / "catalogs", root / "checkpoint", object_cache=cache
+    )
+    if args.incremental:
+        assert saved["transferred_bytes"] == retained - initial_bytes
+        assert saved["reused_objects"] == original_count
     # Interruption point 3: publication completed but operator exited before resume.
     assert SuiteJobs(jobs.db.path).gate.paused()
     print(json.dumps({"stage": "restore", "checkpoint_seconds": saved["seconds"]}), flush=True)
@@ -118,6 +141,12 @@ def main():
         "missing_references": 0,
         "checkpoint_seconds": saved["seconds"],
         "restore_seconds": restored["seconds"],
+        "initial_retained_bytes": initial_bytes,
+        "initial_checkpoint_seconds": initial["seconds"] if initial else None,
+        "transferred_bytes": saved["transferred_bytes"],
+        "transfer_seconds": saved["transfer_seconds"],
+        "reused_objects": saved["reused_objects"],
+        "new_object_fraction": (count - original_count) / original_count,
         "fixture": (
             "ZIP_STORED verified recordings, distinct ZIP dates, "
             "physical copies; synthetic terminal jobs"

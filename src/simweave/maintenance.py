@@ -74,14 +74,15 @@ def drain(jobs, timeout=300):
             time.sleep(0.1)
 
 
-def checkpoint(jobs, artifacts, catalogs, target, timeout=300):
+def checkpoint(jobs, artifacts, catalogs, target, timeout=300, *, object_cache=None):
     from simweave.recovery import checkpoint as snapshot
 
     if hasattr(jobs, "database"):
         raise ValueError("use PostgreSQL-native and object-store backup after drain")
     drain(jobs, timeout)
     with jobs.gate.hold(paused=True):
-        result = snapshot(jobs, artifacts, catalogs, target)
+        options = {} if object_cache is None else {"object_cache": object_cache}
+        result = snapshot(jobs, artifacts, catalogs, target, **options)
     return {**result, "paused": True}
 
 
