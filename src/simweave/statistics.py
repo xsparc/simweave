@@ -93,6 +93,17 @@ class MetricDecision(Contract):
     verdict: Verdict
 
 
+def interval_verdict(interval: Interval, max_increase: float, *, eligible: bool = True) -> Verdict:
+    """Classify an eligible population; descriptive constant intervals cannot pass."""
+    if not eligible or interval.constant:
+        return "inconclusive"
+    if interval.low > max_increase:
+        return "regression"
+    if interval.high <= max_increase:
+        return "within_tolerance"
+    return "inconclusive"
+
+
 class GroupDecision(Contract):
     name: str
     adapter: Adapter
@@ -197,11 +208,7 @@ def analyze(
                     ],
                     policy,
                 )
-                if not issues and not interval.constant:
-                    if interval.low > limit.max_increase:
-                        verdict = "regression"
-                    elif interval.high <= limit.max_increase:
-                        verdict = "within_tolerance"
+                verdict = interval_verdict(interval, limit.max_increase, eligible=not issues)
             decisions.append(
                 MetricDecision(**limit.model_dump(), interval=interval, verdict=verdict)
             )

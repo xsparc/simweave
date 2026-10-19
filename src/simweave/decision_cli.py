@@ -8,6 +8,10 @@ from simweave.statistics import DecisionPolicy
 
 
 def register(commands):
+    calibration = commands.add_parser("calibrate", help="measure synthetic marginal decision rates")
+    calibration.add_argument("--trials", type=int, default=1000)
+    calibration.add_argument("--resamples", type=int, default=1000)
+    calibration.add_argument("--seed", type=int, default=1937)
     commands.add_parser("statistics-schema", help="print the versioned decision policy schema")
     stats = commands.add_parser("statistics", help="analyze paired seeds from a verified bundle")
     stats.add_argument("path", type=Path)
@@ -53,6 +57,15 @@ def dispatch(args) -> int:
     from simweave.bundles import read_bundle
     from simweave.decision_reports import write_history, write_statistics
     from simweave.statistics import analyze
+
+    if args.command == "calibrate":
+        from simweave.calibration import CalibrationConfig, calibrate
+
+        config = CalibrationConfig(
+            trials=args.trials, resamples=args.resamples, random_seed=args.seed
+        )
+        print(canonical(calibrate(config)))
+        return 0
 
     if args.command == "statistics-schema":
         print(json.dumps(DecisionPolicy.model_json_schema(), indent=2))

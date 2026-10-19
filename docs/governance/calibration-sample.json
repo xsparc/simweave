@@ -1,0 +1,153 @@
+{
+  "algorithm": "paired-percentile-mean-v1",
+  "bootstrap_seed": 1729,
+  "cohorts": [
+    {
+      "distribution": "normal",
+      "input_sha256": "2a7574adbf3ad0283dbd9867785e6c2ca2335070393a26189b157431ece8297e",
+      "max_increase": 0.0,
+      "mean_coverage": {
+        "count": 928,
+        "monte_carlo_se": 0.00817410545564467,
+        "rate": 0.928
+      },
+      "name": "normal_null",
+      "pairs": 30,
+      "population_mean": 0.0,
+      "population_std": 1.0,
+      "regression_interpretation": "false_positive_rate",
+      "trials": 1000,
+      "verdicts": {
+        "inconclusive": {
+          "count": 928,
+          "monte_carlo_se": 0.00817410545564467,
+          "rate": 0.928
+        },
+        "regression": {
+          "count": 34,
+          "monte_carlo_se": 0.005730968504537431,
+          "rate": 0.034
+        },
+        "within_tolerance": {
+          "count": 38,
+          "monte_carlo_se": 0.006046155803483731,
+          "rate": 0.038
+        }
+      }
+    },
+    {
+      "distribution": "normal",
+      "input_sha256": "095e9c6da0b75836c5c081fc1c4fa543e50cdc3b5cfab94d0ea4f44f59d64df3",
+      "max_increase": 0.1,
+      "mean_coverage": {
+        "count": 948,
+        "monte_carlo_se": 0.007021111023192843,
+        "rate": 0.948
+      },
+      "name": "normal_boundary",
+      "pairs": 30,
+      "population_mean": 0.1,
+      "population_std": 1.0,
+      "regression_interpretation": "false_positive_rate",
+      "trials": 1000,
+      "verdicts": {
+        "inconclusive": {
+          "count": 948,
+          "monte_carlo_se": 0.007021111023192843,
+          "rate": 0.948
+        },
+        "regression": {
+          "count": 27,
+          "monte_carlo_se": 0.00512552436341883,
+          "rate": 0.027
+        },
+        "within_tolerance": {
+          "count": 25,
+          "monte_carlo_se": 0.0049371044145328745,
+          "rate": 0.025
+        }
+      }
+    },
+    {
+      "distribution": "normal",
+      "input_sha256": "cdabbfcbf38897fc6d372a31a3bf7a71fc6721c069331fd4c269acb65ebed71c",
+      "max_increase": 0.1,
+      "mean_coverage": {
+        "count": 942,
+        "monte_carlo_se": 0.007391616873188169,
+        "rate": 0.942
+      },
+      "name": "normal_shifted",
+      "pairs": 30,
+      "population_mean": 1.0,
+      "population_std": 1.0,
+      "regression_interpretation": "power",
+      "trials": 1000,
+      "verdicts": {
+        "inconclusive": {
+          "count": 1,
+          "monte_carlo_se": 0.0009994998749374609,
+          "rate": 0.001
+        },
+        "regression": {
+          "count": 999,
+          "monte_carlo_se": 0.0009994998749374613,
+          "rate": 0.999
+        },
+        "within_tolerance": {
+          "count": 0,
+          "monte_carlo_se": 0.0,
+          "rate": 0.0
+        }
+      }
+    },
+    {
+      "distribution": "centered_exponential",
+      "input_sha256": "4b8f3910514c05c63a9b07ff6794481412cf40a29aa5c879a9755ae0479d7df9",
+      "max_increase": 0.0,
+      "mean_coverage": {
+        "count": 910,
+        "monte_carlo_se": 0.009049861877399012,
+        "rate": 0.91
+      },
+      "name": "skewed_null",
+      "pairs": 30,
+      "population_mean": 0.0,
+      "population_std": 1.0,
+      "regression_interpretation": "false_positive_rate",
+      "trials": 1000,
+      "verdicts": {
+        "inconclusive": {
+          "count": 910,
+          "monte_carlo_se": 0.009049861877399012,
+          "rate": 0.91
+        },
+        "regression": {
+          "count": 17,
+          "monte_carlo_se": 0.004087909000944126,
+          "rate": 0.017
+        },
+        "within_tolerance": {
+          "count": 73,
+          "monte_carlo_se": 0.008226238508577295,
+          "rate": 0.073
+        }
+      }
+    }
+  ],
+  "config": {
+    "random_seed": 1937,
+    "resamples": 1000,
+    "schema_version": 1,
+    "trials": 1000
+  },
+  "generator": "python-random-gauss-expovariate-v1",
+  "nominal_marginal_coverage": 0.95,
+  "schema_version": 1,
+  "warnings": [
+    "Synthetic independent differences are not simulator calibration or evidence bundles.",
+    "Observed rates apply only to these distributions, pair counts and resampling policy.",
+    "No multiple-metric or repeated-build correction; no automatic baseline approval.",
+    "Monte Carlo standard errors describe simulation frequency uncertainty only."
+  ]
+}

@@ -81,6 +81,10 @@ and retain the runtime. The bundle contains data; it never supplies executable c
 Try `simweave suite examples/cart-statistics.json --output results` for a portable
 reference example with 30 paired seeds. Analyze it with
 `simweave statistics results/evidence.zip --policy examples/decision-policy.json --output decision`.
+
+Use `simweave calibrate` to measure synthetic decision frequencies and interval
+coverage. The [calibration guide](docs/operations/calibration.md) explains the
+four populations, measured undercoverage and interpretation limits.
 The JSON and standalone HTML report show paired mean changes, 95% bootstrap
 intervals, explicit tolerances, quality failures, and inconclusive evidence.
 The `simweave history` commands record immutable builds, explicit baseline
