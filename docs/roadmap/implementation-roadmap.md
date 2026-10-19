@@ -1,5 +1,12 @@
 # Implementation roadmap
 
+## SW015: statistical calibration
+
+The 2026-10-19 request continues delegated research/scope selection and draft
+delivery. ADR 0013 selects the existing statistical calibration recommendation:
+1,000 seeded trials per null/boundary/shifted/skewed cohort, observed rates and
+coverage, edge-case verification and an interpretation guide.
+
 ## SW014: guided baseline review
 
 The 2026-10-18 request delegates research, scope selection, delivery and a draft PR.

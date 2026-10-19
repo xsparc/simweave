@@ -1,5 +1,10 @@
 # Design history
 
+2026-10-19, SW015: the next-milestone request continues delegated scope selection.
+ADR 0013 selects the earlier statistical calibration recommendation. The existing
+classifier now has a bounded offline experiment with explicit observed rates,
+coverage and interpretation limits. See calibration-validation.md.
+
 2026-10-18, SW014: delegated next-scope research selects guided baseline review.
 ADR 0012 reuses existing catalog role and generation contracts, adds explicit
 browser confirmation and readable recorded decisions, and preserves immutable

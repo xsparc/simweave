@@ -60,6 +60,11 @@ distributed tracing, and isolation of third-party simulators are later work.
 
 ## Determinism and replay
 
+ADR 0013 adds a bounded, offline synthetic calibration command for the existing
+paired percentile classifier. Versioned JSON reports frequencies, coverage and
+Monte Carlo uncertainty for four specified populations. Simulation math, catalog
+approvals and bootstrap semantics remain unchanged; see operations/calibration.md.
+
 The clock advances only by the scenario timestep. A per-run PRNG isolates sensor
 noise. Reset reconstructs state. Repeatability is scoped to the same adapter,
 engine, dependencies, platform, and scenario; different physics engines may

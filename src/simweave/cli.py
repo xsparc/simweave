@@ -77,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
             return operations_dispatch(args)
         if args.command == "attestation":
             return attestation_dispatch(args)
-        if args.command in ("statistics", "statistics-schema", "history"):
+        if args.command in ("statistics", "statistics-schema", "history", "calibrate"):
             return dispatch(args)
         if args.command == "report":
             from simweave.bundles import MAX_REPORT

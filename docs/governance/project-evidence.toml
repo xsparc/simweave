@@ -180,7 +180,7 @@ acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
 evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
 
 [review]
-last_reviewed = "2026-10-18"
+last_reviewed = "2026-10-19"
 review_due = "2026-11-16"
 
 [[research_decisions]]
@@ -390,3 +390,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-18-research-select-next-scopes-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0012-guided-baseline-review.md"]
 evidence_refs = ["scripts/check_guided_review.py", "docs/governance/guided-review-validation.md"]
+
+[[research_decisions]]
+id = "RD-STATISTICAL-CALIBRATION"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-19-calibration.md"]
+design_refs = ["docs/architecture/decisions/0013-statistical-calibration.md"]
+
+[[requirements]]
+id = "REQ-STATISTICAL-CALIBRATION"
+statement = "Measure and explain synthetic marginal bootstrap coverage and decision rates."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0013-statistical-calibration.md"]
+implementation_refs = ["src/simweave/calibration.py", "src/simweave/statistics.py", "src/simweave/decision_cli.py"]
+verification_refs = ["tests/test_calibration.py", "tests/test_decisions.py", ".github/workflows/calibration.yml"]
+validation_refs = ["docs/governance/calibration-validation.md", "docs/governance/calibration-sample.json"]
+risk_refs = ["docs/operations/calibration.md"]
+
+[[work_items]]
+id = "SW015-STATISTICAL-CALIBRATION"
+title = "Synthetic decision calibration and interpretation"
+status = "verified"
+requirement_ids = ["REQ-STATISTICAL-CALIBRATION"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-19-next-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0013-statistical-calibration.md"]
+evidence_refs = ["tests/test_calibration.py", "docs/governance/calibration-validation.md", "docs/governance/calibration-sample.json"]
