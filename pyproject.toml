@@ -16,7 +16,7 @@ postgres = ["psycopg[binary,pool]>=3.2,<4"]
 browser = ["playwright>=1.55,<2"]
 s3 = ["boto3>=1.40,<2"]
 mujoco = ["mujoco>=3.3,<4"]
-dev = ["pytest>=8,<10", "httpx>=0.28,<1", "ruff>=0.11,<1", "build>=1.2,<2"]
+dev = ["pytest>=8,<10", "httpx>=0.28.1,<1", "ruff>=0.11,<1", "build>=1.2,<2"]
 
 [project.scripts]
 simweave = "simweave.cli:main"
