@@ -1,5 +1,11 @@
 # Implementation roadmap
 
+## SW016: incremental checkpoints
+
+After SW015's merge, delegated research/scope selection selects the remaining
+incremental-recovery recommendation. ADR 0014 adds verified object reuse, restart
+from complete cached objects and measured 10 GiB/1% churn acceptance.
+
 ## SW015: statistical calibration
 
 The 2026-10-19 request continues delegated research/scope selection and draft

@@ -43,6 +43,11 @@ both the API and worker. The Python package alone does not install ROS/Gazebo.
 
 ## Execution and persistence
 
+ADR 0014 adds optional verified object reuse for SQLite checkpoints. A same-volume
+cache retains completed immutable transfers; each attempt snapshots metadata anew.
+Published checkpoints remain complete and restore through the existing verifier.
+See [incremental checkpoints](../operations/incremental-checkpoints.md).
+
 The API submits durable jobs; a separate worker claims them transactionally.
 Each run stores its normalized scenario, digest, engine and simulator versions,
 metrics, gate results, and ordered telemetry. Batched inserts and cursor pagination

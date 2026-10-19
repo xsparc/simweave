@@ -22,6 +22,7 @@ jobs:
       - run: uv run --frozen --extra dev --extra browser python scripts/check_guided_review.py --output .simweave/guided-review
       - run: uv run --frozen --extra dev python scripts/check_operator_workers.py --output .simweave/workers
       - run: uv run --frozen --extra dev python scripts/check_operator_recovery.py --output .simweave/recovery --gib 0.01
+      - run: uv run --frozen --extra dev python scripts/check_operator_recovery.py --output .simweave/incremental --gib 0.01 --incremental
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -32,6 +33,7 @@ jobs:
             .simweave/guided-review/guided-review.png
             .simweave/browser/*-workspace.png
             .simweave/recovery/verification.json
+            .simweave/incremental/verification.json
             .simweave/workers/verification.json
           include-hidden-files: true
           retention-days: 7

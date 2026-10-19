@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "volume_drill": {
+    "schema_version": 1,
+    "retained_bytes": 10857399780,
+    "objects": 276,
+    "references": 276,
+    "interruption_points": 3,
+    "missing_references": 0,
+    "checkpoint_seconds": 41.078,
+    "restore_seconds": 177.688,
+    "initial_retained_bytes": 10739384565,
+    "initial_checkpoint_seconds": 183.172,
+    "transferred_bytes": 118015215,
+    "reused_objects": 273,
+    "new_object_fraction": 0.01098901098901099,
+    "fixture": "ZIP_STORED verified recordings with distinct ZIP dates; physical source/restore bytes, hard-linked checkpoint cache, synthetic terminal jobs"
+  },
+  "final_source_recheck": {
+    "schema_version": 1,
+    "jobs": 276,
+    "artifacts": 276,
+    "references": 276,
+    "transferred_bytes": 118015215,
+    "reused_objects": 273,
+    "transfer_seconds": 16.875,
+    "seconds": 48.031,
+    "paused": true
+  }
+}
