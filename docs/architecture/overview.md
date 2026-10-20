@@ -151,6 +151,11 @@ connected operations guide defines the recovery boundary and legacy backfill.
 
 ## Operator workflows
 
+ADR 0015 adds an operator-only artifact integrity audit with bounded tenant-scoped
+pages. It checks retained SHA-256 and size, reports fixed failure categories, and
+continues by digest cursor without repair or deletion. See
+[artifact integrity](../operations/artifact-integrity.md) for snapshot limits.
+
 ADR 0010 adds a browser suite workspace using the existing tenant APIs, plus a
 persistent rollback-journal admission fence beside the suite queue. Claims and
 catalog mutations hold read reservations; pause commits after admitted mutations

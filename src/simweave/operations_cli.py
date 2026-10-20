@@ -33,6 +33,11 @@ def register(commands):
     metrics = sub.add_parser("metrics", help="operator-wide metrics without tenant labels")
     metrics.add_argument("--backend", type=Path, required=True)
     metrics.add_argument("--prometheus", action="store_true")
+    audit = sub.add_parser("audit", help="check one bounded page of retained artifact bytes")
+    audit.add_argument("--backend", type=Path, required=True)
+    audit.add_argument("--tenant", required=True)
+    audit.add_argument("--after", default="")
+    audit.add_argument("--limit", type=int, default=10)
     checkpoint = sub.add_parser("checkpoint", help="snapshot quiesced suites, catalogs and bytes")
     checkpoint.add_argument("--backend", type=Path, required=True)
     checkpoint.add_argument("--catalogs", type=Path, required=True)
@@ -136,7 +141,13 @@ def dispatch_jobs(args, jobs):
         result = jobs.list(args.tenant, args.after)
     else:
         artifacts = artifacts_for(args, jobs)
-        if action == "metrics":
+        if action == "audit":
+            from simweave.integrity import audit
+
+            result = audit(artifacts, args.tenant, after=args.after, limit=args.limit)
+            print(canonical(result))
+            return 0 if result["healthy"] else 1
+        elif action == "metrics":
             from simweave.observability import prometheus, snapshot
 
             result = snapshot(jobs, artifacts)

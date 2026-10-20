@@ -386,6 +386,18 @@ class SharedArtifacts(Artifacts):
             raise ValueError("distributed suites require shared S3 storage")
         self.database, self.backend, self.scratch = database, backend, database.scratch
 
+    def inventory_page(self, tenant, after, limit):
+        from simweave.integrity import validate_page
+
+        validate_page(tenant, after, limit)
+        with self.database.connection() as db:
+            rows = db.execute(
+                "SELECT digest,size FROM artifacts WHERE tenant=%s AND digest>%s "
+                "ORDER BY digest LIMIT %s",
+                (tenant, after, limit + 1),
+            ).fetchall()
+            return [(row["digest"], row["size"]) for row in rows]
+
     def check_capacity(self, tenant, digest):
         with self.database.connection() as db:
             if (

@@ -1,5 +1,11 @@
 # Implementation roadmap
 
+## SW017: retained-artifact integrity audit
+
+After SW016's merge, delegated research/scope selection prioritizes detecting
+damaged retained evidence before recovery. ADR 0015 defines bounded, resumable,
+tenant-scoped operator audits and read-only failure reporting.
+
 ## SW016: incremental checkpoints
 
 After SW015's merge, delegated research/scope selection selects the remaining
