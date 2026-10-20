@@ -279,6 +279,17 @@ class Artifacts:
             ).fetchone()
             return row[0] if row else None
 
+    def inventory_page(self, tenant, after, limit):
+        from simweave.integrity import validate_page
+
+        validate_page(tenant, after, limit)
+        with self.db.connect() as db:
+            return db.execute(
+                "SELECT digest,size FROM artifacts WHERE tenant=? AND digest>? "
+                "ORDER BY digest LIMIT ?",
+                (tenant, after, limit + 1),
+            ).fetchall()
+
     def count_operation(self, name):
         try:
             with self.db.connect() as db:

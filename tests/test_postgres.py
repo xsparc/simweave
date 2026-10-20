@@ -43,6 +43,22 @@ def suite():
     )
 
 
+def test_artifact_inventory_page_is_scoped_and_bounded(jobs):
+    from simweave.artifacts import S3
+    from simweave.postgres import SharedArtifacts
+
+    # This test queries real PostgreSQL; it never performs object-store I/O.
+    storage = SharedArtifacts(jobs.database, object.__new__(S3))
+    for tenant in ("alpha", "beta"):
+        for index in range(4):
+            storage.retain(tenant, f"{index:064x}", index + 1)
+    assert storage.inventory_page("alpha", "", 2) == [(f"{i:064x}", i + 1) for i in range(3)]
+    assert storage.inventory_page("alpha", f"{1:064x}", 2) == [(f"{i:064x}", i + 1) for i in (2, 3)]
+    assert storage.inventory_page("unknown", "", 2) == []
+    with pytest.raises(ValueError):
+        storage.inventory_page("alpha", "", 26)
+
+
 def test_concurrent_idempotency_and_tenant_isolation(jobs):
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(lambda _: jobs.submit("alpha", suite(), "same"), range(24)))

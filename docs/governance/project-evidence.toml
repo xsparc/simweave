@@ -446,3 +446,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-19-next-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0013-statistical-calibration.md"]
 evidence_refs = ["tests/test_calibration.py", "docs/governance/calibration-validation.md", "docs/governance/calibration-sample.json"]
+
+[[research_decisions]]
+id = "RD-ARTIFACT-INTEGRITY"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-20-artifact-integrity.md"]
+design_refs = ["docs/architecture/decisions/0015-artifact-integrity-audit.md"]
+
+[[requirements]]
+id = "REQ-ARTIFACT-INTEGRITY"
+statement = "Audit bounded tenant-scoped retained objects without repair or deletion."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0015-artifact-integrity-audit.md"]
+risk_refs = ["docs/operations/artifact-integrity.md"]
+implementation_refs = ["src/simweave/integrity.py", "src/simweave/artifacts.py", "src/simweave/postgres.py", "src/simweave/operations_cli.py"]
+verification_refs = ["tests/test_integrity.py", "tests/test_postgres.py"]
+validation_refs = ["docs/governance/artifact-integrity-validation.md"]
+
+[[work_items]]
+id = "SW017-ARTIFACT-INTEGRITY"
+title = "Bounded retained-artifact integrity audit"
+status = "verified"
+requirement_ids = ["REQ-ARTIFACT-INTEGRITY"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-20-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0015-artifact-integrity-audit.md"]
+evidence_refs = ["tests/test_integrity.py", "docs/governance/artifact-integrity-validation.md"]
