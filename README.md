@@ -195,3 +195,5 @@ for authenticated artifact downloads, metrics and coordinated checkpoint recover
 The [suite workspace and maintenance guide](docs/operations/operator-workflows.md)
 covers browser submission/review, persistent admission pause, worker drain and
 verified fresh-directory recovery. Open **Suite workspace** in the dashboard.
+
+Author bounded parameter grids with [scenario sweeps](docs/operations/scenario-sweeps.md).

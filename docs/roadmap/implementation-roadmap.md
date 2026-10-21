@@ -130,3 +130,10 @@ checks and PostgreSQL suite scheduling with 1,000 jobs and eight workers across
 two isolated container hosts. The fixture has one physical host. SQLite remains
 the default and the catalog retains one API authority. Subsequent milestone
 recommendations remain advisory; no merge, deployment or release is authorized.
+
+## SW018: deterministic scenario sweeps
+
+After SW017's merge, delegated scope selection selects bounded experiment authoring.
+ADR 0016 defines a plan-only parameter grid with strict axes, deterministic output,
+full Suite admission and reference/MuJoCo validation. No automatic tuning or
+promotion is included. See operations/scenario-sweeps.md.

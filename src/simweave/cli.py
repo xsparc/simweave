@@ -31,6 +31,10 @@ def main(argv: list[str] | None = None) -> int:
     init.add_argument("path", type=Path)
     commands.add_parser("schema", help="print the scenario JSON Schema")
     commands.add_parser("suite-schema", help="print the regression suite JSON Schema")
+    commands.add_parser("sweep-schema", help="print the parameter sweep JSON Schema")
+    sweep = commands.add_parser("sweep", help="plan a bounded parameter sweep without execution")
+    sweep.add_argument("path", type=Path)
+    sweep.add_argument("--output", type=Path, help="write a new Suite JSON file; default stdout")
     suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
     suite.add_argument("path", type=Path)
     suite.add_argument("--output", required=True, type=Path)
@@ -73,6 +77,26 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("sweep", "sweep-schema"):
+            from simweave.sweeps import Sweep, plan
+
+            if args.command == "sweep-schema":
+                print(json.dumps(Sweep.model_json_schema(), indent=2))
+                return 0
+            with args.path.open("rb") as stream:
+                raw = stream.read(65_537)
+            if len(raw) > 65_536:
+                raise ValueError("sweep input exceeds 64 KiB")
+            contract = plan(Sweep.model_validate_json(raw))
+            output = contract.model_dump_json() + "\n"
+            if len(output.encode("utf-8")) > 65_536:
+                raise ValueError("generated suite exceeds 64 KiB")
+            if args.output is None:
+                print(output, end="")
+            else:
+                with args.output.open("x", encoding="utf-8", newline="\n") as stream:
+                    stream.write(output)
+            return 0
         if args.command == "operations":
             return operations_dispatch(args)
         if args.command == "attestation":
