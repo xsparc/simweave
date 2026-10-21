@@ -502,3 +502,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-21-research-select-next-milestones-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0016-scenario-sweeps.md"]
 evidence_refs = ["tests/test_sweeps.py", "docs/governance/scenario-sweeps-validation.md"]
+
+[[research_decisions]]
+id = "RD-SWEEP-REVIEW"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-22-sweep-review.md"]
+design_refs = ["docs/architecture/decisions/0017-sweep-result-review.md"]
+
+[[requirements]]
+id = "REQ-SWEEP-REVIEW"
+statement = "Parameter-linked sweep result review with bounded inputs and explicit evidence identity."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0017-sweep-result-review.md"]
+risk_refs = ["docs/operations/sweep-review.md"]
+implementation_refs = ["src/simweave/sweep_review.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_sweep_review.py"]
+validation_refs = ["docs/governance/sweep-review-validation.md"]
+
+[[work_items]]
+id = "SW019-SWEEP-REVIEW"
+title = "Parameter-linked sweep result review"
+status = "verified"
+requirement_ids = ["REQ-SWEEP-REVIEW"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-22-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0017-sweep-result-review.md"]
+evidence_refs = ["tests/test_sweep_review.py", "docs/governance/sweep-review-validation.md"]

@@ -197,3 +197,5 @@ covers browser submission/review, persistent admission pause, worker drain and
 verified fresh-directory recovery. Open **Suite workspace** in the dashboard.
 
 Author bounded parameter grids with [scenario sweeps](docs/operations/scenario-sweeps.md).
+
+Inspect parameter-linked outcomes with [sweep result review](docs/operations/sweep-review.md).

@@ -35,6 +35,11 @@ def main(argv: list[str] | None = None) -> int:
     sweep = commands.add_parser("sweep", help="plan a bounded parameter sweep without execution")
     sweep.add_argument("path", type=Path)
     sweep.add_argument("--output", type=Path, help="write a new Suite JSON file; default stdout")
+    commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
+    sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
+    sweep_review.add_argument("sweep", type=Path)
+    sweep_review.add_argument("report", type=Path)
+    sweep_review.add_argument("--output", type=Path, help="write a new review file; default stdout")
     suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
     suite.add_argument("path", type=Path)
     suite.add_argument("--output", required=True, type=Path)
@@ -77,6 +82,32 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("sweep-review", "sweep-review-schema"):
+            from simweave.bundles import MAX_REPORT
+            from simweave.suites import SuiteReport
+            from simweave.sweep_review import SweepReview, summarize
+            from simweave.sweeps import Sweep
+
+            if args.command == "sweep-review-schema":
+                print(json.dumps(SweepReview.model_json_schema(), indent=2))
+                return 0
+            with args.sweep.open("rb") as stream:
+                sweep_bytes = stream.read(65_537)
+            with args.report.open("rb") as stream:
+                report_bytes = stream.read(MAX_REPORT + 1)
+            if len(sweep_bytes) > 65_536 or len(report_bytes) > MAX_REPORT:
+                raise ValueError("review input exceeds its byte limit")
+            result = summarize(
+                Sweep.model_validate_json(sweep_bytes),
+                SuiteReport.model_validate_json(report_bytes),
+            )
+            output = result.model_dump_json(indent=2) + "\n"
+            if args.output is None:
+                print(output, end="")
+            else:
+                with args.output.open("x", encoding="utf-8", newline="\n") as stream:
+                    stream.write(output)
+            return result.exit_code
         if args.command in ("sweep", "sweep-schema"):
             from simweave.sweeps import Sweep, plan
 
