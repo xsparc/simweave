@@ -177,3 +177,10 @@ pools and transactional admission preserve the existing suite contracts. Catalog
 and legacy runs still belong to a single API host. SQLite defaults and recovery
 remain supported; PostgreSQL recovery/migration is not implemented. See
 [operator setup](../operations/provider-distributed.md) for configuration and limits.
+
+## Parameter sweep authoring
+
+ADR 0016 adds a pure, closed Sweep contract that expands explicit parameter values
+into the existing Suite. Complete scenario/matrix validation precedes output;
+execution, bundles, API admission and baseline decisions retain their contracts.
+See [scenario sweeps](../operations/scenario-sweeps.md).

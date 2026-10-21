@@ -474,3 +474,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-20-research-select-next-milestones-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0015-artifact-integrity-audit.md"]
 evidence_refs = ["tests/test_integrity.py", "docs/governance/artifact-integrity-validation.md"]
+
+[[research_decisions]]
+id = "RD-SCENARIO-SWEEPS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-21-scenario-sweeps.md"]
+design_refs = ["docs/architecture/decisions/0016-scenario-sweeps.md"]
+
+[[requirements]]
+id = "REQ-SCENARIO-SWEEPS"
+statement = "Deterministic scenario sweep planning with strict admission and reproducible identities."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0016-scenario-sweeps.md"]
+risk_refs = ["docs/operations/scenario-sweeps.md"]
+implementation_refs = ["src/simweave/sweeps.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_sweeps.py"]
+validation_refs = ["docs/governance/scenario-sweeps-validation.md"]
+
+[[work_items]]
+id = "SW018-SCENARIO-SWEEPS"
+title = "Deterministic scenario sweep planning"
+status = "verified"
+requirement_ids = ["REQ-SCENARIO-SWEEPS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-21-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0016-scenario-sweeps.md"]
+evidence_refs = ["tests/test_sweeps.py", "docs/governance/scenario-sweeps-validation.md"]

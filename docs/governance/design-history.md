@@ -72,3 +72,7 @@ token profile, server-bound subjects and role scopes, bounded JWKS refresh, and
 policy-constrained GitHub attestation verification. Restore consumes the exact
 verified snapshot. Synthetic CI signing tests provenance without publishing a
 release. Evidence is recorded in `trusted-evidence-validation.md`.
+
+2026-10-21: SW018 adds deterministic scenario sweep planning under delegated next-scope selection.
+The bounded contract is in docs/architecture/decisions/0016-scenario-sweeps.md; executed checks and limits are in
+docs/governance/scenario-sweeps-validation.md.
