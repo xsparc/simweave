@@ -188,3 +188,8 @@ See [scenario sweeps](../operations/scenario-sweeps.md).
 ADR 0017 adds descriptive sweep review bound to the exact generated Suite and
 validated report. It preserves parameter/adapter/seed grouping and withholds
 incomplete-point aggregates. See [sweep review](../operations/sweep-review.md).
+
+The offline sweep HTML renderer consumes the existing validated review contract,
+escapes source text and emits fixed CSS under a restrictive content security
+policy. It adds no dependency to simulation math or persistence. See
+[ADR 0018](decisions/0018-offline-sweep-report.md).

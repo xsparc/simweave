@@ -144,3 +144,9 @@ After SW018's merge, the 2026-10-22 request continues delegated scope selection.
 ADR 0017 adds bounded descriptive results tied to the exact Sweep plan, with
 visible execution failures and preserved comparison warnings. Optimization,
 statistical inference and promotion remain separate workflows.
+
+## SW020: Offline HTML sweep reports
+
+The delegated 2026-10-23 scope continues the merged evidence milestone.
+Decision: `docs/architecture/decisions/0018-offline-sweep-report.md`.
+Acceptance: Escaped hostile titles produce no executable tags or event attributes; CSP matches fixed CSS; metric values and evidence hashes match validated summaries; incomplete points withhold metrics; CLI validates before writing and refuses overwrite.

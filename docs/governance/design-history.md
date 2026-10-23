@@ -80,3 +80,8 @@ docs/governance/scenario-sweeps-validation.md.
 2026-10-22: SW019 adds parameter-linked sweep result review under delegated scope selection.
 See docs/architecture/decisions/0017-sweep-result-review.md for acceptance and
 docs/governance/sweep-review-validation.md for actual checks and limits.
+
+## 2026-10-23: SW020
+
+Offline HTML sweep reports extends the merged evidence workflow. See the accepted decision at
+`docs/architecture/decisions/0018-offline-sweep-report.md` and validation at `docs/governance/offline-sweep-report-validation.md`.

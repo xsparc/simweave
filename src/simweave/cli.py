@@ -40,6 +40,7 @@ def main(argv: list[str] | None = None) -> int:
     sweep_review.add_argument("sweep", type=Path)
     sweep_review.add_argument("report", type=Path)
     sweep_review.add_argument("--output", type=Path, help="write a new review file; default stdout")
+    sweep_review.add_argument("--format", choices=["json", "html"], default="json")
     suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
     suite.add_argument("path", type=Path)
     suite.add_argument("--output", required=True, type=Path)
@@ -97,17 +98,21 @@ def main(argv: list[str] | None = None) -> int:
                 report_bytes = stream.read(MAX_REPORT + 1)
             if len(sweep_bytes) > 65_536 or len(report_bytes) > MAX_REPORT:
                 raise ValueError("review input exceeds its byte limit")
-            result = summarize(
-                Sweep.model_validate_json(sweep_bytes),
-                SuiteReport.model_validate_json(report_bytes),
-            )
-            output = result.model_dump_json(indent=2) + "\n"
+            source = Sweep.model_validate_json(sweep_bytes)
+            report = SuiteReport.model_validate_json(report_bytes)
+            if args.format == "html":
+                from simweave.sweep_html import render_sweep_report
+
+                output, exit_code = render_sweep_report(source, report)
+            else:
+                result = summarize(source, report)
+                output, exit_code = result.model_dump_json(indent=2) + "\n", result.exit_code
             if args.output is None:
                 print(output, end="")
             else:
                 with args.output.open("x", encoding="utf-8", newline="\n") as stream:
                     stream.write(output)
-            return result.exit_code
+            return exit_code
         if args.command in ("sweep", "sweep-schema"):
             from simweave.sweeps import Sweep, plan
 
