@@ -37,3 +37,23 @@ These are descriptive summaries. They do not rank an optimum, correct for multip
 comparisons, establish physical validity, or authorize baseline promotion. Report
 validation checks structure and summary consistency, not the omitted full telemetry.
 Use the existing bundle verifier and provenance workflow for those checks.
+
+## Offline HTML review
+
+```sh
+simweave sweep-review sweep.json suite-report.json --format html --output review.html
+```
+
+Open the resulting file in a browser. It is self-contained, with no scripts or
+external assets. Parameter/adapter sections show seeds, pass/fail/error counts,
+warnings and descriptive metrics. Any execution error withholds that point's
+metrics across all its seeds. Values display six significant digits; use the
+default JSON output for full precision. Exit codes remain 0 for pass, 1 for
+quality/regression failure and 2 for incomplete execution or invalid input.
+
+The original sweep and suite report are revalidated and matched before writing;
+existing output files are never overwritten. Source text is HTML-escaped and a
+restrictive CSP permits only the fixed stylesheet. Evidence hashes identify the
+normalized source contracts. This view does not verify raw telemetry, signatures,
+physical accuracy or approve a baseline. See
+[ADR 0018](../architecture/decisions/0018-offline-sweep-report.md).

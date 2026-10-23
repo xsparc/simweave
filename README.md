@@ -199,3 +199,7 @@ verified fresh-directory recovery. Open **Suite workspace** in the dashboard.
 Author bounded parameter grids with [scenario sweeps](docs/operations/scenario-sweeps.md).
 
 Inspect parameter-linked outcomes with [sweep result review](docs/operations/sweep-review.md).
+
+Sweep reviews support a self-contained, script-free HTML view with parameter-linked
+metrics and explicit incomplete-run warnings. See
+[offline HTML review](docs/operations/sweep-review.md#offline-html-review).
