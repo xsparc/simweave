@@ -76,3 +76,7 @@ release. Evidence is recorded in `trusted-evidence-validation.md`.
 2026-10-21: SW018 adds deterministic scenario sweep planning under delegated next-scope selection.
 The bounded contract is in docs/architecture/decisions/0016-scenario-sweeps.md; executed checks and limits are in
 docs/governance/scenario-sweeps-validation.md.
+
+2026-10-22: SW019 adds parameter-linked sweep result review under delegated scope selection.
+See docs/architecture/decisions/0017-sweep-result-review.md for acceptance and
+docs/governance/sweep-review-validation.md for actual checks and limits.

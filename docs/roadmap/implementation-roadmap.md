@@ -137,3 +137,10 @@ After SW017's merge, delegated scope selection selects bounded experiment author
 ADR 0016 defines a plan-only parameter grid with strict axes, deterministic output,
 full Suite admission and reference/MuJoCo validation. No automatic tuning or
 promotion is included. See operations/scenario-sweeps.md.
+
+## SW019: parameter-linked sweep result review
+
+After SW018's merge, the 2026-10-22 request continues delegated scope selection.
+ADR 0017 adds bounded descriptive results tied to the exact Sweep plan, with
+visible execution failures and preserved comparison warnings. Optimization,
+statistical inference and promotion remain separate workflows.

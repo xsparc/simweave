@@ -184,3 +184,7 @@ ADR 0016 adds a pure, closed Sweep contract that expands explicit parameter valu
 into the existing Suite. Complete scenario/matrix validation precedes output;
 execution, bundles, API admission and baseline decisions retain their contracts.
 See [scenario sweeps](../operations/scenario-sweeps.md).
+
+ADR 0017 adds descriptive sweep review bound to the exact generated Suite and
+validated report. It preserves parameter/adapter/seed grouping and withholds
+incomplete-point aggregates. See [sweep review](../operations/sweep-review.md).
