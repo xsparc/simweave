@@ -203,3 +203,6 @@ Inspect parameter-linked outcomes with [sweep result review](docs/operations/swe
 Sweep reviews support a self-contained, script-free HTML view with parameter-linked
 metrics and explicit incomplete-run warnings. See
 [offline HTML review](docs/operations/sweep-review.md#offline-html-review).
+
+Export validated sweep results for analysis using
+[`sweep-review --format csv`](docs/operations/sweep-review.md#csv-export).

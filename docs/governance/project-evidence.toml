@@ -558,3 +558,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-23-research-select-next-milestones-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0018-offline-sweep-report.md"]
 evidence_refs = ["tests/test_sweep_html.py", "docs/governance/offline-sweep-report-validation.md"]
+
+[[research_decisions]]
+id = "RD-SWEEP-CSV"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-25-sweep-csv-export.md"]
+design_refs = ["docs/architecture/decisions/0019-sweep-csv-export.md"]
+
+[[requirements]]
+id = "REQ-SWEEP-CSV"
+statement = "CSV sweep export with explicit validation and bounded admission."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0019-sweep-csv-export.md"]
+risk_refs = ["docs/operations/sweep-review.md"]
+implementation_refs = ["src/simweave/sweep_csv.py","src/simweave/cli.py"]
+verification_refs = ["tests/test_sweep_csv.py","tests/test_sweep_review.py"]
+validation_refs = ["docs/governance/sweep-csv-validation.md"]
+
+[[work_items]]
+id = "SW021-SWEEP-CSV"
+title = "CSV sweep export"
+status = "verified"
+requirement_ids = ["REQ-SWEEP-CSV"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-25-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0019-sweep-csv-export.md"]
+evidence_refs = ["tests/test_sweep_csv.py", "docs/governance/sweep-csv-validation.md"]

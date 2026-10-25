@@ -85,3 +85,8 @@ docs/governance/sweep-review-validation.md for actual checks and limits.
 
 Offline HTML sweep reports extends the merged evidence workflow. See the accepted decision at
 `docs/architecture/decisions/0018-offline-sweep-report.md` and validation at `docs/governance/offline-sweep-report-validation.md`.
+
+## 2026-10-25: SW021
+
+CSV sweep export: accepted decision `docs/architecture/decisions/0019-sweep-csv-export.md`;
+verification record `docs/governance/sweep-csv-validation.md`.

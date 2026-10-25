@@ -40,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
     sweep_review.add_argument("sweep", type=Path)
     sweep_review.add_argument("report", type=Path)
     sweep_review.add_argument("--output", type=Path, help="write a new review file; default stdout")
-    sweep_review.add_argument("--format", choices=["json", "html"], default="json")
+    sweep_review.add_argument("--format", choices=["json", "html", "csv"], default="json")
     suite = commands.add_parser("suite", help="run a bounded baseline/candidate regression matrix")
     suite.add_argument("path", type=Path)
     suite.add_argument("--output", required=True, type=Path)
@@ -104,11 +104,19 @@ def main(argv: list[str] | None = None) -> int:
                 from simweave.sweep_html import render_sweep_report
 
                 output, exit_code = render_sweep_report(source, report)
+            elif args.format == "csv":
+                from simweave.sweep_csv import render_sweep_csv
+
+                output, exit_code = render_sweep_csv(source, report)
             else:
                 result = summarize(source, report)
                 output, exit_code = result.model_dump_json(indent=2) + "\n", result.exit_code
             if args.output is None:
-                print(output, end="")
+                if args.format == "csv" and hasattr(sys.stdout, "buffer"):
+                    # Preserve UTF-8 and CRLF even with Windows text-stream translation.
+                    sys.stdout.buffer.write(output.encode("utf-8"))
+                else:
+                    print(output, end="")
             else:
                 with args.output.open("x", encoding="utf-8", newline="\n") as stream:
                     stream.write(output)
