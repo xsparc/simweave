@@ -57,3 +57,27 @@ restrictive CSP permits only the fixed stylesheet. Evidence hashes identify the
 normalized source contracts. This view does not verify raw telemetry, signatures,
 physical accuracy or approve a baseline. See
 [ADR 0018](../architecture/decisions/0018-offline-sweep-report.md).
+
+## CSV export
+
+```sh
+simweave sweep-review sweep.json suite-report.json --format csv --output review.csv
+```
+
+The version-1 long-form CSV contains four metric rows per parameter/adapter point.
+Columns include the sweep/scenario labels, adapter, parameters and seeds as JSON,
+pass/fail/error counts, metric name and baseline/candidate/delta summaries, warnings
+as JSON, all three evidence hashes, exit code and descriptive-only interpretation.
+The header order is fixed by `sweep_csv.FIELDS`. Numeric values retain round-trip
+precision. An incomplete point still has four rows, with blank numeric summaries;
+blank means unavailable, never zero. Exit codes match JSON and HTML.
+
+File and normal CLI stdout output use UTF-8 with CRLF records. All cells are quoted.
+Arbitrary labels carry a literal `text:`
+prefix; structured cells begin with a JSON object or array. This prevents source
+labels from being emitted as formula-leading cells. Preserve the prefix when
+opening in spreadsheets. For programmatic label recovery remove exactly the first
+five characters after CSV parsing. Do not strip it and then reopen as untyped CSV.
+Spreadsheet import and later editing can alter interpretation; no guarantee covers
+all applications or subsequent transformations. JSON remains the structured
+review format. Existing input caps and refusal to overwrite remain in force.

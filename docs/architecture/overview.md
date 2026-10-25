@@ -193,3 +193,7 @@ The offline sweep HTML renderer consumes the existing validated review contract,
 escapes source text and emits fixed CSS under a restrictive content security
 policy. It adds no dependency to simulation math or persistence. See
 [ADR 0018](decisions/0018-offline-sweep-report.md).
+
+CSV sweep export consumes the same validated summary as JSON/HTML. ADR 0019 defines
+fixed long-form rows, explicit incomplete evidence and prefixed text labels.
+It adds no dependency to simulation math or persistence.

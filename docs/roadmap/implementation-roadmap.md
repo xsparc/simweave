@@ -150,3 +150,9 @@ statistical inference and promotion remain separate workflows.
 The delegated 2026-10-23 scope continues the merged evidence milestone.
 Decision: `docs/architecture/decisions/0018-offline-sweep-report.md`.
 Acceptance: Escaped hostile titles produce no executable tags or event attributes; CSP matches fixed CSS; metric values and evidence hashes match validated summaries; incomplete points withhold metrics; CLI validates before writing and refuses overwrite.
+
+## SW021: CSV sweep export
+
+The delegated 2026-10-25 scope closes a bounded workflow gap on current main.
+Decision: `docs/architecture/decisions/0019-sweep-csv-export.md`.
+Acceptance: Deterministic CSV parses to the expected row count and columns; numeric round trips, source hashes and seed ordering match the review; hostile labels remain text-prefixed; incomplete metrics are blank; CLI preserves CRLF and refuses overwrite or invalid evidence.
