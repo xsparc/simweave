@@ -156,3 +156,9 @@ Acceptance: Escaped hostile titles produce no executable tags or event attribute
 The delegated 2026-10-25 scope closes a bounded workflow gap on current main.
 Decision: `docs/architecture/decisions/0019-sweep-csv-export.md`.
 Acceptance: Deterministic CSV parses to the expected row count and columns; numeric round trips, source hashes and seed ordering match the review; hostile labels remain text-prefixed; incomplete metrics are blank; CLI preserves CRLF and refuses overwrite or invalid evidence.
+
+## SW022: Sweep workload preview
+
+The delegated 2026-10-26 scope extends an existing admitted contract.
+Decision: `docs/architecture/decisions/0020-sweep-workload-preview.md`.
+Acceptance: Counts independently equal expanded runs/steps for multiple axes/adapters/seeds; ordering and suite identity match the planner; no simulation is invoked; over-budget, invalid and mutated inputs fail; schema version is strict; CLI byte bounds and exclusive output hold.

@@ -197,3 +197,7 @@ policy. It adds no dependency to simulation math or persistence. See
 CSV sweep export consumes the same validated summary as JSON/HTML. ADR 0019 defines
 fixed long-form rows, explicit incomplete evidence and prefixed text labels.
 It adds no dependency to simulation math or persistence.
+
+ADR 0020 adds a plan-only workload preview derived from admitted Suite expansion.
+It reports counts and identities without loading simulators or reserving workers.
+See [sweep workload](../operations/sweep-workload.md).
