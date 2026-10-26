@@ -90,3 +90,8 @@ Offline HTML sweep reports extends the merged evidence workflow. See the accepte
 
 CSV sweep export: accepted decision `docs/architecture/decisions/0019-sweep-csv-export.md`;
 verification record `docs/governance/sweep-csv-validation.md`.
+
+## 2026-10-26: SW022
+
+Sweep workload preview: decision `docs/architecture/decisions/0020-sweep-workload-preview.md`;
+verification `docs/governance/sweep-workload-validation.md`.

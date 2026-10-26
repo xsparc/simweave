@@ -586,3 +586,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-25-research-select-next-milestones-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0019-sweep-csv-export.md"]
 evidence_refs = ["tests/test_sweep_csv.py", "docs/governance/sweep-csv-validation.md"]
+
+[[research_decisions]]
+id = "RD-SWEEP-WORKLOAD"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-26-sweep-workload-preview.md"]
+design_refs = ["docs/architecture/decisions/0020-sweep-workload-preview.md"]
+
+[[requirements]]
+id = "REQ-SWEEP-WORKLOAD"
+statement = "Sweep workload preview with strict admission and explicit evidence identity."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0020-sweep-workload-preview.md"]
+risk_refs = ["docs/operations/sweep-workload.md"]
+implementation_refs = ["src/simweave/sweep_inspect.py","src/simweave/cli.py"]
+verification_refs = ["tests/test_sweep_inspect.py","tests/test_sweeps.py"]
+validation_refs = ["docs/governance/sweep-workload-validation.md"]
+
+[[work_items]]
+id = "SW022-SWEEP-WORKLOAD"
+title = "Sweep workload preview"
+status = "verified"
+requirement_ids = ["REQ-SWEEP-WORKLOAD"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-26-research-select-next-milestones-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0020-sweep-workload-preview.md"]
+evidence_refs = ["tests/test_sweep_inspect.py", "docs/governance/sweep-workload-validation.md"]

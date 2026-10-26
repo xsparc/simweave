@@ -206,3 +206,6 @@ metrics and explicit incomplete-run warnings. See
 
 Export validated sweep results for analysis using
 [`sweep-review --format csv`](docs/operations/sweep-review.md#csv-export).
+
+Preview run and step counts before execution with
+[`sweep-inspect`](docs/operations/sweep-workload.md).

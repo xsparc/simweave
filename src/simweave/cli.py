@@ -35,6 +35,10 @@ def main(argv: list[str] | None = None) -> int:
     sweep = commands.add_parser("sweep", help="plan a bounded parameter sweep without execution")
     sweep.add_argument("path", type=Path)
     sweep.add_argument("--output", type=Path, help="write a new Suite JSON file; default stdout")
+    inspect = commands.add_parser("sweep-inspect", help="preview admitted run and step counts")
+    inspect.add_argument("path", type=Path)
+    inspect.add_argument("--output", type=Path, help="write new workload JSON; default stdout")
+    commands.add_parser("sweep-inspect-schema", help="print the sweep workload JSON Schema")
     commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
     sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
     sweep_review.add_argument("sweep", type=Path)
@@ -121,17 +125,22 @@ def main(argv: list[str] | None = None) -> int:
                 with args.output.open("x", encoding="utf-8", newline="\n") as stream:
                     stream.write(output)
             return exit_code
-        if args.command in ("sweep", "sweep-schema"):
+        if args.command in ("sweep", "sweep-schema", "sweep-inspect", "sweep-inspect-schema"):
+            from simweave.sweep_inspect import SweepWorkload, inspect_sweep
             from simweave.sweeps import Sweep, plan
 
             if args.command == "sweep-schema":
                 print(json.dumps(Sweep.model_json_schema(), indent=2))
                 return 0
+            if args.command == "sweep-inspect-schema":
+                print(json.dumps(SweepWorkload.model_json_schema(), indent=2))
+                return 0
             with args.path.open("rb") as stream:
                 raw = stream.read(65_537)
             if len(raw) > 65_536:
                 raise ValueError("sweep input exceeds 64 KiB")
-            contract = plan(Sweep.model_validate_json(raw))
+            source = Sweep.model_validate_json(raw)
+            contract = inspect_sweep(source) if args.command == "sweep-inspect" else plan(source)
             output = contract.model_dump_json() + "\n"
             if len(output.encode("utf-8")) > 65_536:
                 raise ValueError("generated suite exceeds 64 KiB")
