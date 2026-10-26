@@ -95,3 +95,7 @@ verification record `docs/governance/sweep-csv-validation.md`.
 
 Sweep workload preview: decision `docs/architecture/decisions/0020-sweep-workload-preview.md`;
 verification `docs/governance/sweep-workload-validation.md`.
+
+## 2026-10-27: SW023
+
+Sweep capacity report: decision `docs/architecture/decisions/0021-sweep-capacity-report.md`; validation `docs/governance/sweep-capacity-validation.md`.

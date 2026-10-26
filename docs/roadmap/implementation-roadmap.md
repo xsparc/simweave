@@ -162,3 +162,13 @@ Acceptance: Deterministic CSV parses to the expected row count and columns; nume
 The delegated 2026-10-26 scope extends an existing admitted contract.
 Decision: `docs/architecture/decisions/0020-sweep-workload-preview.md`.
 Acceptance: Counts independently equal expanded runs/steps for multiple axes/adapters/seeds; ordering and suite identity match the planner; no simulation is invoked; over-budget, invalid and mutated inputs fail; schema version is strict; CLI byte bounds and exclusive output hold.
+
+## SW023: Sweep capacity report
+
+Delegated 2026-10-27 milestone. Decision: `docs/architecture/decisions/0021-sweep-capacity-report.md`.
+
+3. Show remaining run and step admission capacity.
+4. Aggregate planned runs and steps by adapter.
+5. Export a standalone offline HTML capacity report.
+
+Acceptance: Remaining capacity reaches zero at each admission boundary; adapter totals equal workload totals in declared order. Default JSON is unchanged. Invalid/over-budget input produces no report, output never overwrites, hostile text is escaped, and contract constants reject non-integer values.

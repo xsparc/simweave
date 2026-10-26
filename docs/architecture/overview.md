@@ -201,3 +201,7 @@ It adds no dependency to simulation math or persistence.
 ADR 0020 adds a plan-only workload preview derived from admitted Suite expansion.
 It reports counts and identities without loading simulators or reserving workers.
 See [sweep workload](../operations/sweep-workload.md).
+
+### Sweep capacity report
+
+Extend `sweep-inspect` with opt-in `--format capacity-json` and `--format html`. Derive remaining run/step admission capacity and per-adapter totals from the validated workload preview. Preserve the default JSON contract and its schema command. HTML is a standalone escaped document with a hash-authorized inline stylesheet and restrictive CSP, with no scripts or remote assets. Existing 64 KiB input/output and exclusive output admission apply. See `docs/architecture/decisions/0021-sweep-capacity-report.md` for acceptance and limits.

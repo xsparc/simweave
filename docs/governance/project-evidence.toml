@@ -614,3 +614,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-26-research-select-next-milestones-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0020-sweep-workload-preview.md"]
 evidence_refs = ["tests/test_sweep_inspect.py", "docs/governance/sweep-workload-validation.md"]
+
+[[research_decisions]]
+id = "RD-SWEEP-CAPACITY"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-27-sweep-capacity.md"]
+design_refs = ["docs/architecture/decisions/0021-sweep-capacity-report.md"]
+
+[[requirements]]
+id = "REQ-SWEEP-CAPACITY"
+statement = "Sweep capacity report with bounded admission and explicit authority."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0021-sweep-capacity-report.md"]
+risk_refs = ["docs/operations/sweep-workload.md"]
+implementation_refs = ["src/simweave/sweep_capacity.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_sweep_capacity.py", "tests/test_sweep_inspect.py"]
+validation_refs = ["docs/governance/sweep-capacity-validation.md"]
+
+[[work_items]]
+id = "SW023-SWEEP-CAPACITY"
+title = "Sweep capacity report"
+status = "verified"
+requirement_ids = ["REQ-SWEEP-CAPACITY"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-27-five-item-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0021-sweep-capacity-report.md"]
+evidence_refs = ["tests/test_sweep_capacity.py", "docs/governance/sweep-capacity-validation.md"]
