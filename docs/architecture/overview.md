@@ -205,3 +205,7 @@ See [sweep workload](../operations/sweep-workload.md).
 ### Sweep capacity report
 
 Extend `sweep-inspect` with opt-in `--format capacity-json` and `--format html`. Derive remaining run/step admission capacity and per-adapter totals from the validated workload preview. Preserve the default JSON contract and its schema command. HTML is a standalone escaped document with a hash-authorized inline stylesheet and restrictive CSP, with no scripts or remote assets. Existing 64 KiB input/output and exclusive output admission apply. See `docs/architecture/decisions/0021-sweep-capacity-report.md` for acceptance and limits.
+
+### Capacity export contracts
+
+Expose `sweep-capacity-schema` from the existing Pydantic contract and add `sweep-inspect --format csv`. Emit one quoted CSV row per adapter, including per-adapter counts, repeated whole-plan totals/headroom, evidence digests and interpretation. Prefix the free-text sweep name with text: and preserve UTF-8/CRLF. Centralize unchanged 64-run and 200000-step bounds in suites.py and reuse them for workload/capacity fields and arithmetic. Existing JSON values, HTML, byte bounds and exclusive file creation remain compatible. See `docs/architecture/decisions/0022-capacity-export-contracts.md` for acceptance and limits.

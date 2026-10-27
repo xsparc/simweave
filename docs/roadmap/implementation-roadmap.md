@@ -172,3 +172,16 @@ Delegated 2026-10-27 milestone. Decision: `docs/architecture/decisions/0021-swee
 5. Export a standalone offline HTML capacity report.
 
 Acceptance: Remaining capacity reaches zero at each admission boundary; adapter totals equal workload totals in declared order. Default JSON is unchanged. Invalid/over-budget input produces no report, output never overwrites, hostile text is escaped, and contract constants reject non-integer values.
+
+## SW024: Capacity export contracts
+
+Subsequent five-item handoff: [next milestone](../next-milestone.md). SW025 owns
+the plan-difference contract, CLI and offline HTML; these remain planned.
+
+Delegated 2026-10-27 milestone. Decision: `docs/architecture/decisions/0022-capacity-export-contracts.md`.
+
+3. Publish the capacity JSON Schema.
+4. Export capacity CSV for offline comparison.
+5. Share admission limits across suite validation and capacity reports.
+
+Acceptance: Generated schema exposes closed nested contracts and shared limits. CSV round-trips hostile labels, sums adapter totals correctly, preserves identities/order and exact CLI bytes, and never overwrites files. Invalid and over-budget plans fail before output. Existing capacity boundary and full suite tests pass.

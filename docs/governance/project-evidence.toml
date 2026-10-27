@@ -642,3 +642,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-27-five-item-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0021-sweep-capacity-report.md"]
 evidence_refs = ["tests/test_sweep_capacity.py", "docs/governance/sweep-capacity-validation.md"]
+
+[[research_decisions]]
+id = "RD-CAPACITY-EXPORT-CONTRACTS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-27-capacity-export-contracts.md"]
+design_refs = ["docs/architecture/decisions/0022-capacity-export-contracts.md"]
+
+[[requirements]]
+id = "REQ-CAPACITY-EXPORT-CONTRACTS"
+statement = "Capacity export contracts with bounded admission and explicit authority."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0022-capacity-export-contracts.md"]
+risk_refs = ["docs/operations/sweep-workload.md"]
+implementation_refs = ["src/simweave/sweep_capacity.py", "src/simweave/sweep_inspect.py", "src/simweave/suites.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_capacity_exports.py", "tests/test_sweep_capacity.py"]
+validation_refs = ["docs/governance/capacity-export-validation.md"]
+
+[[work_items]]
+id = "SW024-CAPACITY-EXPORT-CONTRACTS"
+title = "Capacity export contracts"
+status = "verified"
+requirement_ids = ["REQ-CAPACITY-EXPORT-CONTRACTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-27-five-item-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0022-capacity-export-contracts.md"]
+evidence_refs = ["tests/test_capacity_exports.py", "docs/governance/capacity-export-validation.md"]

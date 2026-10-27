@@ -99,3 +99,7 @@ verification `docs/governance/sweep-workload-validation.md`.
 ## 2026-10-27: SW023
 
 Sweep capacity report: decision `docs/architecture/decisions/0021-sweep-capacity-report.md`; validation `docs/governance/sweep-capacity-validation.md`.
+
+## 2026-10-27: SW024
+
+Capacity export contracts: decision `docs/architecture/decisions/0022-capacity-export-contracts.md`; validation `docs/governance/capacity-export-validation.md`.
