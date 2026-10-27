@@ -6,7 +6,7 @@ from typing import Literal
 from pydantic import Field, field_validator
 
 from simweave.contracts import Contract, Number, canonical
-from simweave.suites import Adapter, Seed
+from simweave.suites import MAX_SUITE_RUNS, MAX_SUITE_STEPS, Adapter, Seed
 from simweave.sweeps import Sweep, plan
 
 
@@ -15,8 +15,8 @@ class PointWorkload(Contract):
     parameters: dict[str, Number]
     adapter: Adapter
     seeds: list[Seed]
-    runs: int = Field(ge=2, le=64)
-    steps: int = Field(ge=1, le=200_000)
+    runs: int = Field(ge=2, le=MAX_SUITE_RUNS)
+    steps: int = Field(ge=1, le=MAX_SUITE_STEPS)
 
 
 class SweepWorkload(Contract):
@@ -24,8 +24,8 @@ class SweepWorkload(Contract):
     sweep_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
     suite_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
     scenarios: int = Field(ge=1, le=8)
-    runs: int = Field(ge=2, le=64)
-    steps: int = Field(ge=1, le=200_000)
+    runs: int = Field(ge=2, le=MAX_SUITE_RUNS)
+    steps: int = Field(ge=1, le=MAX_SUITE_STEPS)
     points: list[PointWorkload] = Field(min_length=1, max_length=24)
     interpretation: Literal["planned_counts_not_runtime_estimates"] = (
         "planned_counts_not_runtime_estimates"

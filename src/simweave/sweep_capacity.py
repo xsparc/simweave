@@ -1,31 +1,33 @@
 """Opt-in capacity report; the original workload contract stays unchanged."""
 
 import base64
+import csv
 import hashlib
+import io
 from html import escape
 from typing import Literal
 
 from pydantic import Field, field_validator
 
 from simweave.contracts import Contract
-from simweave.suites import Adapter
+from simweave.suites import MAX_SUITE_RUNS, MAX_SUITE_STEPS, Adapter
 from simweave.sweep_inspect import SweepWorkload, inspect_sweep
 from simweave.sweeps import Sweep
 
 
 class AdapterWorkload(Contract):
     adapter: Adapter
-    runs: int = Field(ge=2, le=64)
-    steps: int = Field(ge=1, le=200_000)
+    runs: int = Field(ge=2, le=MAX_SUITE_RUNS)
+    steps: int = Field(ge=1, le=MAX_SUITE_STEPS)
 
 
 class SweepCapacity(Contract):
     schema_version: Literal[1] = 1
     workload: SweepWorkload
-    max_runs: Literal[64] = 64
-    max_steps: Literal[200000] = 200000
-    remaining_runs: int = Field(ge=0, le=62)
-    remaining_steps: int = Field(ge=0, le=199998)
+    max_runs: int = Field(default=MAX_SUITE_RUNS, ge=MAX_SUITE_RUNS, le=MAX_SUITE_RUNS)
+    max_steps: int = Field(default=MAX_SUITE_STEPS, ge=MAX_SUITE_STEPS, le=MAX_SUITE_STEPS)
+    remaining_runs: int = Field(ge=0, le=MAX_SUITE_RUNS - 2)
+    remaining_steps: int = Field(ge=0, le=MAX_SUITE_STEPS - 2)
     adapters: list[AdapterWorkload] = Field(min_length=1, max_length=3)
 
     @field_validator("schema_version", "max_runs", "max_steps", mode="before")
@@ -41,8 +43,8 @@ def inspect_capacity(sweep: Sweep) -> SweepCapacity:
     adapters = list(dict.fromkeys(p.adapter for p in workload.points))
     return SweepCapacity(
         workload=workload,
-        remaining_runs=64 - workload.runs,
-        remaining_steps=200000 - workload.steps,
+        remaining_runs=MAX_SUITE_RUNS - workload.runs,
+        remaining_steps=MAX_SUITE_STEPS - workload.steps,
         adapters=[
             AdapterWorkload(
                 adapter=adapter,
@@ -52,6 +54,51 @@ def inspect_capacity(sweep: Sweep) -> SweepCapacity:
             for adapter in adapters
         ],
     )
+
+
+def render_capacity_csv(sweep: Sweep) -> str:
+    """One row per adapter; headroom columns describe the entire admitted plan."""
+    result = inspect_capacity(sweep)
+    stream = io.StringIO(newline="")
+    writer = csv.writer(stream, quoting=csv.QUOTE_ALL, lineterminator="\r\n")
+    writer.writerow(
+        [
+            "schema_version",
+            "sweep_name_text",
+            "adapter",
+            "adapter_runs",
+            "adapter_steps",
+            "total_runs",
+            "total_steps",
+            "max_runs",
+            "max_steps",
+            "remaining_runs",
+            "remaining_steps",
+            "sweep_sha256",
+            "suite_sha256",
+            "interpretation",
+        ]
+    )
+    for adapter in result.adapters:
+        writer.writerow(
+            [
+                1,
+                "text:" + sweep.name,
+                adapter.adapter,
+                adapter.runs,
+                adapter.steps,
+                result.workload.runs,
+                result.workload.steps,
+                result.max_runs,
+                result.max_steps,
+                result.remaining_runs,
+                result.remaining_steps,
+                result.workload.sweep_digest,
+                result.workload.suite_digest,
+                result.workload.interpretation,
+            ]
+        )
+    return stream.getvalue()
 
 
 STYLE = """

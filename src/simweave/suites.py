@@ -25,6 +25,8 @@ from simweave.provenance import Environment, capture
 
 Seed = Annotated[int, Field(ge=0, le=2**32 - 1)]
 Adapter = Literal["reference", "mujoco", "gazebo"]
+MAX_SUITE_RUNS = 64
+MAX_SUITE_STEPS = 200_000
 
 
 class Suite(Contract):
@@ -66,10 +68,10 @@ class Suite(Contract):
         if self.baseline.target != self.candidate.target:
             raise ValueError("controller targets must match")
         multiplier = 2 * len(self.seeds) * len(self.adapters)
-        if len(self.scenarios) * multiplier > 64:
-            raise ValueError("suite exceeds 64 runs")
-        if sum(s.world.steps for s in self.scenarios) * multiplier > 200_000:
-            raise ValueError("suite exceeds 200000 total steps")
+        if len(self.scenarios) * multiplier > MAX_SUITE_RUNS:
+            raise ValueError(f"suite exceeds {MAX_SUITE_RUNS} runs")
+        if sum(s.world.steps for s in self.scenarios) * multiplier > MAX_SUITE_STEPS:
+            raise ValueError(f"suite exceeds {MAX_SUITE_STEPS} total steps")
         # Revalidate all overrides now, before creating output or executing work.
         for _, _, scenario in self.expand():
             Scenario.model_validate(scenario.model_dump())
@@ -105,7 +107,7 @@ class SuiteReport(Contract):
     schema_version: Literal[1] = 1
     suite: Suite
     suite_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
-    cases: list[CaseResult] = Field(min_length=2, max_length=64)
+    cases: list[CaseResult] = Field(min_length=2, max_length=MAX_SUITE_RUNS)
 
     @field_validator("schema_version", mode="before")
     @classmethod

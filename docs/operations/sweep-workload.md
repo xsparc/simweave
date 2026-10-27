@@ -29,3 +29,14 @@ simweave sweep-inspect sweep.json --format html --output capacity.html
 Omit `--output` to print the selected format. The original default JSON and `sweep-inspect-schema` remain unchanged. Capacity JSON nests the original report under `workload`, adds `max_runs` (64), `max_steps` (200000), remaining counts and adapter rows. Counts include both controllers for each seed. A 16-run, 160-step plan has 48 runs and 199840 steps of remaining admission capacity. HTML shows the same counts, parameter points and sweep/suite identities.
 
 Capacity is planned admission headroom, not reserved resources, adapter availability or a time/memory/storage/cost estimate. No simulation, queue scheduling or baseline decision occurs. Reports are unsigned derived evidence; execution independently validates its input.
+
+## Capacity export contracts
+
+```sh
+simweave sweep-capacity-schema
+simweave sweep-inspect sweep.json --format csv --output capacity.csv
+```
+
+CSV schema version 1 has one row per adapter in declared order. adapter_runs/adapter_steps are local totals; total_runs/total_steps, max_runs/max_steps and remaining_runs/remaining_steps describe the whole plan on every row. sweep_name_text carries a literal text: prefix. Digests identify the Sweep and expanded Suite. Omit --output for stdout; both routes preserve UTF-8 and CRLF.
+
+CSV headroom is for the entire plan and is repeated on each adapter row; it is not per-adapter quota and must not be summed. Labels are deliberately prefixed; stripping the prefix can reintroduce spreadsheet formula risks. JSON Schema describes structure, not proof that a report derives from a valid plan. Reports remain unsigned planned counts, without execution, availability checks or resource estimates.
