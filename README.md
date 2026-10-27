@@ -209,3 +209,7 @@ Export validated sweep results for analysis using
 
 Preview run and step counts before execution with
 [`sweep-inspect`](docs/operations/sweep-workload.md).
+
+### Sweep capacity report
+
+Omit `--output` to print the selected format. The original default JSON and `sweep-inspect-schema` remain unchanged. Capacity JSON nests the original report under `workload`, adds `max_runs` (64), `max_steps` (200000), remaining counts and adapter rows. Counts include both controllers for each seed. A 16-run, 160-step plan has 48 runs and 199840 steps of remaining admission capacity. HTML shows the same counts, parameter points and sweep/suite identities. See [the workflow](docs/operations/sweep-workload.md).

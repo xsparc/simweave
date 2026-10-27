@@ -37,7 +37,8 @@ def main(argv: list[str] | None = None) -> int:
     sweep.add_argument("--output", type=Path, help="write a new Suite JSON file; default stdout")
     inspect = commands.add_parser("sweep-inspect", help="preview admitted run and step counts")
     inspect.add_argument("path", type=Path)
-    inspect.add_argument("--output", type=Path, help="write new workload JSON; default stdout")
+    inspect.add_argument("--output", type=Path, help="write a new report file; default stdout")
+    inspect.add_argument("--format", choices=["json", "capacity-json", "html"], default="json")
     commands.add_parser("sweep-inspect-schema", help="print the sweep workload JSON Schema")
     commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
     sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
@@ -140,8 +141,19 @@ def main(argv: list[str] | None = None) -> int:
             if len(raw) > 65_536:
                 raise ValueError("sweep input exceeds 64 KiB")
             source = Sweep.model_validate_json(raw)
-            contract = inspect_sweep(source) if args.command == "sweep-inspect" else plan(source)
-            output = contract.model_dump_json() + "\n"
+            if args.command == "sweep-inspect" and args.format != "json":
+                from simweave.sweep_capacity import inspect_capacity, render_capacity
+
+                output = (
+                    render_capacity(source)
+                    if args.format == "html"
+                    else inspect_capacity(source).model_dump_json() + "\n"
+                )
+            else:
+                contract = (
+                    inspect_sweep(source) if args.command == "sweep-inspect" else plan(source)
+                )
+                output = contract.model_dump_json() + "\n"
             if len(output.encode("utf-8")) > 65_536:
                 raise ValueError("generated suite exceeds 64 KiB")
             if args.output is None:
