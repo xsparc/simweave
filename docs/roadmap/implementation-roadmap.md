@@ -175,8 +175,7 @@ Acceptance: Remaining capacity reaches zero at each admission boundary; adapter 
 
 ## SW024: Capacity export contracts
 
-Subsequent five-item handoff: [next milestone](../next-milestone.md). SW025 owns
-the plan-difference contract, CLI and offline HTML; these remain planned.
+The [recorded handoff](../governance/handoff-2026-10-27.md) is implemented in SW025.
 
 Delegated 2026-10-27 milestone. Decision: `docs/architecture/decisions/0022-capacity-export-contracts.md`.
 
@@ -185,3 +184,15 @@ Delegated 2026-10-27 milestone. Decision: `docs/architecture/decisions/0022-capa
 5. Share admission limits across suite validation and capacity reports.
 
 Acceptance: Generated schema exposes closed nested contracts and shared limits. CSV round-trips hostile labels, sums adapter totals correctly, preserves identities/order and exact CLI bytes, and never overwrites files. Invalid and over-budget plans fail before output. Existing capacity boundary and full suite tests pass.
+
+## SW025: Directional sweep plan comparison
+
+Following iteration: [TC019 and SW026 handoff](../next-milestone.md), planned only.
+
+Delegated 2026-10-28 milestone. Decision: `docs/architecture/decisions/0023-sweep-plan-diff.md`.
+
+3. Add the versioned directional plan-difference contract.
+4. Expose bounded JSON comparison and schema commands.
+5. Render offline HTML comparison with evidence identities.
+
+Acceptance: Direction reversal negates deltas; adapter additions/removals preserve declared order; identical inputs are explicit and changed experiments with equal counts are not called identical. Both mutated/over-budget sources fail before rendering. Contracts reject inconsistent summaries and noninteger schema versions. CLI rejects oversized inputs without output and never overwrites. HTML preserves JSON identities/counts, escapes hostile names and passes desktop/mobile checks.

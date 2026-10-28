@@ -103,3 +103,7 @@ Sweep capacity report: decision `docs/architecture/decisions/0021-sweep-capacity
 ## 2026-10-27: SW024
 
 Capacity export contracts: decision `docs/architecture/decisions/0022-capacity-export-contracts.md`; validation `docs/governance/capacity-export-validation.md`.
+
+## 2026-10-28: SW025
+
+Directional sweep plan comparison: decision `docs/architecture/decisions/0023-sweep-plan-diff.md`; validation `docs/governance/sweep-plan-diff-validation.md`.

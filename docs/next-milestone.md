@@ -1,36 +1,38 @@
-# Next iteration: configuration trust and plan comparison
+# Next iteration: validation diagnostics and plan-review exports
 
-Status: planned handoff, 2026-10-27. These five tasks are not implemented in
-TC017/SW024. The next run should recheck merged PRs and branch dependencies
-before starting; preserve existing work and avoid duplicate implementation.
+Status: planned handoff, 2026-10-28. These five tasks are not implemented in
+TC018/SW025. The [previous handoff](governance/handoff-2026-10-27.md) is completed
+by the current trust/budget checks and directional plan-comparison work.
 
-1. **ToolCapsule: offline trust-store validation.** Add a bounded, read-only
-   `trust-check` command for key IDs and Ed25519 public-key encoding. Report counts
-   without echoing keys. Accept empty stores as deny-all. Reject malformed keys,
-   duplicate JSON key IDs and oversized files; do not load signing seeds or
-   claim that a syntactically valid key is trusted by anyone else.
-2. **ToolCapsule: budget-fit report.** Compare an explicit Limits file against an
-   explicit host Policy and report which requested budgets exceed maxima. Reuse
-   admission comparisons to avoid drift. No policy rewriting, package signing,
-   execution or authority grant. Test equality, each exceeded field and invalid
-   input; make clear that fitting budgets alone does not admit a package.
-3. **SimWeave: plan-difference contract.** Compare two admitted Sweep inputs in a
-   pure versioned model, with source identities and signed run/step/headroom
-   changes, plus adapter additions/removals. Validate both plans before output;
-   do not simulate or infer numerical result equivalence.
-4. **SimWeave: plan-difference CLI.** Expose bounded JSON comparison with exclusive
-   output creation. Preserve direction (before versus after), deterministic
-   ordering and exit behavior. Test invalid/oversized input and unchanged plans.
-5. **SimWeave: offline plan-difference HTML.** Render the same validated comparison
-   with escaped text, script-free CSP and clear before/after counts. Verify
-   identity parity with JSON, hostile labels and desktop/mobile overflow.
+1. **ToolCapsule TC019: structured validation errors.** Add an opt-in JSON error
+   mode for configuration/trust/budget checks with stable error codes and no
+   input values, key IDs, key material or paths. Preserve default stderr and
+   existing 0/1/2 exit meanings. Test malformed input, I/O and non-fitting budgets.
+2. **ToolCapsule TC019: configuration workflow acceptance fixture.** Add a bounded
+   synthetic workflow that generates templates and a public trust store, checks
+   configuration, signs a known fixture, verifies budget fit and package preflight,
+   then demonstrates explicit allowlist and budget denial. Exercise it in CI
+   without ambient guest permissions or real operator files.
+3. **SimWeave SW026: per-adapter plan deltas.** Extend plan comparison with ordered
+   before/after run and step totals for every adapter in the union, including
+   zero counts for added/removed adapters. Totals must sum to global deltas.
+   Define backward-compatible output/version behavior and no equivalence claims.
+4. **SimWeave SW026: plan-difference CSV.** Export the validated comparison with
+   explicit direction, adapter/global counts and identities. Reuse text-prefixed
+   labels, exact UTF-8/CRLF, byte bounds and exclusive output. Test hostile labels,
+   numeric round trips and added/removed adapters.
+5. **SimWeave SW026: source-bound comparison verification.** Add a read-only
+   command that takes both Sweep sources and a JSON comparison, recomputes the
+   expected report and rejects altered counts, identities or reversed direction.
+   Bound all files and avoid rewriting evidence. Document that this is local
+   consistency checking, not a signature or independent execution attestation.
 
-Priority rationale: configuration checks naturally extend to the remaining
-operator-supplied trust file and budget compatibility; capacity reports now
-provide the inputs for reviewing plan changes before execution. These scopes
-reuse current contracts and avoid new runtime, broker or scheduler boundaries.
+Priority rationale: validation commands need stable automation diagnostics and
+an end-to-end authoring check; directional comparisons need adapter-level detail,
+portable tabular review and verification against retained source plans.
 
-Expected milestones: TC018 (items 1–2), SW025 (items 3–5). Each repository needs
-its own implementation, tests, ADR/evidence update and draft PR. Reuse the patched
-ToolCapsule branch while security PR #18 remains open; if it has merged, use main.
-Merging, release, deployment and automatic baseline approval remain out of scope.
+Each repository needs its own tests, ADR/evidence updates and draft PR. Check
+merge state before starting to avoid duplicate implementation. ToolCapsule should
+use the patched dependency branch while security PR #18 remains open, otherwise
+main. Merge, deployment, release, paid execution and automatic baseline approval
+remain outside this handoff.

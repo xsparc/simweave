@@ -217,3 +217,7 @@ Omit `--output` to print the selected format. The original default JSON and `swe
 ### Capacity export contracts
 
 CSV schema version 1 has one row per adapter in declared order. adapter_runs/adapter_steps are local totals; total_runs/total_steps, max_runs/max_steps and remaining_runs/remaining_steps describe the whole plan on every row. sweep_name_text carries a literal text: prefix. Digests identify the Sweep and expanded Suite. Omit --output for stdout; both routes preserve UTF-8 and CRLF. See [the workflow](docs/operations/sweep-workload.md).
+
+### Directional sweep plan comparison
+
+The first input is before and the second is after; all deltas are after minus before. An admitted comparison exits 0 whether or not plans differ; invalid input/I/O exits 2. Omit --output for stdout. JSON includes before/after snapshots, signed run/step/headroom changes, ordered adapter changes and identical_inputs. A zero count delta does not establish experiment equivalence. See [the workflow](docs/operations/sweep-plan-diff.md).

@@ -42,6 +42,12 @@ def main(argv: list[str] | None = None) -> int:
         "--format", choices=["json", "capacity-json", "html", "csv"], default="json"
     )
     commands.add_parser("sweep-capacity-schema", help="print the sweep capacity JSON Schema")
+    commands.add_parser("sweep-diff-schema", help="print the plan-difference JSON Schema")
+    diff = commands.add_parser("sweep-diff", help="compare two admitted plans without execution")
+    diff.add_argument("before", type=Path)
+    diff.add_argument("after", type=Path)
+    diff.add_argument("--format", choices=["json", "html"], default="json")
+    diff.add_argument("--output", type=Path)
     commands.add_parser("sweep-inspect-schema", help="print the sweep workload JSON Schema")
     commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
     sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
@@ -91,6 +97,33 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command in ("sweep-diff", "sweep-diff-schema"):
+            from simweave.sweep_diff import PlanDifference, compare_plans, render_plan_diff
+            from simweave.sweeps import Sweep
+
+            if args.command == "sweep-diff-schema":
+                print(json.dumps(PlanDifference.model_json_schema(), indent=2))
+                return 0
+            sources = []
+            for path in (args.before, args.after):
+                with path.open("rb") as stream:
+                    raw = stream.read(65_537)
+                if len(raw) > 65_536:
+                    raise ValueError("sweep input exceeds 64 KiB")
+                sources.append(Sweep.model_validate_json(raw))
+            output = (
+                render_plan_diff(*sources)
+                if args.format == "html"
+                else compare_plans(*sources).model_dump_json() + "\n"
+            )
+            if len(output.encode("utf-8")) > 65_536:
+                raise ValueError("plan comparison exceeds 64 KiB")
+            if args.output is None:
+                print(output, end="")
+            else:
+                with args.output.open("x", encoding="utf-8", newline="\n") as stream:
+                    stream.write(output)
+            return 0
         if args.command in ("sweep-review", "sweep-review-schema"):
             from simweave.bundles import MAX_REPORT
             from simweave.suites import SuiteReport
