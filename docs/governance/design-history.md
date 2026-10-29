@@ -107,3 +107,7 @@ Capacity export contracts: decision `docs/architecture/decisions/0022-capacity-e
 ## 2026-10-28: SW025
 
 Directional sweep plan comparison: decision `docs/architecture/decisions/0023-sweep-plan-diff.md`; validation `docs/governance/sweep-plan-diff-validation.md`.
+
+## 2026-10-29: SW026
+
+Adapter deltas and source-bound plan review: decision docs/architecture/decisions/0024-plan-review-exports.md; validation docs/governance/plan-review-exports-validation.md.
