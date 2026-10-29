@@ -187,7 +187,7 @@ Acceptance: Generated schema exposes closed nested contracts and shared limits. 
 
 ## SW025: Directional sweep plan comparison
 
-Following iteration: [TC019 and SW026 handoff](../next-milestone.md), planned only.
+SW026 implements the [retained handoff](../governance/handoff-2026-10-28.md).
 
 Delegated 2026-10-28 milestone. Decision: `docs/architecture/decisions/0023-sweep-plan-diff.md`.
 
@@ -196,3 +196,11 @@ Delegated 2026-10-28 milestone. Decision: `docs/architecture/decisions/0023-swee
 5. Render offline HTML comparison with evidence identities.
 
 Acceptance: Direction reversal negates deltas; adapter additions/removals preserve declared order; identical inputs are explicit and changed experiments with equal counts are not called identical. Both mutated/over-budget sources fail before rendering. Contracts reject inconsistent summaries and noninteger schema versions. CLI rejects oversized inputs without output and never overwrites. HTML preserves JSON identities/counts, escapes hostile names and passes desktop/mobile checks.
+
+## SW026: Adapter deltas and source-bound plan review
+
+Keep v1 default output. Add opt-in v2 ordered adapter deltas, CSV and bounded read-only verification of either report version against both sources.
+
+Decision: docs/architecture/decisions/0024-plan-review-exports.md.
+Acceptance: v1 compatibility, v2 union counts and sum checks, safe CSV bytes, exclusive output and verification against both retained sources.
+Next iteration: docs/next-milestone.md (planned only).

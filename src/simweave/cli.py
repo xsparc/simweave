@@ -42,12 +42,22 @@ def main(argv: list[str] | None = None) -> int:
         "--format", choices=["json", "capacity-json", "html", "csv"], default="json"
     )
     commands.add_parser("sweep-capacity-schema", help="print the sweep capacity JSON Schema")
-    commands.add_parser("sweep-diff-schema", help="print the plan-difference JSON Schema")
+    diff_schema = commands.add_parser(
+        "sweep-diff-schema", help="print the plan-difference JSON Schema"
+    )
+    diff_schema.add_argument("--schema-version", type=int, choices=[1, 2], default=1)
     diff = commands.add_parser("sweep-diff", help="compare two admitted plans without execution")
     diff.add_argument("before", type=Path)
     diff.add_argument("after", type=Path)
-    diff.add_argument("--format", choices=["json", "html"], default="json")
+    diff.add_argument("--format", choices=["json", "html", "csv"], default="json")
+    diff.add_argument("--schema-version", type=int, choices=[1, 2], default=1)
     diff.add_argument("--output", type=Path)
+    diff_check = commands.add_parser(
+        "sweep-diff-verify", help="check a comparison against both sources"
+    )
+    diff_check.add_argument("before", type=Path)
+    diff_check.add_argument("after", type=Path)
+    diff_check.add_argument("report", type=Path)
     commands.add_parser("sweep-inspect-schema", help="print the sweep workload JSON Schema")
     commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
     sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
@@ -97,12 +107,20 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
-        if args.command in ("sweep-diff", "sweep-diff-schema"):
-            from simweave.sweep_diff import PlanDifference, compare_plans, render_plan_diff
+        if args.command in ("sweep-diff", "sweep-diff-schema", "sweep-diff-verify"):
+            from simweave.sweep_diff import (
+                PlanDifference,
+                PlanDifferenceV2,
+                compare_plans,
+                render_plan_diff,
+                render_plan_diff_csv,
+                verify_plan_diff,
+            )
             from simweave.sweeps import Sweep
 
             if args.command == "sweep-diff-schema":
-                print(json.dumps(PlanDifference.model_json_schema(), indent=2))
+                model = PlanDifference if args.schema_version == 1 else PlanDifferenceV2
+                print(json.dumps(model.model_json_schema(), indent=2))
                 return 0
             sources = []
             for path in (args.before, args.after):
@@ -111,15 +129,38 @@ def main(argv: list[str] | None = None) -> int:
                 if len(raw) > 65_536:
                     raise ValueError("sweep input exceeds 64 KiB")
                 sources.append(Sweep.model_validate_json(raw))
-            output = (
-                render_plan_diff(*sources)
-                if args.format == "html"
-                else compare_plans(*sources).model_dump_json() + "\n"
-            )
+            if args.command == "sweep-diff-verify":
+                with args.report.open("rb") as stream:
+                    report = verify_plan_diff(*sources, stream.read(65_537))
+                print(
+                    json.dumps(
+                        {
+                            "schema_version": 1,
+                            "verified": True,
+                            "report_schema_version": report.schema_version,
+                            "interpretation": "local_source_consistency_only",
+                        }
+                    )
+                )
+                return 0
+            if args.format == "html":
+                if args.schema_version != 1:
+                    raise ValueError("HTML supports comparison version 1 only")
+                output = render_plan_diff(*sources)
+            elif args.format == "csv":
+                output = render_plan_diff_csv(*sources)
+            else:
+                output = (
+                    compare_plans(*sources, schema_version=args.schema_version).model_dump_json()
+                    + "\n"
+                )
             if len(output.encode("utf-8")) > 65_536:
                 raise ValueError("plan comparison exceeds 64 KiB")
             if args.output is None:
-                print(output, end="")
+                if args.format == "csv" and hasattr(sys.stdout, "buffer"):
+                    sys.stdout.buffer.write(output.encode("utf-8"))
+                else:
+                    print(output, end="")
             else:
                 with args.output.open("x", encoding="utf-8", newline="\n") as stream:
                     stream.write(output)

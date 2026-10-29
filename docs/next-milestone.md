@@ -1,38 +1,36 @@
-# Next iteration: validation diagnostics and plan-review exports
+# Next iteration: configuration contracts and portable plan review
 
-Status: planned handoff, 2026-10-28. These five tasks are not implemented in
-TC018/SW025. The [previous handoff](governance/handoff-2026-10-27.md) is completed
-by the current trust/budget checks and directional plan-comparison work.
+Status: planned handoff, 2026-10-29. These five tasks are not implemented by
+TC019/SW026. The completed tasks are retained in
+[the previous handoff](governance/handoff-2026-10-28.md).
 
-1. **ToolCapsule TC019: structured validation errors.** Add an opt-in JSON error
-   mode for configuration/trust/budget checks with stable error codes and no
-   input values, key IDs, key material or paths. Preserve default stderr and
-   existing 0/1/2 exit meanings. Test malformed input, I/O and non-fitting budgets.
-2. **ToolCapsule TC019: configuration workflow acceptance fixture.** Add a bounded
-   synthetic workflow that generates templates and a public trust store, checks
-   configuration, signs a known fixture, verifies budget fit and package preflight,
-   then demonstrates explicit allowlist and budget denial. Exercise it in CI
-   without ambient guest permissions or real operator files.
-3. **SimWeave SW026: per-adapter plan deltas.** Extend plan comparison with ordered
-   before/after run and step totals for every adapter in the union, including
-   zero counts for added/removed adapters. Totals must sum to global deltas.
-   Define backward-compatible output/version behavior and no equivalence claims.
-4. **SimWeave SW026: plan-difference CSV.** Export the validated comparison with
-   explicit direction, adapter/global counts and identities. Reuse text-prefixed
-   labels, exact UTF-8/CRLF, byte bounds and exclusive output. Test hostile labels,
-   numeric round trips and added/removed adapters.
-5. **SimWeave SW026: source-bound comparison verification.** Add a read-only
-   command that takes both Sweep sources and a JSON comparison, recomputes the
-   expected report and rejects altered counts, identities or reversed direction.
-   Bound all files and avoid rewriting evidence. Document that this is local
-   consistency checking, not a signature or independent execution attestation.
+1. **ToolCapsule TC020: validation-diagnostic schema.** Publish a discoverable
+   versioned schema for fixed validation errors and success summaries, with
+   examples for every error code and contract tests against CLI output.
+2. **ToolCapsule TC020: combined configuration check.** Add a bounded read-only
+   check requiring explicit limits, policy and trust files. Report each check
+   plus budget fit in one versioned result without key IDs, values or paths.
+   Preserve deny-all semantics and make incomplete/failed checks explicit;
+   successful configuration checking must not imply package admission.
+3. **SimWeave SW027: version-2 comparison HTML.** Render adapter before/after
+   counts and deltas alongside global totals and identities. Preserve v1 HTML,
+   escaping, script-free CSP, byte limits and desktop/mobile table usability.
+4. **SimWeave SW027: source-bound CSV comparison verification.** Parse the exact
+   exported table contract, recompute it from both sources and reject changed
+   rows, counts, labels, identities or direction. Bound input and distinguish
+   text-prefix handling; do not rewrite or repair evidence.
+5. **SimWeave SW027: portable plan-review acceptance example.** Add documented
+   synthetic before/after plans covering adapter addition/removal and unchanged
+   counts with changed identities. Exercise JSON v1/v2, CSV and HTML plus
+   source-bound verification and rejection cases in CI without a simulator.
 
-Priority rationale: validation commands need stable automation diagnostics and
-an end-to-end authoring check; directional comparisons need adapter-level detail,
-portable tabular review and verification against retained source plans.
+Priority: make validation contracts discoverable for automation and complete
+portable review of the new per-adapter comparison without changing execution.
 
-Each repository needs its own tests, ADR/evidence updates and draft PR. Check
-merge state before starting to avoid duplicate implementation. ToolCapsule should
-use the patched dependency branch while security PR #18 remains open, otherwise
-main. Merge, deployment, release, paid execution and automatic baseline approval
+Check merge state before starting. TC019 is based on the patched security
+branch after squash-merged PR #22 and still depends on security PR #18.
+SW026 is based on main after squash-merged PR #30. Use the corresponding
+merged base when available and avoid repeating changes.
+Each repository keeps its own implementation, evidence and draft PR.
+Merge, deployment, release, paid execution and automatic baseline approval
 remain outside this handoff.

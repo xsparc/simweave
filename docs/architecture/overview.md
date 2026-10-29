@@ -213,3 +213,8 @@ Expose `sweep-capacity-schema` from the existing Pydantic contract and add `swee
 ### Directional sweep plan comparison
 
 Implement the three SW025 handoff tasks: a strict version-1 plan-difference contract, bounded JSON CLI and standalone HTML. Revalidate both Sweep inputs and generated Suite plans; derive snapshots with normalized source/Suite identities, counts and remaining admission capacity. Deltas are after minus before. Added adapters follow after order; removed adapters follow before order. Validate internal report arithmetic and identity flags. `sweep-diff before.json after.json [--format json|html] [--output path]` caps each input and output at 64 KiB and creates files exclusively. `sweep-diff-schema` exposes the model schema. HTML escapes labels and uses existing fixed CSS with a restrictive hash-based CSP. See `docs/architecture/decisions/0023-sweep-plan-diff.md` for acceptance and limits.
+
+## Adapter deltas and source-bound plan review
+
+Keep v1 default output. Add opt-in v2 ordered adapter deltas, CSV and bounded read-only verification of either report version against both sources.
+See [SW026 decision](decisions/0024-plan-review-exports.md) for compatibility, acceptance and limits.

@@ -1,7 +1,10 @@
 """Directional, plan-only comparison of two independently admitted sweeps."""
 
 import base64
+import csv
 import hashlib
+import io
+import json
 from html import escape
 from typing import Literal
 
@@ -86,6 +89,51 @@ class PlanDifference(Contract):
         return self
 
 
+class AdapterDifference(Contract):
+    adapter: Adapter
+    before_runs: int = Field(ge=0, le=MAX_SUITE_RUNS)
+    after_runs: int = Field(ge=0, le=MAX_SUITE_RUNS)
+    runs_delta: int = Field(ge=-MAX_SUITE_RUNS, le=MAX_SUITE_RUNS)
+    before_steps: int = Field(ge=0, le=MAX_SUITE_STEPS)
+    after_steps: int = Field(ge=0, le=MAX_SUITE_STEPS)
+    steps_delta: int = Field(ge=-MAX_SUITE_STEPS, le=MAX_SUITE_STEPS)
+
+    @model_validator(mode="after")
+    def consistent(self):
+        for field in ("runs", "steps"):
+            if getattr(self, field + "_delta") != getattr(self, "after_" + field) - getattr(
+                self, "before_" + field
+            ):
+                raise ValueError("inconsistent adapter delta")
+        for side in ("before", "after"):
+            runs, steps = getattr(self, side + "_runs"), getattr(self, side + "_steps")
+            if (runs == 0) != (steps == 0) or steps < runs:
+                raise ValueError("inconsistent adapter counts")
+        return self
+
+
+class PlanDifferenceV2(PlanDifference):
+    schema_version: Literal[2] = 2
+    adapter_deltas: list[AdapterDifference] = Field(min_length=1, max_length=3)
+
+    @model_validator(mode="after")
+    def consistent_adapters(self):
+        expected = list(dict.fromkeys(self.before.adapters + self.after.adapters))
+        if [item.adapter for item in self.adapter_deltas] != expected:
+            raise ValueError("inconsistent adapter union order")
+        for side in ("before", "after"):
+            snapshot = getattr(self, side)
+            for field in ("runs", "steps"):
+                if sum(getattr(a, side + "_" + field) for a in self.adapter_deltas) != getattr(
+                    snapshot, field
+                ):
+                    raise ValueError("adapter counts do not sum to plan totals")
+            for item in self.adapter_deltas:
+                if (getattr(item, side + "_runs") > 0) != (item.adapter in snapshot.adapters):
+                    raise ValueError("adapter presence differs from counts")
+        return self
+
+
 def _snapshot(source: Sweep) -> PlanSnapshot:
     result = inspect_capacity(source)
     return PlanSnapshot(
@@ -100,10 +148,12 @@ def _snapshot(source: Sweep) -> PlanSnapshot:
     )
 
 
-def compare_plans(before: Sweep, after: Sweep) -> PlanDifference:
+def compare_plans(before: Sweep, after: Sweep, *, schema_version: int = 1) -> PlanDifference:
     """Revalidate both sources and generated suites before producing any report."""
+    if type(schema_version) is not int or schema_version not in (1, 2):
+        raise ValueError("unsupported comparison version")
     old, new = _snapshot(before), _snapshot(after)
-    return PlanDifference(
+    result = PlanDifference(
         before=old,
         after=new,
         runs_delta=new.runs - old.runs,
@@ -114,6 +164,108 @@ def compare_plans(before: Sweep, after: Sweep) -> PlanDifference:
         removed_adapters=[a for a in old.adapters if a not in new.adapters],
         identical_inputs=old.sweep_digest == new.sweep_digest,
     )
+    if schema_version == 1:
+        return result
+    old_counts = {a.adapter: a for a in inspect_capacity(before).adapters}
+    new_counts = {a.adapter: a for a in inspect_capacity(after).adapters}
+    deltas = []
+    for adapter in dict.fromkeys(old.adapters + new.adapters):
+        values = {}
+        for field in ("runs", "steps"):
+            values["before_" + field] = getattr(old_counts.get(adapter), field, 0)
+            values["after_" + field] = getattr(new_counts.get(adapter), field, 0)
+            values[field + "_delta"] = values["after_" + field] - values["before_" + field]
+        deltas.append(AdapterDifference(adapter=adapter, **values))
+    return PlanDifferenceV2.model_validate(
+        result.model_dump() | {"schema_version": 2, "adapter_deltas": deltas}
+    )
+
+
+def verify_plan_diff(before: Sweep, after: Sweep, raw: bytes) -> PlanDifference:
+    """Check retained source consistency; not a signature or execution attestation."""
+    if len(raw) > 65_536:
+        raise ValueError("plan comparison exceeds 64 KiB")
+    data = json.loads(raw)
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int:
+        raise ValueError("invalid comparison version")
+    model = {1: PlanDifference, 2: PlanDifferenceV2}.get(data["schema_version"])
+    if model is None:
+        raise ValueError("unsupported comparison version")
+    report = model.model_validate(data)
+    expected = compare_plans(before, after, schema_version=report.schema_version)
+    if report != expected:
+        raise ValueError("comparison differs from retained sources")
+    return report
+
+
+def render_plan_diff_csv(before: Sweep, after: Sweep) -> str:
+    result = compare_plans(before, after, schema_version=2)
+    stream = io.StringIO(newline="")
+    writer = csv.writer(stream, quoting=csv.QUOTE_ALL, lineterminator="\r\n")
+    writer.writerow(
+        [
+            "schema_version",
+            "direction",
+            "scope",
+            "adapter",
+            "before_name_text",
+            "after_name_text",
+            "before_runs",
+            "after_runs",
+            "runs_delta",
+            "before_steps",
+            "after_steps",
+            "steps_delta",
+            "before_sweep_sha256",
+            "after_sweep_sha256",
+            "before_suite_sha256",
+            "after_suite_sha256",
+            "interpretation",
+        ]
+    )
+    rows = [
+        (
+            "global",
+            "",
+            result.before.runs,
+            result.after.runs,
+            result.runs_delta,
+            result.before.steps,
+            result.after.steps,
+            result.steps_delta,
+        )
+    ]
+    rows.extend(
+        (
+            "adapter",
+            a.adapter,
+            a.before_runs,
+            a.after_runs,
+            a.runs_delta,
+            a.before_steps,
+            a.after_steps,
+            a.steps_delta,
+        )
+        for a in result.adapter_deltas
+    )
+    for scope, adapter, *counts in rows:
+        writer.writerow(
+            [
+                2,
+                "after_minus_before",
+                scope,
+                adapter,
+                "text:" + result.before.name,
+                "text:" + result.after.name,
+                *counts,
+                result.before.sweep_digest,
+                result.after.sweep_digest,
+                result.before.suite_digest,
+                result.after.suite_digest,
+                result.interpretation,
+            ]
+        )
+    return stream.getvalue()
 
 
 def render_plan_diff(before: Sweep, after: Sweep) -> str:

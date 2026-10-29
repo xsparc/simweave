@@ -698,3 +698,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-28-five-item-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0023-sweep-plan-diff.md"]
 evidence_refs = ["tests/test_sweep_diff.py", "docs/governance/sweep-plan-diff-validation.md"]
+
+[[research_decisions]]
+id = "RD-PLAN-REVIEW-EXPORTS"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-29-plan-review-exports.md"]
+design_refs = ["docs/architecture/decisions/0024-plan-review-exports.md"]
+
+[[requirements]]
+id = "REQ-PLAN-REVIEW-EXPORTS"
+statement = "Adapter deltas and source-bound plan review with bounded inputs and explicit evidence scope."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0024-plan-review-exports.md"]
+risk_refs = ["docs/operations/plan-review-exports.md"]
+implementation_refs = ["src/simweave/sweep_diff.py","src/simweave/cli.py"]
+verification_refs = ["tests/test_plan_review_exports.py","tests/test_sweep_diff.py"]
+validation_refs = ["docs/governance/plan-review-exports-validation.md"]
+
+[[work_items]]
+id = "SW026-PLAN-REVIEW-EXPORTS"
+title = "Adapter deltas and source-bound plan review"
+status = "verified"
+requirement_ids = ["REQ-PLAN-REVIEW-EXPORTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-29-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0024-plan-review-exports.md"]
+evidence_refs = ["tests/test_plan_review_exports.py","tests/test_sweep_diff.py","docs/governance/plan-review-exports-validation.md"]
