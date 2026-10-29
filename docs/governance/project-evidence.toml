@@ -670,3 +670,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-27-five-item-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0022-capacity-export-contracts.md"]
 evidence_refs = ["tests/test_capacity_exports.py", "docs/governance/capacity-export-validation.md"]
+
+[[research_decisions]]
+id = "RD-SWEEP-PLAN-DIFF"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-28-sweep-plan-diff.md"]
+design_refs = ["docs/architecture/decisions/0023-sweep-plan-diff.md"]
+
+[[requirements]]
+id = "REQ-SWEEP-PLAN-DIFF"
+statement = "Directional sweep plan comparison with bounded admission and explicit authority."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0023-sweep-plan-diff.md"]
+risk_refs = ["docs/operations/sweep-plan-diff.md"]
+implementation_refs = ["src/simweave/sweep_diff.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_sweep_diff.py", "tests/test_sweep_capacity.py"]
+validation_refs = ["docs/governance/sweep-plan-diff-validation.md"]
+
+[[work_items]]
+id = "SW025-SWEEP-PLAN-DIFF"
+title = "Directional sweep plan comparison"
+status = "verified"
+requirement_ids = ["REQ-SWEEP-PLAN-DIFF"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-28-five-item-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0023-sweep-plan-diff.md"]
+evidence_refs = ["tests/test_sweep_diff.py", "docs/governance/sweep-plan-diff-validation.md"]

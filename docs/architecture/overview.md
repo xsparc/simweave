@@ -209,3 +209,7 @@ Extend `sweep-inspect` with opt-in `--format capacity-json` and `--format html`.
 ### Capacity export contracts
 
 Expose `sweep-capacity-schema` from the existing Pydantic contract and add `sweep-inspect --format csv`. Emit one quoted CSV row per adapter, including per-adapter counts, repeated whole-plan totals/headroom, evidence digests and interpretation. Prefix the free-text sweep name with text: and preserve UTF-8/CRLF. Centralize unchanged 64-run and 200000-step bounds in suites.py and reuse them for workload/capacity fields and arithmetic. Existing JSON values, HTML, byte bounds and exclusive file creation remain compatible. See `docs/architecture/decisions/0022-capacity-export-contracts.md` for acceptance and limits.
+
+### Directional sweep plan comparison
+
+Implement the three SW025 handoff tasks: a strict version-1 plan-difference contract, bounded JSON CLI and standalone HTML. Revalidate both Sweep inputs and generated Suite plans; derive snapshots with normalized source/Suite identities, counts and remaining admission capacity. Deltas are after minus before. Added adapters follow after order; removed adapters follow before order. Validate internal report arithmetic and identity flags. `sweep-diff before.json after.json [--format json|html] [--output path]` caps each input and output at 64 KiB and creates files exclusively. `sweep-diff-schema` exposes the model schema. HTML escapes labels and uses existing fixed CSS with a restrictive hash-based CSP. See `docs/architecture/decisions/0023-sweep-plan-diff.md` for acceptance and limits.
