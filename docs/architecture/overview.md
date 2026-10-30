@@ -218,3 +218,8 @@ Implement the three SW025 handoff tasks: a strict version-1 plan-difference cont
 
 Keep v1 default output. Add opt-in v2 ordered adapter deltas, CSV and bounded read-only verification of either report version against both sources.
 See [SW026 decision](decisions/0024-plan-review-exports.md) for compatibility, acceptance and limits.
+
+## Portable plan review
+
+SW027 adds bounded offline contracts and verification without changing runtime
+execution authority. See the [accepted decision](decisions/0025-portable-plan-review.md) and its explicit evidence limits.

@@ -111,3 +111,7 @@ Directional sweep plan comparison: decision `docs/architecture/decisions/0023-sw
 ## 2026-10-29: SW026
 
 Adapter deltas and source-bound plan review: decision docs/architecture/decisions/0024-plan-review-exports.md; validation docs/governance/plan-review-exports-validation.md.
+
+## 2026-10-31: SW027
+
+Portable plan review: decision `docs/architecture/decisions/0025-portable-plan-review.md`; verification `docs/governance/portable-plan-review-validation.md`.

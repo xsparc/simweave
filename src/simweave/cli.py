@@ -58,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     diff_check.add_argument("before", type=Path)
     diff_check.add_argument("after", type=Path)
     diff_check.add_argument("report", type=Path)
+    diff_check.add_argument("--format", choices=["json", "csv"], default="json")
     commands.add_parser("sweep-inspect-schema", help="print the sweep workload JSON Schema")
     commands.add_parser("sweep-review-schema", help="print the sweep review JSON Schema")
     sweep_review = commands.add_parser("sweep-review", help="summarize results by sweep point")
@@ -115,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
                 render_plan_diff,
                 render_plan_diff_csv,
                 verify_plan_diff,
+                verify_plan_diff_csv,
             )
             from simweave.sweeps import Sweep
 
@@ -131,7 +133,8 @@ def main(argv: list[str] | None = None) -> int:
                 sources.append(Sweep.model_validate_json(raw))
             if args.command == "sweep-diff-verify":
                 with args.report.open("rb") as stream:
-                    report = verify_plan_diff(*sources, stream.read(65_537))
+                    verify = verify_plan_diff_csv if args.format == "csv" else verify_plan_diff
+                    report = verify(*sources, stream.read(65_537))
                 print(
                     json.dumps(
                         {
@@ -144,9 +147,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 return 0
             if args.format == "html":
-                if args.schema_version != 1:
-                    raise ValueError("HTML supports comparison version 1 only")
-                output = render_plan_diff(*sources)
+                output = render_plan_diff(*sources, schema_version=args.schema_version)
             elif args.format == "csv":
                 output = render_plan_diff_csv(*sources)
             else:
