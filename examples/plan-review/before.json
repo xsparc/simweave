@@ -1,0 +1,26 @@
+{
+  "name": "before",
+  "scenario": {
+    "world": {
+      "steps": 10
+    }
+  },
+  "axes": [
+    {
+      "field": "robot.mass",
+      "values": [
+        1.0,
+        2.0
+      ]
+    }
+  ],
+  "seeds": [
+    1
+  ],
+  "adapters": [
+    "gazebo",
+    "reference"
+  ],
+  "baseline": {},
+  "candidate": {}
+}

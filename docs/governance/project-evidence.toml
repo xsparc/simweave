@@ -726,3 +726,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-29-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0024-plan-review-exports.md"]
 evidence_refs = ["tests/test_plan_review_exports.py","tests/test_sweep_diff.py","docs/governance/plan-review-exports-validation.md"]
+
+[[research_decisions]]
+id = "RD-PORTABLE-PLAN-REVIEW"
+disposition = "adopted"
+source_refs = ["docs/research/2026-10-31-portable-plan-review.md"]
+design_refs = ["docs/architecture/decisions/0025-portable-plan-review.md"]
+
+[[requirements]]
+id = "REQ-PORTABLE-PLAN-REVIEW"
+statement = "Portable plan review with bounded input, explicit direction and limited evidence claims."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0025-portable-plan-review.md"]
+risk_refs = ["docs/operations/portable-plan-review.md"]
+implementation_refs = ["src/simweave/sweep_diff.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_portable_plan_review.py", "tests/test_plan_review_exports.py"]
+validation_refs = ["docs/governance/portable-plan-review-validation.md"]
+
+[[work_items]]
+id = "SW027-PORTABLE-PLAN-REVIEW"
+title = "Portable plan review"
+status = "verified"
+requirement_ids = ["REQ-PORTABLE-PLAN-REVIEW"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-10-31-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0025-portable-plan-review.md"]
+evidence_refs = ["tests/test_portable_plan_review.py", "tests/test_plan_review_exports.py", "docs/governance/portable-plan-review-validation.md"]

@@ -268,8 +268,25 @@ def render_plan_diff_csv(before: Sweep, after: Sweep) -> str:
     return stream.getvalue()
 
 
-def render_plan_diff(before: Sweep, after: Sweep) -> str:
-    result = compare_plans(before, after)
+def verify_plan_diff_csv(before: Sweep, after: Sweep, raw: bytes) -> PlanDifferenceV2:
+    """Accept the canonical exported table only; never normalize or repair evidence."""
+    if len(raw) > 65_536:
+        raise ValueError("plan comparison exceeds 64 KiB")
+    expected = render_plan_diff_csv(before, after)
+    try:
+        rows = list(csv.reader(io.StringIO(raw.decode("utf-8"), newline=""), strict=True))
+    except (UnicodeError, csv.Error) as exc:
+        raise ValueError("invalid comparison CSV") from exc
+    expected_rows = list(csv.reader(io.StringIO(expected, newline=""), strict=True))
+    if rows != expected_rows or raw != expected.encode("utf-8"):
+        raise ValueError("CSV differs from canonical source comparison")
+    return PlanDifferenceV2.model_validate(
+        compare_plans(before, after, schema_version=2).model_dump()
+    )
+
+
+def render_plan_diff(before: Sweep, after: Sweep, *, schema_version: int = 1) -> str:
+    result = compare_plans(before, after, schema_version=schema_version)
     style_hash = base64.b64encode(hashlib.sha256(STYLE.encode()).digest()).decode()
     policy = (
         f"default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'sha256-{style_hash}'"
@@ -303,6 +320,22 @@ def render_plan_diff(before: Sweep, after: Sweep) -> str:
     for label, values in [("Added", result.added_adapters), ("Removed", result.removed_adapters)]:
         parts.append(f"<p>{label}: {escape(', '.join(values)) if values else 'none'}</p>")
     parts.append("</section>")
+    if isinstance(result, PlanDifferenceV2):
+        parts.append(
+            "<section><h2>Adapter counts</h2><p>Changes are after minus before; "
+            'zero counts indicate an absent adapter.</p><div class="table-wrap"><table>'
+            '<thead><tr><th scope="col">Adapter</th><th scope="col">Before runs</th>'
+            '<th scope="col">After runs</th><th scope="col">Run change</th>'
+            '<th scope="col">Before steps</th><th scope="col">After steps</th>'
+            '<th scope="col">Step change</th></tr></thead><tbody>'
+        )
+        for item in result.adapter_deltas:
+            parts.append(
+                f'<tr><th scope="row">{escape(item.adapter)}</th>'
+                f"<td>{item.before_runs}</td><td>{item.after_runs}</td><td>{item.runs_delta:+d}</td>"
+                f"<td>{item.before_steps}</td><td>{item.after_steps}</td><td>{item.steps_delta:+d}</td></tr>"
+            )
+        parts.append("</tbody></table></div></section>")
     for label, snapshot in [("Before", result.before), ("After", result.after)]:
         parts.append(
             f"<section><h2>{label}</h2><h3>{escape(snapshot.name)}</h3>"

@@ -23,5 +23,6 @@ sanitized diagnostic. It performs no simulation and proves no authorship,
 signature, execution results or physics equivalence. Retain sources separately
 if the comparison must remain independently checkable later.
 
-Version 2 HTML is deferred; `--schema-version 2 --format html` fails rather than
-silently dropping adapter totals. See the next milestone for that renderer.
+Version 2 HTML is available with `--schema-version 2 --format html` and includes
+adapter counts. CSV verification uses `sweep-diff-verify ... --format csv` and
+requires exact canonical bytes. See the [portable example](portable-plan-review.md).

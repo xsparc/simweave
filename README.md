@@ -221,3 +221,5 @@ CSV schema version 1 has one row per adapter in declared order. adapter_runs/ada
 ### Directional sweep plan comparison
 
 The first input is before and the second is after; all deltas are after minus before. An admitted comparison exits 0 whether or not plans differ; invalid input/I/O exits 2. Omit --output for stdout. JSON includes before/after snapshots, signed run/step/headroom changes, ordered adapter changes and identical_inputs. A zero count delta does not establish experiment equivalence. See [the workflow](docs/operations/sweep-plan-diff.md).
+
+See [portable plan review](docs/operations/portable-plan-review.md) for the latest offline review workflow and evidence limits.

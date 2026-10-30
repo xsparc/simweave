@@ -204,3 +204,9 @@ Keep v1 default output. Add opt-in v2 ordered adapter deltas, CSV and bounded re
 Decision: docs/architecture/decisions/0024-plan-review-exports.md.
 Acceptance: v1 compatibility, v2 union counts and sum checks, safe CSV bytes, exclusive output and verification against both retained sources.
 Next iteration: docs/next-milestone.md (planned only).
+
+## SW027: Portable plan review
+
+Implemented the saved 2026-10-29 handoff. Decision: `docs/architecture/decisions/0025-portable-plan-review.md`.
+Acceptance and limitations: `docs/governance/portable-plan-review-validation.md`.
+Next five tasks: `docs/next-milestone.md` (planned only).

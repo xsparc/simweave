@@ -1,36 +1,32 @@
-# Next iteration: configuration contracts and portable plan review
+# Next iteration: portable configuration and comparison evidence
 
-Status: planned handoff, 2026-10-29. These five tasks are not implemented by
-TC019/SW026. The completed tasks are retained in
-[the previous handoff](governance/handoff-2026-10-28.md).
+Status: planned handoff, 2026-10-31. TC020/SW027 completed the archived
+[previous five tasks](governance/handoff-2026-10-29.md).
 
-1. **ToolCapsule TC020: validation-diagnostic schema.** Publish a discoverable
-   versioned schema for fixed validation errors and success summaries, with
-   examples for every error code and contract tests against CLI output.
-2. **ToolCapsule TC020: combined configuration check.** Add a bounded read-only
-   check requiring explicit limits, policy and trust files. Report each check
-   plus budget fit in one versioned result without key IDs, values or paths.
-   Preserve deny-all semantics and make incomplete/failed checks explicit;
-   successful configuration checking must not imply package admission.
-3. **SimWeave SW027: version-2 comparison HTML.** Render adapter before/after
-   counts and deltas alongside global totals and identities. Preserve v1 HTML,
-   escaping, script-free CSP, byte limits and desktop/mobile table usability.
-4. **SimWeave SW027: source-bound CSV comparison verification.** Parse the exact
-   exported table contract, recompute it from both sources and reject changed
-   rows, counts, labels, identities or direction. Bound input and distinguish
-   text-prefix handling; do not rewrite or repair evidence.
-5. **SimWeave SW027: portable plan-review acceptance example.** Add documented
-   synthetic before/after plans covering adapter addition/removal and unchanged
-   counts with changed identities. Exercise JSON v1/v2, CSV and HTML plus
-   source-bound verification and rejection cases in CI without a simulator.
+1. **ToolCapsule TC021: strict retained configuration-result reader.** Validate
+   the v1 envelope and cross-field relationships; reject contradictory validity,
+   budget status and deny-all indicators. Add bounded read-only CLI intake and
+   fixtures for every valid and invalid result shape. No package admission.
+2. **ToolCapsule TC021: source-bound configuration verification.** Recompute a
+   retained result against explicit limits/policy/trust files, reject mismatch,
+   and report local consistency only. Preserve fixed diagnostics, no input echo,
+   and no writes or execution. Document that identical summaries do not identify
+   identical keys or policies and provide no attestation.
+3. **SimWeave SW028: canonical plan-review bundle.** Define a bounded closed
+   JSON envelope containing both source plans and their v2 comparison, with
+   explicit version and identity rules; revalidate all contents without execution.
+4. **SimWeave SW028: portable bundle import/export commands.** Create envelopes
+   exclusively and verify retained envelopes with fixed diagnostics. Reject
+   tampering, excess input and unsupported versions; do not install adapters,
+   fetch assets, create jobs or interpret embedded paths.
+5. **SimWeave SW028: bundle acceptance and documentation.** Exercise export,
+   offline verification and rendering from one retained envelope using the
+   synthetic plan-review example, including altered identities, reverse direction
+   and desktop/mobile review. Preserve existing two-source CLI behavior.
 
-Priority: make validation contracts discoverable for automation and complete
-portable review of the new per-adapter comparison without changing execution.
-
-Check merge state before starting. TC019 is based on the patched security
-branch after squash-merged PR #22 and still depends on security PR #18.
-SW026 is based on main after squash-merged PR #30. Use the corresponding
-merged base when available and avoid repeating changes.
-Each repository keeps its own implementation, evidence and draft PR.
-Merge, deployment, release, paid execution and automatic baseline approval
-remain outside this handoff.
+Priority: configuration and plan-review outputs now have portable contracts;
+next make retained evidence safely checkable without broadening execution.
+Check merge state first: TC020 targets the security branch while PR #18 remains
+open; SW027 targets main. Keep separate repository commits and draft PRs.
+These tasks are planned only. Merging, release, deployment, paid services and
+baseline approval remain outside the handoff.
