@@ -23,7 +23,9 @@ def main(argv: list[str] | None = None) -> int:
     from simweave.decision_cli import dispatch, register
     from simweave.operations_cli import dispatch as operations_dispatch
     from simweave.operations_cli import register as operations_register
+    from simweave.plan_bundle_cli import register as bundle_register
 
+    bundle_register(commands)
     register(commands)
     attestation_register(commands)
     operations_register(commands)
@@ -108,6 +110,10 @@ def main(argv: list[str] | None = None) -> int:
     ros.add_argument("--timeout", type=float, default=5)
     args = parser.parse_args(argv)
     try:
+        if args.command.startswith("sweep-bundle"):
+            from simweave.plan_bundle_cli import dispatch as bundle_dispatch
+
+            return bundle_dispatch(args)
         if args.command in ("sweep-diff", "sweep-diff-schema", "sweep-diff-verify"):
             from simweave.sweep_diff import (
                 PlanDifference,

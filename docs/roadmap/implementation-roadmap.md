@@ -210,3 +210,11 @@ Next iteration: docs/next-milestone.md (planned only).
 Implemented the saved 2026-10-29 handoff. Decision: `docs/architecture/decisions/0025-portable-plan-review.md`.
 Acceptance and limitations: `docs/governance/portable-plan-review-validation.md`.
 Next five tasks: `docs/next-milestone.md` (planned only).
+
+## SW028: Portable plan-review bundle
+
+Delegated stewardship on 2026-11-02 selects the three retained SW028 handoff tasks.
+ADR 0026 defines a closed, bounded source/comparison envelope with export, offline
+verification and reuse of the existing HTML/CSV renderers. Acceptance covers
+canonical round trips, tampering/direction, byte limits, exclusive writes and
+non-execution. No simulator, API or baseline permission changes are included.

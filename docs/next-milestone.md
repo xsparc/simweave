@@ -30,3 +30,7 @@ Check merge state first: TC020 targets the security branch while PR #18 remains
 open; SW027 targets main. Keep separate repository commits and draft PRs.
 These tasks are planned only. Merging, release, deployment, paid services and
 baseline approval remain outside the handoff.
+
+SimWeave status, 2026-11-02: tasks 3-5 are implemented in SW028; see
+[plan-review bundle validation](governance/plan-review-bundle-validation.md).
+Other project tasks retain their existing authority and status.

@@ -223,3 +223,8 @@ See [SW026 decision](decisions/0024-plan-review-exports.md) for compatibility, a
 
 SW027 adds bounded offline contracts and verification without changing runtime
 execution authority. See the [accepted decision](decisions/0025-portable-plan-review.md) and its explicit evidence limits.
+
+ADR 0026 retains both plan sources and their v2 comparison in a bounded JSON
+envelope. Intake recomputes the comparison before verification or rendering;
+existing simulation and two-source review boundaries remain unchanged. See
+[portable plan-review bundles](../operations/plan-review-bundle.md).
