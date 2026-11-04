@@ -1,36 +1,31 @@
-# Next iteration: portable configuration and comparison evidence
+# Next iteration: configuration changes and external plan sources
 
-Status: planned handoff, 2026-10-31. TC020/SW027 completed the archived
-[previous five tasks](governance/handoff-2026-10-29.md).
+Status: planned handoff, 2026-11-04. TC021 completes retained configuration
+checks; SW028 was implemented in merged PR #33 and reverified in this iteration.
+The [previous handoff](governance/handoff-2026-10-31.md) records the completed scope.
 
-1. **ToolCapsule TC021: strict retained configuration-result reader.** Validate
-   the v1 envelope and cross-field relationships; reject contradictory validity,
-   budget status and deny-all indicators. Add bounded read-only CLI intake and
-   fixtures for every valid and invalid result shape. No package admission.
-2. **ToolCapsule TC021: source-bound configuration verification.** Recompute a
-   retained result against explicit limits/policy/trust files, reject mismatch,
-   and report local consistency only. Preserve fixed diagnostics, no input echo,
-   and no writes or execution. Document that identical summaries do not identify
-   identical keys or policies and provide no attestation.
-3. **SimWeave SW028: canonical plan-review bundle.** Define a bounded closed
-   JSON envelope containing both source plans and their v2 comparison, with
-   explicit version and identity rules; revalidate all contents without execution.
-4. **SimWeave SW028: portable bundle import/export commands.** Create envelopes
-   exclusively and verify retained envelopes with fixed diagnostics. Reject
-   tampering, excess input and unsupported versions; do not install adapters,
-   fetch assets, create jobs or interpret embedded paths.
-5. **SimWeave SW028: bundle acceptance and documentation.** Exercise export,
-   offline verification and rendering from one retained envelope using the
-   synthetic plan-review example, including altered identities, reverse direction
-   and desktop/mobile review. Preserve existing two-source CLI behavior.
+1. **ToolCapsule TC022: retained-summary difference contract.** Compare two
+   validated configuration summaries with explicit before/after direction and
+   fixed changed-field names. Report validity, deny-all and budget-status changes;
+   never infer grants, identical source content, or actual package authority.
+2. **ToolCapsule TC022: bounded difference CLI and acceptance.** Add exclusive
+   JSON output, a closed discoverable schema and synthetic tests for failure
+   summaries, reversed direction, unchanged summaries, malformed/oversized input
+   and no writes to evidence. Preserve existing checker outputs.
+3. **SimWeave SW029: external-source bundle verification.** Check a retained
+   plan-review bundle against two explicit source plans. Recompute canonical
+   identities and reject self-consistent replacement, changed seeds or direction.
+   Keep the existing standalone consistency verifier and bounded reads.
+4. **SimWeave SW029: bundle CSV verification.** Verify a retained CSV rendering
+   against a validated bundle using the existing canonical exporter. Enforce
+   exact UTF-8/CRLF, text prefixes and row order without repairing evidence.
+5. **SimWeave SW029: portable review acceptance.** Extend the synthetic example
+   through both new verifiers, including consistent replacement of the entire
+   envelope, equivalent JSON formatting and unchanged workload with changed
+   sources. Document normalized identity and local consistency limits.
 
-Priority: configuration and plan-review outputs now have portable contracts;
-next make retained evidence safely checkable without broadening execution.
-Check merge state first: TC020 targets the security branch while PR #18 remains
-open; SW027 targets main. Keep separate repository commits and draft PRs.
-These tasks are planned only. Merging, release, deployment, paid services and
-baseline approval remain outside the handoff.
-
-SimWeave status, 2026-11-02: tasks 3-5 are implemented in SW028; see
-[plan-review bundle validation](governance/plan-review-bundle-validation.md).
-Other project tasks retain their existing authority and status.
+Priority: distinguish internally consistent evidence from evidence tied to
+independently retained sources. No simulation, authority grant or signing is
+introduced. Check merged main before branching in both repositories; the prior
+ToolCapsule security stack is now merged. Keep separate commits and draft PRs.
+These tasks are planned only; merge, deployment and release need separate authority.

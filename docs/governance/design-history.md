@@ -115,3 +115,9 @@ Adapter deltas and source-bound plan review: decision docs/architecture/decision
 ## 2026-10-31: SW027
 
 Portable plan review: decision `docs/architecture/decisions/0025-portable-plan-review.md`; verification `docs/governance/portable-plan-review-validation.md`.
+
+## 2026-11-04: merged SW028 verification
+
+PR #33 completed the saved three tasks. Reverified against merged main; see
+`docs/governance/milestone-2026-11-04-validation.md`. Updated the shared handoff
+without duplicating implementation or changing runtime authority.

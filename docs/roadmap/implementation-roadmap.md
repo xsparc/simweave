@@ -218,3 +218,6 @@ ADR 0026 defines a closed, bounded source/comparison envelope with export, offli
 verification and reuse of the existing HTML/CSV renderers. Acceptance covers
 canonical round trips, tampering/direction, byte limits, exclusive writes and
 non-execution. No simulator, API or baseline permission changes are included.
+
+SW028 is merged through PR #33 and reverified on 2026-11-04. The next shared
+five-task handoff is `docs/next-milestone.md`; SW029 tasks are planned only.
