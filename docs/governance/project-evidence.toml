@@ -754,3 +754,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-10-31-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0025-portable-plan-review.md"]
 evidence_refs = ["tests/test_portable_plan_review.py", "tests/test_plan_review_exports.py", "docs/governance/portable-plan-review-validation.md"]
+
+[[research_decisions]]
+id = "RD-PLAN-REVIEW-BUNDLE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-02-plan-review-bundle.md"]
+design_refs = ["docs/architecture/decisions/0026-plan-review-bundle.md"]
+
+[[requirements]]
+id = "REQ-PLAN-REVIEW-BUNDLE"
+statement = "Retain and verify source-bound plan comparisons in bounded portable JSON envelopes."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0026-plan-review-bundle.md"]
+implementation_refs = ["src/simweave/plan_bundle.py", "src/simweave/plan_bundle_cli.py", "src/simweave/cli.py"]
+verification_refs = ["tests/test_plan_bundle.py", "tests/test_portable_plan_review.py"]
+validation_refs = ["docs/governance/plan-review-bundle-validation.md"]
+risk_refs = ["docs/operations/plan-review-bundle.md"]
+
+[[work_items]]
+id = "SW028-PLAN-REVIEW-BUNDLE"
+title = "Portable source-bound plan-review envelope"
+status = "verified"
+requirement_ids = ["REQ-PLAN-REVIEW-BUNDLE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-02-delegated-simweave-stewardship"
+acceptance_refs = ["docs/architecture/decisions/0026-plan-review-bundle.md"]
+evidence_refs = ["tests/test_plan_bundle.py", "docs/governance/plan-review-bundle-validation.md"]
