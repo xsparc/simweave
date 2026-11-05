@@ -221,3 +221,9 @@ non-execution. No simulator, API or baseline permission changes are included.
 
 SW028 is merged through PR #33 and reverified on 2026-11-04. The next shared
 five-task handoff is `docs/next-milestone.md`; SW029 tasks are planned only.
+
+## SW029: Bundle source verification (2026-11-05)
+
+Completed the saved milestone with bounded, non-executing retained-evidence checks.
+See `docs/architecture/decisions/0027-bundle-source-verification.md`, `docs/bundle-source-verification.md` and `docs/governance/bundle-source-verification-validation.md`.
+The next five tasks in `docs/next-milestone.md` are planned only.

@@ -121,3 +121,9 @@ Portable plan review: decision `docs/architecture/decisions/0025-portable-plan-r
 PR #33 completed the saved three tasks. Reverified against merged main; see
 `docs/governance/milestone-2026-11-04-validation.md`. Updated the shared handoff
 without duplicating implementation or changing runtime authority.
+
+## SW029: Bundle source verification (2026-11-05)
+
+Completed the saved milestone with bounded, non-executing retained-evidence checks.
+See `docs/architecture/decisions/0027-bundle-source-verification.md`, `docs/bundle-source-verification.md` and `docs/governance/bundle-source-verification-validation.md`.
+The next five tasks in `docs/next-milestone.md` are planned only.

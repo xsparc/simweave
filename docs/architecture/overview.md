@@ -228,3 +228,9 @@ ADR 0026 retains both plan sources and their v2 comparison in a bounded JSON
 envelope. Intake recomputes the comparison before verification or rendering;
 existing simulation and two-source review boundaries remain unchanged. See
 [portable plan-review bundles](../operations/plan-review-bundle.md).
+
+## SW029: Bundle source verification (2026-11-05)
+
+Completed the saved milestone with bounded, non-executing retained-evidence checks.
+See `docs/architecture/decisions/0027-bundle-source-verification.md`, `docs/bundle-source-verification.md` and `docs/governance/bundle-source-verification-validation.md`.
+The next five tasks in `docs/next-milestone.md` are planned only.

@@ -11,6 +11,8 @@ from simweave.plan_bundle import (
     decode_json,
     encode_bundle,
     read_bundle,
+    verify_bundle_csv,
+    verify_bundle_sources,
 )
 from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
 from simweave.sweeps import Sweep
@@ -24,6 +26,17 @@ def register(commands):
     export.add_argument("--output", required=True, type=Path)
     verify = commands.add_parser("sweep-bundle-verify", help="verify retained plan-review evidence")
     verify.add_argument("path", type=Path)
+    sources = commands.add_parser(
+        "sweep-bundle-verify-sources", help="verify a bundle against explicit sources"
+    )
+    sources.add_argument("path", type=Path)
+    sources.add_argument("before", type=Path)
+    sources.add_argument("after", type=Path)
+    csv_check = commands.add_parser(
+        "sweep-bundle-verify-csv", help="verify canonical CSV against a bundle"
+    )
+    csv_check.add_argument("path", type=Path)
+    csv_check.add_argument("csv", type=Path)
     render = commands.add_parser("sweep-bundle-render", help="render a verified retained bundle")
     render.add_argument("path", type=Path)
     render.add_argument("--format", choices=("html", "csv"), default="html")
@@ -49,8 +62,21 @@ def dispatch(args):
         ]
         raw = encode_bundle(create_bundle(*sources))
     else:
-        bundle = read_bundle(bounded_read(args.path, MAX_BUNDLE))
-        if args.command == "sweep-bundle-verify":
+        retained = bounded_read(args.path, MAX_BUNDLE)
+        bundle = read_bundle(retained)
+        if args.command == "sweep-bundle-verify-sources":
+            sources = [
+                Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
+                for path in (args.before, args.after)
+            ]
+            verify_bundle_sources(retained, *sources)
+        elif args.command == "sweep-bundle-verify-csv":
+            verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
+        if args.command in {
+            "sweep-bundle-verify",
+            "sweep-bundle-verify-sources",
+            "sweep-bundle-verify-csv",
+        }:
             print(
                 json.dumps(
                     {

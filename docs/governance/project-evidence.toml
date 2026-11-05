@@ -782,3 +782,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-02-delegated-simweave-stewardship"
 acceptance_refs = ["docs/architecture/decisions/0026-plan-review-bundle.md"]
 evidence_refs = ["tests/test_plan_bundle.py", "docs/governance/plan-review-bundle-validation.md", "docs/governance/milestone-2026-11-04-validation.md"]
+
+[[research_decisions]]
+id = "RD-BUNDLE-SOURCE-VERIFICATION"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-05-bundle-source-verification.md"]
+design_refs = ["docs/architecture/decisions/0027-bundle-source-verification.md"]
+
+[[requirements]]
+id = "REQ-BUNDLE-SOURCE-VERIFICATION"
+statement = "Bundle source verification with bounded input and explicit evidence limits."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0027-bundle-source-verification.md"]
+risk_refs = ["docs/bundle-source-verification.md"]
+implementation_refs = ["src/simweave/plan_bundle.py"]
+verification_refs = ["tests/test_bundle_verification.py"]
+validation_refs = ["docs/governance/bundle-source-verification-validation.md"]
+
+[[work_items]]
+id = "SW029-BUNDLE-SOURCE-VERIFICATION"
+title = "Bundle source verification"
+status = "verified"
+requirement_ids = ["REQ-BUNDLE-SOURCE-VERIFICATION"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-05-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0027-bundle-source-verification.md"]
+evidence_refs = ["tests/test_bundle_verification.py", "docs/governance/bundle-source-verification-validation.md"]
