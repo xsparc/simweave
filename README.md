@@ -227,3 +227,5 @@ See [portable plan review](docs/operations/portable-plan-review.md) for the late
 Retain both source plans and their v2 comparison in one
 [portable plan-review bundle](docs/operations/plan-review-bundle.md) for offline
 verification and HTML/CSV export from a single file.
+
+See [Bundle source verification](docs/bundle-source-verification.md) for the retained-evidence workflow and its limits.

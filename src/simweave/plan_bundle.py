@@ -6,7 +6,7 @@ from typing import Literal
 from pydantic import field_validator, model_validator
 
 from simweave.contracts import Contract, canonical
-from simweave.sweep_diff import PlanDifferenceV2, compare_plans
+from simweave.sweep_diff import PlanDifferenceV2, compare_plans, verify_plan_diff_csv
 from simweave.sweeps import Sweep
 
 MAX_COMPONENT = 65_536
@@ -78,3 +78,16 @@ def read_bundle(raw: bytes) -> PlanBundle:
     if len(raw) > MAX_BUNDLE:
         raise ValueError("bundle exceeds byte limit")
     return PlanBundle.model_validate(decode_json(raw))
+
+
+def verify_bundle_sources(raw: bytes, before: Sweep, after: Sweep) -> PlanBundle:
+    retained = read_bundle(raw)
+    expected = create_bundle(before, after)
+    if retained != expected:
+        raise ValueError("bundle differs from explicit sources")
+    return retained
+
+
+def verify_bundle_csv(bundle: PlanBundle, raw: bytes) -> None:
+    checked = PlanBundle.model_validate(bundle.model_dump())
+    verify_plan_diff_csv(checked.before, checked.after, raw)

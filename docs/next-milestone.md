@@ -1,31 +1,13 @@
-# Next iteration: configuration changes and external plan sources
+# Next iteration: independently retained review evidence
 
-Status: planned handoff, 2026-11-04. TC021 completes retained configuration
-checks; SW028 was implemented in merged PR #33 and reverified in this iteration.
-The [previous handoff](governance/handoff-2026-10-31.md) records the completed scope.
+Status: planned handoff, 2026-11-05. TC022 and SW029 complete the
+[previous five tasks](governance/handoff-2026-11-04.md).
 
-1. **ToolCapsule TC022: retained-summary difference contract.** Compare two
-   validated configuration summaries with explicit before/after direction and
-   fixed changed-field names. Report validity, deny-all and budget-status changes;
-   never infer grants, identical source content, or actual package authority.
-2. **ToolCapsule TC022: bounded difference CLI and acceptance.** Add exclusive
-   JSON output, a closed discoverable schema and synthetic tests for failure
-   summaries, reversed direction, unchanged summaries, malformed/oversized input
-   and no writes to evidence. Preserve existing checker outputs.
-3. **SimWeave SW029: external-source bundle verification.** Check a retained
-   plan-review bundle against two explicit source plans. Recompute canonical
-   identities and reject self-consistent replacement, changed seeds or direction.
-   Keep the existing standalone consistency verifier and bounded reads.
-4. **SimWeave SW029: bundle CSV verification.** Verify a retained CSV rendering
-   against a validated bundle using the existing canonical exporter. Enforce
-   exact UTF-8/CRLF, text prefixes and row order without repairing evidence.
-5. **SimWeave SW029: portable review acceptance.** Extend the synthetic example
-   through both new verifiers, including consistent replacement of the entire
-   envelope, equivalent JSON formatting and unchanged workload with changed
-   sources. Document normalized identity and local consistency limits.
+1. **ToolCapsule TC023: retained-difference reader.** Add bounded strict intake for the versioned difference envelope, reject duplicates/unknown fields, and recompute changed fields and direction from embedded summaries.
+2. **ToolCapsule TC023: explicit-summary verification.** Verify a retained difference against independently provided before/after summaries with CLI acceptance for whole-envelope replacement, reverse direction and no evidence writes. Preserve the distinction from original configuration sources.
+3. **SimWeave SW030: bundle canonical identity.** Expose a versioned digest of normalized bundle bytes with explicit newline/number rules and distinction from source-plan digests.
+4. **SimWeave SW030: expected bundle identity gate.** Require an optional independently retained digest before bundle review/export; enforce strict digest syntax and fail before output creation.
+5. **SimWeave SW030: portable retention acceptance.** Extend the example through digest retention and verification, equivalent formatting and internally consistent replacement; test SDK mutation and byte limits without simulator execution.
 
-Priority: distinguish internally consistent evidence from evidence tied to
-independently retained sources. No simulation, authority grant or signing is
-introduced. Check merged main before branching in both repositories; the prior
-ToolCapsule security stack is now merged. Keep separate commits and draft PRs.
-These tasks are planned only; merge, deployment and release need separate authority.
+Check merged state before branching; keep repository-specific draft PRs and commits.
+Planned only; merging, deployment and release require separate authority.
