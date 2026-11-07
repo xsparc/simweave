@@ -810,3 +810,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-05-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0027-bundle-source-verification.md"]
 evidence_refs = ["tests/test_bundle_verification.py", "docs/governance/bundle-source-verification-validation.md"]
+
+[[research_decisions]]
+id = "RD-BUNDLE-IDENTITIES"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-07-bundle-identities.md"]
+design_refs = ["docs/architecture/decisions/0028-bundle-identities.md"]
+
+[[requirements]]
+id = "REQ-BUNDLE-IDENTITIES"
+statement = "Bundle identities with bounded intake, independent verification targets and explicit evidence limits."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0028-bundle-identities.md"]
+risk_refs = ["docs/bundle-identities.md"]
+implementation_refs = ["src/simweave/bundle_identity.py", "src/simweave/plan_bundle_cli.py"]
+verification_refs = ["tests/test_bundle_identity.py"]
+validation_refs = ["docs/governance/bundle-identities-validation.md"]
+
+[[work_items]]
+id = "SW030-BUNDLE-IDENTITIES"
+title = "Bundle identities"
+status = "verified"
+requirement_ids = ["REQ-BUNDLE-IDENTITIES"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-07-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0028-bundle-identities.md"]
+evidence_refs = ["tests/test_bundle_identity.py", "docs/governance/bundle-identities-validation.md"]

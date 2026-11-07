@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from simweave.bundle_identity import bundle_identity, verify_bundle_identity
 from simweave.plan_bundle import (
     MAX_BUNDLE,
     MAX_COMPONENT,
@@ -37,10 +38,14 @@ def register(commands):
     )
     csv_check.add_argument("path", type=Path)
     csv_check.add_argument("csv", type=Path)
+    identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
+    identity.add_argument("path", type=Path)
     render = commands.add_parser("sweep-bundle-render", help="render a verified retained bundle")
     render.add_argument("path", type=Path)
     render.add_argument("--format", choices=("html", "csv"), default="html")
     render.add_argument("--output", required=True, type=Path)
+    for command in (export, verify, sources, csv_check, render):
+        command.add_argument("--expected-sha256")
 
 
 def bounded_read(path, limit):
@@ -60,10 +65,18 @@ def dispatch(args):
             Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
             for path in (args.before, args.after)
         ]
-        raw = encode_bundle(create_bundle(*sources))
+        bundle = create_bundle(*sources)
+        if args.expected_sha256 is not None:
+            verify_bundle_identity(bundle, args.expected_sha256)
+        raw = encode_bundle(bundle)
     else:
         retained = bounded_read(args.path, MAX_BUNDLE)
         bundle = read_bundle(retained)
+        if getattr(args, "expected_sha256", None) is not None:
+            verify_bundle_identity(bundle, args.expected_sha256)
+        if args.command == "sweep-bundle-identity":
+            print(json.dumps(bundle_identity(bundle)))
+            return 0
         if args.command == "sweep-bundle-verify-sources":
             sources = [
                 Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
