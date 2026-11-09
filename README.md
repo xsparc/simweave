@@ -231,3 +231,5 @@ verification and HTML/CSV export from a single file.
 See [Bundle source verification](docs/bundle-source-verification.md) for the retained-evidence workflow and its limits.
 
 See [Bundle identities](docs/bundle-identities.md) for the verification workflow and evidence limits.
+
+See [Retained bundle identities](docs/retained-bundle-identities.md) for the bounded review workflow.

@@ -233,3 +233,9 @@ The next five tasks in `docs/next-milestone.md` are planned only.
 Implemented the saved retained-evidence tasks. Decision: `docs/architecture/decisions/0028-bundle-identities.md`.
 Workflow and limits: `docs/bundle-identities.md`. Verification: `docs/governance/bundle-identities-validation.md`.
 The shared next-five project tracker is `docs/next-milestone.md`; its tasks remain planned.
+
+## SW031: Retained bundle identities (2026-11-09)
+
+Implemented the saved review tasks. Decision: `docs/architecture/decisions/0029-retained-bundle-identities.md`.
+Workflow: `docs/retained-bundle-identities.md`. Verification and limits: `docs/governance/retained-bundle-identities-validation.md`.
+The shared next-five project tracker is `docs/next-milestone.md`; those tasks remain planned.

@@ -1,17 +1,16 @@
-# Next milestone: review workflows and retained identity files
+# Next milestone: portable review exports
 
-Status: planned handoff, 2026-11-07. TC023, SW030 and EF-008 complete the saved
-[previous handoff](governance/handoff-2026-11-05.md). This is one shared five-task
-backlog across all three repositories; entries are not implementation approval.
+Status: planned handoff, 2026-11-09. TC024, SW031 and EF-009 complete the
+[previous five tasks](governance/handoff-2026-11-07.md). This shared tracker is
+copied to each component repository and its milestone PR.
 
-1. **ToolCapsule TC024: standalone difference review.** Render validated retained differences as escaped, script-free HTML with explicit before/after validity, deny-all and budget changes. Preserve evidence limits, bound output and create files exclusively; verify hostile text and narrow-screen layout.
-2. **ToolCapsule TC024: source-checked review gate.** Accept an optional explicit pair of before/after summaries before rendering. Reject partial pairs, reversed or replaced evidence before output; preserve read-only inputs and fixed diagnostics.
-3. **SimWeave SW031: retained bundle identity contract.** Define a closed schema and bounded duplicate-safe reader for the existing identity summary. Require strict profile/version/digest/byte count and test schema drift, malformed input and SDK mutation.
-4. **SimWeave SW031: identity-file review gate.** Verify both canonical byte count and digest from an independent identity file before bundle verification/render/export. Make the file option mutually exclusive with a digest argument; cover equivalent formatting, replacement, bounds and exclusive output in the portable example.
-5. **EdgeForge EF-009: source-checked retained review.** Add one bounded CLI workflow that validates a comparison against explicit before/after reports and an optional identity record before HTML export. Compose existing validators, fail before output, and test wrong sources with a matching comparison identity, reversed direction, failed agreement and no inference during review.
+1. **ToolCapsule TC025: canonical difference CSV.** Define a fixed ordered table of before/after summary fields and change labels, with explicit UTF-8/CRLF and formula-safe text rules. Add bounded exclusive export from validated retained differences; preserve the HTML and JSON contracts.
+2. **ToolCapsule TC025: retained CSV verification.** Verify exact canonical CSV bytes against a validated difference and optional explicit summary pair. Reject changed cells/order/prefixes/newlines and consistent source replacement; never repair evidence or write outputs during verification.
+3. **SimWeave SW032: source-checked bundle rendering.** Accept an optional paired before/after source-plan gate on bundle rendering, composed with existing identity-file/digest checks. Reject partial pairs, wrong plans with a matching identity, reversal and replacement before HTML/CSV creation; cover the portable example without simulation.
+4. **EdgeForge EF-010: source-checked CSV review.** Extend comparison-review with explicit html/csv selection, reuse canonical CSV serialization, and enforce source and optional identity checks before bounded exclusive export. Test failed agreement, wrong sources and exact byte equivalence.
+5. **EdgeForge EF-010: portable review acceptance guide.** Add an executable synthetic example through source-checked HTML and CSV, identity retention and existing CSV verification. Reject a consistently replaced review with independently retained sources, and prove no inference runs during review. Keep environment labels synthetic and avoid timing gates.
 
-Priority: make independently checked evidence usable in review without conflating
-internal consistency, source consistency and retained identity. Do not add signing,
-execution, service integrations or timing gates. Inspect actual merged state before
-branching; EdgeForge's foundational stack may still be open. Keep separate commits
-and draft PRs. Merge, deployment and release require separate authorization.
+Priority: portable review tables and one-command source checks without conflating
+internal consistency, source consistency and retained identity. Inspect merged
+state before branching, especially EdgeForge's open foundational stack. These are
+planned tasks; merge, deployment, release and signing remain outside scope.
