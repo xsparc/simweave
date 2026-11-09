@@ -3,7 +3,14 @@
 import json
 from pathlib import Path
 
-from simweave.bundle_identity import bundle_identity, verify_bundle_identity
+from simweave.bundle_identity import (
+    MAX_IDENTITY_BYTES,
+    BundleIdentity,
+    bundle_identity,
+    read_bundle_identity,
+    verify_bundle_identity,
+    verify_bundle_identity_record,
+)
 from simweave.plan_bundle import (
     MAX_BUNDLE,
     MAX_COMPONENT,
@@ -20,6 +27,7 @@ from simweave.sweeps import Sweep
 
 
 def register(commands):
+    commands.add_parser("sweep-bundle-identity-schema", help="print the retained identity schema")
     commands.add_parser("sweep-bundle-schema", help="print the plan-review bundle schema")
     export = commands.add_parser("sweep-bundle", help="retain two plans and their v2 comparison")
     export.add_argument("before", type=Path)
@@ -45,7 +53,9 @@ def register(commands):
     render.add_argument("--format", choices=("html", "csv"), default="html")
     render.add_argument("--output", required=True, type=Path)
     for command in (export, verify, sources, csv_check, render):
-        command.add_argument("--expected-sha256")
+        expected = command.add_mutually_exclusive_group()
+        expected.add_argument("--expected-sha256")
+        expected.add_argument("--identity", type=Path)
 
 
 def bounded_read(path, limit):
@@ -56,7 +66,19 @@ def bounded_read(path, limit):
     return raw
 
 
+def check_identity(args, bundle):
+    if getattr(args, "identity", None) is not None:
+        verify_bundle_identity_record(
+            bundle, read_bundle_identity(bounded_read(args.identity, MAX_IDENTITY_BYTES))
+        )
+    if getattr(args, "expected_sha256", None) is not None:
+        verify_bundle_identity(bundle, args.expected_sha256)
+
+
 def dispatch(args):
+    if args.command == "sweep-bundle-identity-schema":
+        print(json.dumps(BundleIdentity.model_json_schema(), indent=2))
+        return 0
     if args.command == "sweep-bundle-schema":
         print(json.dumps(PlanBundle.model_json_schema(), indent=2))
         return 0
@@ -66,14 +88,12 @@ def dispatch(args):
             for path in (args.before, args.after)
         ]
         bundle = create_bundle(*sources)
-        if args.expected_sha256 is not None:
-            verify_bundle_identity(bundle, args.expected_sha256)
+        check_identity(args, bundle)
         raw = encode_bundle(bundle)
     else:
         retained = bounded_read(args.path, MAX_BUNDLE)
         bundle = read_bundle(retained)
-        if getattr(args, "expected_sha256", None) is not None:
-            verify_bundle_identity(bundle, args.expected_sha256)
+        check_identity(args, bundle)
         if args.command == "sweep-bundle-identity":
             print(json.dumps(bundle_identity(bundle)))
             return 0

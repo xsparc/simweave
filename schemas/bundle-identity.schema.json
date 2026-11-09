@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "bundle_sha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Bundle Sha256",
+      "type": "string"
+    },
+    "bytes": {
+      "maximum": 196608,
+      "minimum": 1,
+      "title": "Bytes",
+      "type": "integer"
+    },
+    "canonicalization": {
+      "const": "simweave-plan-bundle-json-v1",
+      "title": "Canonicalization",
+      "type": "string"
+    },
+    "interpretation": {
+      "const": "retained_identity_not_attestation",
+      "title": "Interpretation",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "canonicalization",
+    "bundle_sha256",
+    "bytes",
+    "interpretation"
+  ],
+  "title": "BundleIdentity",
+  "type": "object"
+}
