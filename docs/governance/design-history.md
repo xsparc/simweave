@@ -127,3 +127,9 @@ without duplicating implementation or changing runtime authority.
 Completed the saved milestone with bounded, non-executing retained-evidence checks.
 See `docs/architecture/decisions/0027-bundle-source-verification.md`, `docs/bundle-source-verification.md` and `docs/governance/bundle-source-verification-validation.md`.
 The next five tasks in `docs/next-milestone.md` are planned only.
+
+## SW030: Bundle identities (2026-11-07)
+
+Implemented the saved retained-evidence tasks. Decision: `docs/architecture/decisions/0028-bundle-identities.md`.
+Workflow and limits: `docs/bundle-identities.md`. Verification: `docs/governance/bundle-identities-validation.md`.
+The shared next-five project tracker is `docs/next-milestone.md`; its tasks remain planned.
