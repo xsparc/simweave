@@ -866,3 +866,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-09-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0029-retained-bundle-identities.md"]
 evidence_refs = ["tests/test_retained_bundle_identity.py", "docs/governance/retained-bundle-identities-validation.md"]
+
+[[research_decisions]]
+id = "RD-SOURCE-CHECKED-BUNDLE-RENDERING"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-10-source-checked-bundle-rendering.md"]
+design_refs = ["docs/architecture/decisions/0030-source-checked-bundle-rendering.md"]
+
+[[requirements]]
+id = "REQ-SOURCE-CHECKED-BUNDLE-RENDERING"
+statement = "Source checked bundle rendering with bounded exact exports and independent source checks."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0030-source-checked-bundle-rendering.md"]
+risk_refs = ["docs/source-checked-bundle-rendering.md"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py"]
+verification_refs = ["tests/test_source_checked_bundle_rendering.py"]
+validation_refs = ["docs/governance/source-checked-bundle-rendering-validation.md"]
+
+[[work_items]]
+id = "SW032-SOURCE-CHECKED-BUNDLE-RENDERING"
+title = "Source checked bundle rendering"
+status = "verified"
+requirement_ids = ["REQ-SOURCE-CHECKED-BUNDLE-RENDERING"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-10-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0030-source-checked-bundle-rendering.md"]
+evidence_refs = ["tests/test_source_checked_bundle_rendering.py", "docs/governance/source-checked-bundle-rendering-validation.md"]

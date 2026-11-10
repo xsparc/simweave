@@ -246,3 +246,9 @@ The shared next-five project tracker is `docs/next-milestone.md`; its tasks rema
 Implemented the saved review tasks. Decision: `docs/architecture/decisions/0029-retained-bundle-identities.md`.
 Workflow: `docs/retained-bundle-identities.md`. Verification and limits: `docs/governance/retained-bundle-identities-validation.md`.
 The shared next-five project tracker is `docs/next-milestone.md`; those tasks remain planned.
+
+## SW032: Source checked bundle rendering (2026-11-10)
+
+Implemented the saved portable review tasks. Decision: `docs/architecture/decisions/0030-source-checked-bundle-rendering.md`.
+Workflow: `docs/source-checked-bundle-rendering.md`. Verification and limits: `docs/governance/source-checked-bundle-rendering-validation.md`.
+The next-five project tracker is `docs/next-milestone.md`; those tasks remain planned.

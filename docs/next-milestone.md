@@ -1,16 +1,17 @@
-# Next milestone: portable review exports
+# Next milestone: retained review identity and HTML verification
 
-Status: planned handoff, 2026-11-09. TC024, SW031 and EF-009 complete the
-[previous five tasks](governance/handoff-2026-11-07.md). This shared tracker is
-copied to each component repository and its milestone PR.
+Status: planned handoff, 2026-11-10. TC025, SW032 and EF-010 complete the
+[previous five tasks](governance/handoff-2026-11-09.md). This shared tracker is
+copied into all three repositories and milestone PRs.
 
-1. **ToolCapsule TC025: canonical difference CSV.** Define a fixed ordered table of before/after summary fields and change labels, with explicit UTF-8/CRLF and formula-safe text rules. Add bounded exclusive export from validated retained differences; preserve the HTML and JSON contracts.
-2. **ToolCapsule TC025: retained CSV verification.** Verify exact canonical CSV bytes against a validated difference and optional explicit summary pair. Reject changed cells/order/prefixes/newlines and consistent source replacement; never repair evidence or write outputs during verification.
-3. **SimWeave SW032: source-checked bundle rendering.** Accept an optional paired before/after source-plan gate on bundle rendering, composed with existing identity-file/digest checks. Reject partial pairs, wrong plans with a matching identity, reversal and replacement before HTML/CSV creation; cover the portable example without simulation.
-4. **EdgeForge EF-010: source-checked CSV review.** Extend comparison-review with explicit html/csv selection, reuse canonical CSV serialization, and enforce source and optional identity checks before bounded exclusive export. Test failed agreement, wrong sources and exact byte equivalence.
-5. **EdgeForge EF-010: portable review acceptance guide.** Add an executable synthetic example through source-checked HTML and CSV, identity retention and existing CSV verification. Reject a consistently replaced review with independently retained sources, and prove no inference runs during review. Keep environment labels synthetic and avoid timing gates.
+1. **ToolCapsule TC026: canonical difference identity.** Define a versioned deterministic encoding and SHA-256 identity for validated retained differences. Preserve summary/source limits, distinguish normalized identity from original-file bytes, and test equivalent formatting, reversal and consistent replacement.
+2. **ToolCapsule TC026: expected-identity review gate.** Accept an optional strict expected digest before difference checking and HTML/CSV export, composed with independent summary checks. Reject mismatches before output and preserve all existing command behavior without the option.
+3. **SimWeave SW033: executable portable review guide.** Add a synthetic example through bundle creation, identity retention, explicit-source HTML/CSV rendering and CSV verification. Prove replacement rejection, input preservation and no simulation during review.
+4. **SimWeave SW033: retained HTML verification.** Verify exact HTML bytes against a validated bundle, with optional source/identity gates and bounded read-only intake. Reject edited content, CSP/style changes and line-ending changes without repair or browser execution.
+5. **EdgeForge EF-011: retained HTML verification.** Verify exact HTML bytes against a validated comparison and explicit report sources, optionally checking a retained identity record. Reuse the existing renderer and test wrong sources with matching identity, altered markup/CSP and no inference.
 
-Priority: portable review tables and one-command source checks without conflating
-internal consistency, source consistency and retained identity. Inspect merged
-state before branching, especially EdgeForge's open foundational stack. These are
-planned tasks; merge, deployment, release and signing remain outside scope.
+Priority: detect post-export edits and preserve independently retained review
+targets. Exact-render verification is format-version-sensitive, not signature
+verification. Inspect merged state before branching, especially EdgeForge's open
+foundational stack. Planned only; merge, deployment, release and signing require
+separate authorization.

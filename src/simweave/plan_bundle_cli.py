@@ -52,6 +52,8 @@ def register(commands):
     render.add_argument("path", type=Path)
     render.add_argument("--format", choices=("html", "csv"), default="html")
     render.add_argument("--output", required=True, type=Path)
+    render.add_argument("--before", type=Path)
+    render.add_argument("--after", type=Path)
     for command in (export, verify, sources, csv_check, render):
         expected = command.add_mutually_exclusive_group()
         expected.add_argument("--expected-sha256")
@@ -97,6 +99,15 @@ def dispatch(args):
         if args.command == "sweep-bundle-identity":
             print(json.dumps(bundle_identity(bundle)))
             return 0
+        if args.command == "sweep-bundle-render":
+            if (args.before is None) != (args.after is None):
+                raise ValueError("both source plans are required")
+            if args.before is not None:
+                sources = [
+                    Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
+                    for path in (args.before, args.after)
+                ]
+                verify_bundle_sources(retained, *sources)
         if args.command == "sweep-bundle-verify-sources":
             sources = [
                 Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
