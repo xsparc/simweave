@@ -235,3 +235,5 @@ See [Bundle identities](docs/bundle-identities.md) for the verification workflow
 See [Retained bundle identities](docs/retained-bundle-identities.md) for the bounded review workflow.
 
 See [Source checked bundle rendering](docs/source-checked-bundle-rendering.md) for the portable review workflow.
+
+See [Bundle html verification](docs/bundle-html-verification.md) for the retained review workflow.

@@ -1,17 +1,14 @@
-# Next milestone: retained review identity and HTML verification
+# Next milestone: portable evidence contracts
 
-Status: planned handoff, 2026-11-10. TC025, SW032 and EF-010 complete the
-[previous five tasks](governance/handoff-2026-11-09.md). This shared tracker is
-copied into all three repositories and milestone PRs.
+Status: planned handoff, 2026-11-11. TC026, SW033 and EF-011 complete the
+[previous five tasks](governance/handoff-2026-11-10.md).
 
-1. **ToolCapsule TC026: canonical difference identity.** Define a versioned deterministic encoding and SHA-256 identity for validated retained differences. Preserve summary/source limits, distinguish normalized identity from original-file bytes, and test equivalent formatting, reversal and consistent replacement.
-2. **ToolCapsule TC026: expected-identity review gate.** Accept an optional strict expected digest before difference checking and HTML/CSV export, composed with independent summary checks. Reject mismatches before output and preserve all existing command behavior without the option.
-3. **SimWeave SW033: executable portable review guide.** Add a synthetic example through bundle creation, identity retention, explicit-source HTML/CSV rendering and CSV verification. Prove replacement rejection, input preservation and no simulation during review.
-4. **SimWeave SW033: retained HTML verification.** Verify exact HTML bytes against a validated bundle, with optional source/identity gates and bounded read-only intake. Reject edited content, CSP/style changes and line-ending changes without repair or browser execution.
-5. **EdgeForge EF-011: retained HTML verification.** Verify exact HTML bytes against a validated comparison and explicit report sources, optionally checking a retained identity record. Reuse the existing renderer and test wrong sources with matching identity, altered markup/CSP and no inference.
+1. **ToolCapsule TC027: retained difference identity records.** Define a closed versioned identity schema and bounded reader, expose the schema, and accept an identity file mutually exclusive with the expected digest on existing review/check commands. Reject duplicate/unknown fields, malformed digests and unsupported encodings; compose with source checks.
+2. **ToolCapsule TC027: exact retained HTML verification.** Verify bounded HTML bytes against a validated difference, optionally checking independent summaries and identity. Reuse the existing renderer; reject markup, CSP, style and newline edits without execution or repair.
+3. **SimWeave SW034: source-checked CSV verification.** Add optional paired source plans to retained bundle CSV verification, composing with identity/digest gates exactly as HTML verification does. Test partial pairs, reversal and consistent replacement with matching replacement identity; preserve read-only behavior.
+4. **EdgeForge EF-012: portable comparison bundle contract.** Define a closed versioned envelope containing two retained reports and their comparison. Bound every component and whole envelope, recompute derived comparison at intake, and expose a checked JSON Schema. Reject duplicates, unsupported versions and inconsistent evidence without inference.
+5. **EdgeForge EF-012: portable bundle export and verification.** Add exclusive local export and read-only verification for the new envelope, with synthetic and native-generated acceptance fixtures. Preserve failed-agreement evidence and document that self-contained consistency does not establish independently retained identity or provenance.
 
-Priority: detect post-export edits and preserve independently retained review
-targets. Exact-render verification is format-version-sensitive, not signature
-verification. Inspect merged state before branching, especially EdgeForge's open
-foundational stack. Planned only; merge, deployment, release and signing require
-separate authorization.
+Acceptance must retain existing source limits and fixed diagnostics. These are
+planned tasks, not release or merge authority. Inspect the current merged state
+before branching, especially EdgeForge's foundational stack.

@@ -20,6 +20,7 @@ from simweave.plan_bundle import (
     encode_bundle,
     read_bundle,
     verify_bundle_csv,
+    verify_bundle_html,
     verify_bundle_sources,
 )
 from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
@@ -46,6 +47,11 @@ def register(commands):
     )
     csv_check.add_argument("path", type=Path)
     csv_check.add_argument("csv", type=Path)
+    html_check = commands.add_parser("sweep-bundle-verify-html", help="verify exact retained HTML")
+    html_check.add_argument("path", type=Path)
+    html_check.add_argument("html", type=Path)
+    html_check.add_argument("--before", type=Path)
+    html_check.add_argument("--after", type=Path)
     identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
     identity.add_argument("path", type=Path)
     render = commands.add_parser("sweep-bundle-render", help="render a verified retained bundle")
@@ -54,7 +60,7 @@ def register(commands):
     render.add_argument("--output", required=True, type=Path)
     render.add_argument("--before", type=Path)
     render.add_argument("--after", type=Path)
-    for command in (export, verify, sources, csv_check, render):
+    for command in (export, verify, sources, csv_check, html_check, render):
         expected = command.add_mutually_exclusive_group()
         expected.add_argument("--expected-sha256")
         expected.add_argument("--identity", type=Path)
@@ -99,7 +105,7 @@ def dispatch(args):
         if args.command == "sweep-bundle-identity":
             print(json.dumps(bundle_identity(bundle)))
             return 0
-        if args.command == "sweep-bundle-render":
+        if args.command in {"sweep-bundle-render", "sweep-bundle-verify-html"}:
             if (args.before is None) != (args.after is None):
                 raise ValueError("both source plans are required")
             if args.before is not None:
@@ -116,7 +122,10 @@ def dispatch(args):
             verify_bundle_sources(retained, *sources)
         elif args.command == "sweep-bundle-verify-csv":
             verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
+        elif args.command == "sweep-bundle-verify-html":
+            verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
         if args.command in {
+            "sweep-bundle-verify-html",
             "sweep-bundle-verify",
             "sweep-bundle-verify-sources",
             "sweep-bundle-verify-csv",

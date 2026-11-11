@@ -91,3 +91,14 @@ def verify_bundle_sources(raw: bytes, before: Sweep, after: Sweep) -> PlanBundle
 def verify_bundle_csv(bundle: PlanBundle, raw: bytes) -> None:
     checked = PlanBundle.model_validate(bundle.model_dump())
     verify_plan_diff_csv(checked.before, checked.after, raw)
+
+
+def verify_bundle_html(bundle: PlanBundle, raw: bytes) -> None:
+    from simweave.sweep_diff import render_plan_diff
+
+    if len(raw) > MAX_COMPONENT:
+        raise ValueError("HTML exceeds byte limit")
+    checked = PlanBundle.model_validate(bundle.model_dump())
+    expected = render_plan_diff(checked.before, checked.after, schema_version=2).encode("utf-8")
+    if len(expected) > MAX_COMPONENT or raw != expected:
+        raise ValueError("HTML differs from canonical rendering")
