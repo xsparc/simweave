@@ -894,3 +894,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-10-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0030-source-checked-bundle-rendering.md"]
 evidence_refs = ["tests/test_source_checked_bundle_rendering.py", "docs/governance/source-checked-bundle-rendering-validation.md"]
+
+[[research_decisions]]
+id = "RD-BUNDLE-HTML-VERIFICATION"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-11-bundle-html-verification.md"]
+design_refs = ["docs/architecture/decisions/0031-bundle-html-verification.md"]
+
+[[requirements]]
+id = "REQ-BUNDLE-HTML-VERIFICATION"
+statement = "Bundle html verification with bounded intake and independent evidence gates."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0031-bundle-html-verification.md"]
+risk_refs = ["docs/bundle-html-verification.md"]
+implementation_refs = ["src/simweave/plan_bundle.py", "src/simweave/plan_bundle_cli.py", "examples/portable_review.py"]
+verification_refs = ["tests/test_bundle_html.py"]
+validation_refs = ["docs/governance/bundle-html-verification-validation.md"]
+
+[[work_items]]
+id = "SW033-BUNDLE-HTML-VERIFICATION"
+title = "Bundle html verification"
+status = "verified"
+requirement_ids = ["REQ-BUNDLE-HTML-VERIFICATION"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-11-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0031-bundle-html-verification.md"]
+evidence_refs = ["tests/test_bundle_html.py", "docs/governance/bundle-html-verification-validation.md"]

@@ -252,3 +252,9 @@ The shared next-five project tracker is `docs/next-milestone.md`; those tasks re
 Implemented the saved portable review tasks. Decision: `docs/architecture/decisions/0030-source-checked-bundle-rendering.md`.
 Workflow: `docs/source-checked-bundle-rendering.md`. Verification and limits: `docs/governance/source-checked-bundle-rendering-validation.md`.
 The next-five project tracker is `docs/next-milestone.md`; those tasks remain planned.
+
+## SW033: Bundle html verification (2026-11-11)
+
+Implemented the saved handoff. Decision: `docs/architecture/decisions/0031-bundle-html-verification.md`.
+Workflow and limitations: `docs/bundle-html-verification.md`. Verification: `docs/governance/bundle-html-verification-validation.md`.
+The next five planned tasks are tracked in `docs/next-milestone.md`.
