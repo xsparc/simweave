@@ -47,6 +47,8 @@ def register(commands):
     )
     csv_check.add_argument("path", type=Path)
     csv_check.add_argument("csv", type=Path)
+    csv_check.add_argument("--before", type=Path)
+    csv_check.add_argument("--after", type=Path)
     html_check = commands.add_parser("sweep-bundle-verify-html", help="verify exact retained HTML")
     html_check.add_argument("path", type=Path)
     html_check.add_argument("html", type=Path)
@@ -105,7 +107,11 @@ def dispatch(args):
         if args.command == "sweep-bundle-identity":
             print(json.dumps(bundle_identity(bundle)))
             return 0
-        if args.command in {"sweep-bundle-render", "sweep-bundle-verify-html"}:
+        if args.command in {
+            "sweep-bundle-render",
+            "sweep-bundle-verify-html",
+            "sweep-bundle-verify-csv",
+        }:
             if (args.before is None) != (args.after is None):
                 raise ValueError("both source plans are required")
             if args.before is not None:

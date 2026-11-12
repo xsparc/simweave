@@ -922,3 +922,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-11-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0031-bundle-html-verification.md"]
 evidence_refs = ["tests/test_bundle_html.py", "docs/governance/bundle-html-verification-validation.md"]
+
+[[research_decisions]]
+id = "RD-SOURCE-CHECKED-CSV"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-12-source-checked-csv.md"]
+design_refs = ["docs/architecture/decisions/0032-source-checked-csv.md"]
+
+[[requirements]]
+id = "REQ-SOURCE-CHECKED-CSV"
+statement = "Source checked csv with bounded intake and explicit evidence checks."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0032-source-checked-csv.md"]
+risk_refs = ["docs/source-checked-csv.md"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py"]
+verification_refs = ["tests/test_bundle_html.py"]
+validation_refs = ["docs/governance/source-checked-csv-validation.md"]
+
+[[work_items]]
+id = "SW034-SOURCE-CHECKED-CSV"
+title = "Source checked csv"
+status = "verified"
+requirement_ids = ["REQ-SOURCE-CHECKED-CSV"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-12-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0032-source-checked-csv.md"]
+evidence_refs = ["tests/test_bundle_html.py", "docs/governance/source-checked-csv-validation.md"]

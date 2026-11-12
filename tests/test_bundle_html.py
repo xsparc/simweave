@@ -8,7 +8,7 @@ from test_sweep_diff import source
 from simweave.bundle_identity import bundle_identity
 from simweave.cli import main
 from simweave.plan_bundle import MAX_COMPONENT, create_bundle, encode_bundle, verify_bundle_html
-from simweave.sweep_diff import render_plan_diff
+from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
 
 
 def test_exact_html_and_bounds():
@@ -27,8 +27,14 @@ def test_exact_html_and_bounds():
             verify_bundle_html(bundle, changed)
 
 
-def test_cli_gates_and_read_only(tmp_path, monkeypatch, capsys):
+@pytest.mark.parametrize("format", ["html", "csv"])
+def test_cli_gates_and_read_only(tmp_path, monkeypatch, capsys, format):
     monkeypatch.setattr("simweave.suites.execute", lambda *a, **k: pytest.fail("execution"))
+    render = (
+        (lambda a, b: render_plan_diff(a, b, schema_version=2))
+        if format == "html"
+        else render_plan_diff_csv
+    )
     a, b = source(), source(seeds=[9])
     bundle = create_bundle(a, b)
     left, right, retained, identity, html = [
@@ -38,9 +44,9 @@ def test_cli_gates_and_read_only(tmp_path, monkeypatch, capsys):
     right.write_text(b.model_dump_json())
     retained.write_bytes(encode_bundle(bundle))
     identity.write_text(json.dumps(bundle_identity(bundle)))
-    html.write_bytes(render_plan_diff(a, b, schema_version=2).encode())
+    html.write_bytes(render(a, b).encode())
     saved = {p: p.read_bytes() for p in (left, right, retained, identity, html)}
-    base = ["sweep-bundle-verify-html", str(retained), str(html)]
+    base = ["sweep-bundle-verify-" + format, str(retained), str(html)]
     sources = ["--before", str(left), "--after", str(right)]
     assert main(base) == 0
     assert main(base + sources + ["--identity", str(identity)]) == 0
@@ -50,7 +56,7 @@ def test_cli_gates_and_read_only(tmp_path, monkeypatch, capsys):
     replacement = create_bundle(a, a)
     retained.write_bytes(encode_bundle(replacement))
     identity.write_text(json.dumps(bundle_identity(replacement)))
-    html.write_bytes(render_plan_diff(a, a, schema_version=2).encode())
+    html.write_bytes(render(a, a).encode())
     assert main(base + ["--identity", str(identity)]) == 0
     assert main(base + sources + ["--identity", str(identity)]) == 2
     for p, raw in saved.items():
