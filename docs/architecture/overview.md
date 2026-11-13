@@ -258,3 +258,9 @@ The next-five project tracker is `docs/next-milestone.md`; those tasks remain pl
 Implemented the saved handoff. Decision: `docs/architecture/decisions/0031-bundle-html-verification.md`.
 Workflow and limitations: `docs/bundle-html-verification.md`. Verification: `docs/governance/bundle-html-verification-validation.md`.
 The next five planned tasks are tracked in `docs/next-milestone.md`.
+
+## SW034: Source checked csv (2026-11-12)
+
+Implemented the saved handoff. Decision: `docs/architecture/decisions/0032-source-checked-csv.md`.
+Workflow and limitations: `docs/source-checked-csv.md`. Verification: `docs/governance/source-checked-csv-validation.md`.
+The next five planned tasks are tracked in `docs/next-milestone.md`.
