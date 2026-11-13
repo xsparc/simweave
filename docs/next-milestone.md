@@ -1,14 +1,14 @@
-# Next milestone: independently checked portable workflows
+# Next milestone: retained bundle identities and portable summaries
 
-Status: planned handoff, 2026-11-12. TC027, SW034 and EF-012 complete the
-[previous five tasks](governance/handoff-2026-11-11.md).
+Status: planned handoff, 2026-11-13. TC028, SW035 and EF-013 complete the
+[previous five tasks](governance/handoff-2026-11-12.md).
 
-1. **ToolCapsule TC028: exclusive identity export.** Add optional bounded `--out` output to difference identity generation, retaining stdout compatibility. Reuse the closed record contract; test collisions, invalid differences and byte preservation.
-2. **ToolCapsule TC028: executable retained-review example.** Build synthetic summaries and differences, retain identity, export HTML/CSV and verify both against independent summaries. Prove replacement and output-collision rejection without guest execution; document source-check rendering mode.
-3. **SimWeave SW035: portable example with independent verification.** Update the executable review workflow to supply original plans during both HTML and CSV verification. Add post-export tampering and matching-replacement-identity rejection checks, preserving all original inputs and the simulation guard.
-4. **EdgeForge EF-013: independent comparison-bundle sources.** Add bounded read-only bundle verification against explicit before/after reports. Detect a consistently replaced bundle, source reversal and wrong reports; preserve standalone verification and failed-agreement support.
-5. **EdgeForge EF-013: bundle review export.** Render validated bundle comparisons to existing HTML/CSV formats, optionally requiring independent source reports. Reuse exact existing renderers and exclusive output creation; test bounds, mismatches and no inference.
+1. **ToolCapsule TC029: portable summary bundle contract.** Define a closed versioned envelope containing before/after configuration summaries and their derived difference. Reuse strict readers, bound components and envelope, expose a schema, and reject duplicates, inconsistent differences and unsupported versions without guest execution.
+2. **ToolCapsule TC029: summary bundle export and verification.** Add exclusive export and read-only verification for the envelope, optionally comparing independent summary files. Test source reversal, consistent replacement, failed configuration evidence and unchanged inputs.
+3. **SimWeave SW036: exclusive identity-file export.** Add optional bounded output to bundle identity generation while retaining stdout behavior. Reuse the existing closed record and exclusive creation, test invalid bundle/no output and collisions, and update the portable example to use the CLI export.
+4. **EdgeForge EF-014: normalized bundle identity.** Define a versioned deterministic encoding and SHA-256 identity for comparison bundles, with strict expected-digest gates on verification and rendering. Distinguish normalized identity from original file bytes, compose with source checks and pin a golden vector.
+5. **EdgeForge EF-014: exact bundle export verification.** Add bounded read-only verification of retained HTML/CSV against a validated comparison bundle, optionally checking independent sources and expected identity. Reuse existing renderers, reject post-export edits and prove no inference.
 
-Retain independently sourced targets when detecting substitution. These tasks are
-planned, not merge or release authority. Recheck current bases before branching;
-EdgeForge's foundation stack remains open at this handoff.
+Planned only. Independent sources and identity targets remain necessary for
+substitution detection. Recheck merged bases before implementation, especially
+EdgeForge's open foundation stack. No merge, release or deployment authority.
