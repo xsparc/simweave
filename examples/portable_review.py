@@ -8,9 +8,7 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
-from simweave.bundle_identity import bundle_identity
 from simweave.cli import main
-from simweave.plan_bundle import read_bundle
 
 
 def require(condition):
@@ -44,8 +42,7 @@ def run(directory: Path) -> dict:
             )
     with patch("simweave.suites.execute", side_effect=RuntimeError("simulation invoked")):
         require(cli(["sweep-bundle", before, after, "--output", bundle]) == 0)
-        record = bundle_identity(read_bundle(bundle.read_bytes()))
-        identity.write_text(json.dumps(record), encoding="utf-8")
+        require(cli(["sweep-bundle-identity", bundle, "--output", identity]) == 0)
         saved = {p: p.read_bytes() for p in (before, after, bundle, identity)}
         for format in ("html", "csv"):
             output = directory / ("review." + format)
@@ -105,9 +102,7 @@ def run(directory: Path) -> dict:
         replacement = directory / "replacement.json"
         require(cli(["sweep-bundle", before, before, "--output", replacement]) == 0)
         replacement_id = directory / "replacement-identity.json"
-        replacement_id.write_text(
-            json.dumps(bundle_identity(read_bundle(replacement.read_bytes()))), encoding="utf-8"
-        )
+        require(cli(["sweep-bundle-identity", replacement, "--output", replacement_id]) == 0)
         require(cli(["sweep-bundle-verify", replacement, "--identity", replacement_id]) == 0)
         for format in ("html", "csv"):
             blocked = directory / ("blocked." + format)

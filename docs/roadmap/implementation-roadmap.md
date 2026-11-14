@@ -263,3 +263,8 @@ The next five planned tasks are tracked in `docs/next-milestone.md`.
 Implemented the saved handoff. Decision: `docs/architecture/decisions/0033-independent-review-example.md`.
 Workflow and limitations: `docs/independent-review-example.md`. Verification: `docs/governance/independent-review-example-validation.md`.
 The next five planned tasks are tracked in `docs/next-milestone.md`.
+
+## SW036: Identity file export (2026-11-15)
+
+Implemented the accepted decision in `docs/architecture/decisions/0034-identity-file-export.md`. Evidence: `docs/governance/identity-file-export-validation.md`.
+The next five tasks are tracked in `docs/next-milestone.md`.
