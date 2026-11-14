@@ -950,3 +950,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-12-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0032-source-checked-csv.md"]
 evidence_refs = ["tests/test_bundle_html.py", "docs/governance/source-checked-csv-validation.md"]
+
+[[research_decisions]]
+id = "RD-INDEPENDENT-REVIEW-EXAMPLE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-13-independent-review-example.md"]
+design_refs = ["docs/architecture/decisions/0033-independent-review-example.md"]
+
+[[requirements]]
+id = "REQ-INDEPENDENT-REVIEW-EXAMPLE"
+statement = "Independent review example with independent evidence checks and exclusive output."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0033-independent-review-example.md"]
+risk_refs = ["docs/independent-review-example.md"]
+implementation_refs = ["examples/portable_review.py"]
+verification_refs = ["tests/test_bundle_html.py"]
+validation_refs = ["docs/governance/independent-review-example-validation.md"]
+
+[[work_items]]
+id = "SW035-INDEPENDENT-REVIEW-EXAMPLE"
+title = "Independent review example"
+status = "verified"
+requirement_ids = ["REQ-INDEPENDENT-REVIEW-EXAMPLE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-13-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0033-independent-review-example.md"]
+evidence_refs = ["tests/test_bundle_html.py", "docs/governance/independent-review-example-validation.md"]

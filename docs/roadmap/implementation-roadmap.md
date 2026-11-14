@@ -257,3 +257,9 @@ The next five planned tasks are tracked in `docs/next-milestone.md`.
 Implemented the saved handoff. Decision: `docs/architecture/decisions/0032-source-checked-csv.md`.
 Workflow and limitations: `docs/source-checked-csv.md`. Verification: `docs/governance/source-checked-csv-validation.md`.
 The next five planned tasks are tracked in `docs/next-milestone.md`.
+
+## SW035: Independent review example (2026-11-13)
+
+Implemented the saved handoff. Decision: `docs/architecture/decisions/0033-independent-review-example.md`.
+Workflow and limitations: `docs/independent-review-example.md`. Verification: `docs/governance/independent-review-example-validation.md`.
+The next five planned tasks are tracked in `docs/next-milestone.md`.

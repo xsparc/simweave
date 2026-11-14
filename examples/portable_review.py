@@ -67,8 +67,41 @@ def run(directory: Path) -> dict:
             raw = output.read_bytes()
             require(cli(args) == 2 and output.read_bytes() == raw)
             require(
-                cli(["sweep-bundle-verify-" + format, bundle, output, "--identity", identity]) == 0
+                cli(
+                    [
+                        "sweep-bundle-verify-" + format,
+                        bundle,
+                        output,
+                        "--identity",
+                        identity,
+                        "--before",
+                        before,
+                        "--after",
+                        after,
+                    ]
+                )
+                == 0
             )
+            saved[output] = raw
+            tampered = directory / ("tampered." + format)
+            tampered.write_bytes(raw + b"\n")
+            require(
+                cli(
+                    [
+                        "sweep-bundle-verify-" + format,
+                        bundle,
+                        tampered,
+                        "--identity",
+                        identity,
+                        "--before",
+                        before,
+                        "--after",
+                        after,
+                    ]
+                )
+                == 2
+            )
+            require(tampered.read_bytes() == raw + b"\n")
         replacement = directory / "replacement.json"
         require(cli(["sweep-bundle", before, before, "--output", replacement]) == 0)
         replacement_id = directory / "replacement-identity.json"
@@ -98,6 +131,31 @@ def run(directory: Path) -> dict:
                 == 2
             )
             require(not blocked.exists())
+            replaced_output = directory / ("replacement." + format)
+            require(
+                cli(
+                    [
+                        "sweep-bundle-render",
+                        replacement,
+                        "--format",
+                        format,
+                        "--identity",
+                        replacement_id,
+                        "--output",
+                        replaced_output,
+                    ]
+                )
+                == 0
+            )
+            verify = [
+                "sweep-bundle-verify-" + format,
+                replacement,
+                replaced_output,
+                "--identity",
+                replacement_id,
+            ]
+            require(cli(verify) == 0)
+            require(cli(verify + ["--before", before, "--after", after]) == 2)
         require(all(p.read_bytes() == raw for p, raw in saved.items()))
     return {"verified": True, "formats": ["html", "csv"], "simulation": "none"}
 

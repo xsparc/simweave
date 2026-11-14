@@ -239,3 +239,5 @@ See [Source checked bundle rendering](docs/source-checked-bundle-rendering.md) f
 See [Bundle html verification](docs/bundle-html-verification.md) for the retained review workflow.
 
 See [Source checked csv](docs/source-checked-csv.md) for the retained evidence workflow.
+
+See [Independent review example](docs/independent-review-example.md) for the portable review workflow.
