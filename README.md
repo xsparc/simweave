@@ -241,3 +241,5 @@ See [Bundle html verification](docs/bundle-html-verification.md) for the retaine
 See [Source checked csv](docs/source-checked-csv.md) for the retained evidence workflow.
 
 See [Independent review example](docs/independent-review-example.md) for the portable review workflow.
+
+[Identity file export](docs/identity-file-export.md) documents the new portable review commands and limits.
