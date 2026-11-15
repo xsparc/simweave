@@ -43,6 +43,12 @@ def run(directory: Path) -> dict:
     with patch("simweave.suites.execute", side_effect=RuntimeError("simulation invoked")):
         require(cli(["sweep-bundle", before, after, "--output", bundle]) == 0)
         require(cli(["sweep-bundle-identity", bundle, "--output", identity]) == 0)
+        require(cli(["sweep-bundle-identity-check", identity]) == 0)
+        malformed = directory / "malformed-identity.json"
+        malformed.write_bytes(b'{"schema_version":1,"schema_version":1}')
+        malformed_bytes = malformed.read_bytes()
+        require(cli(["sweep-bundle-identity-check", malformed]) == 2)
+        require(malformed.read_bytes() == malformed_bytes)
         saved = {p: p.read_bytes() for p in (before, after, bundle, identity)}
         for format in ("html", "csv"):
             output = directory / ("review." + format)
