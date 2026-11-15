@@ -978,3 +978,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-13-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0033-independent-review-example.md"]
 evidence_refs = ["tests/test_bundle_html.py", "docs/governance/independent-review-example-validation.md"]
+
+[[research_decisions]]
+id = "RD-IDENTITY-FILE-EXPORT"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-15-identity-file-export.md"]
+design_refs = ["docs/architecture/decisions/0034-identity-file-export.md"]
+
+[[requirements]]
+id = "REQ-IDENTITY-FILE-EXPORT"
+statement = "Identity file export with bounded validation and explicit retained-evidence semantics."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0034-identity-file-export.md"]
+risk_refs = ["docs/identity-file-export.md"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py", "examples/portable_review.py"]
+verification_refs = ["tests/test_identity_export.py", "tests/test_bundle_html.py"]
+validation_refs = ["docs/governance/identity-file-export-validation.md"]
+
+[[work_items]]
+id = "SW036-IDENTITY-FILE-EXPORT"
+title = "Identity file export"
+status = "verified"
+requirement_ids = ["REQ-IDENTITY-FILE-EXPORT"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-15-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0034-identity-file-export.md"]
+evidence_refs = ["tests/test_identity_export.py", "tests/test_bundle_html.py", "docs/governance/identity-file-export-validation.md"]

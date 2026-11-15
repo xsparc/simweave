@@ -56,6 +56,7 @@ def register(commands):
     html_check.add_argument("--after", type=Path)
     identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
     identity.add_argument("path", type=Path)
+    identity.add_argument("--output", type=Path)
     render = commands.add_parser("sweep-bundle-render", help="render a verified retained bundle")
     render.add_argument("path", type=Path)
     render.add_argument("--format", choices=("html", "csv"), default="html")
@@ -105,7 +106,14 @@ def dispatch(args):
         bundle = read_bundle(retained)
         check_identity(args, bundle)
         if args.command == "sweep-bundle-identity":
-            print(json.dumps(bundle_identity(bundle)))
+            record = bundle_identity(bundle)
+            if args.output is None:
+                print(json.dumps(record))
+            else:
+                raw = (json.dumps(record, indent=2) + "\n").encode("utf-8")
+                read_bundle_identity(raw)
+                with args.output.open("xb") as stream:
+                    stream.write(raw)
             return 0
         if args.command in {
             "sweep-bundle-render",
