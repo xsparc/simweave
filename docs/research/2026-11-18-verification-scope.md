@@ -12,3 +12,5 @@ coverage: architecture, roadmap, prior ADRs, code/tests and focused primary spec
 
 overall_recommendation: implement the approved bounded milestone and queue the shared five-item handoff.
 evidence_gaps: synthetic local tests do not prove vendor interoperability, authorship, physical-device performance or hosted service behavior. Broader ecosystem work is outside this focused request.
+
+Integration note: PR #43 merged during delivery. Rebased onto main commit `40567fae8554b0eb8b05c581c2bf9dba0725475b`; the implementation tree was unchanged before this documentation correction.

@@ -20,7 +20,7 @@ successful verification response. No input is modified and no simulation runs.
 
 The schema_version, verified and interpretation fields remain unchanged. These
 booleans describe checks actually completed, not authenticity or attestation.
-This branch builds on unmerged identity-record-check PR #43; no merge is implied.
+PR #43 merged during implementation; this milestone now builds on its squash commit on main.
 
 ## Alternatives and acceptance
 
