@@ -165,6 +165,9 @@ def dispatch(args):
                     {
                         "schema_version": 1,
                         "verified": True,
+                        "source_checked": getattr(args, "before", None) is not None,
+                        "identity_checked": getattr(args, "identity", None) is not None
+                        or getattr(args, "expected_sha256", None) is not None,
                         "interpretation": "local_source_consistency_only",
                     }
                 )

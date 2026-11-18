@@ -245,3 +245,5 @@ See [Independent review example](docs/independent-review-example.md) for the por
 [Identity file export](docs/identity-file-export.md) documents the new portable review commands and limits.
 
 [Identity record check](docs/identity-record-check.md) documents the portable review commands and their limits.
+
+[Verification scope](docs/verification-scope.md) documents the new behavior and limits.

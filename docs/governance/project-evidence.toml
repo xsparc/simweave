@@ -208,8 +208,8 @@ acceptance_refs = ["docs/architecture/decisions/0009-connected-operations.md"]
 evidence_refs = ["tests/test_connected_operations.py", "scripts/check_connected_operations.py", "docs/governance/connected-operations-validation.md"]
 
 [review]
-last_reviewed = "2026-10-19"
-review_due = "2026-11-16"
+last_reviewed = "2026-11-18"
+review_due = "2026-12-16"
 
 [[research_decisions]]
 id = "RD-DURABLE-OPERATIONS"
@@ -1034,3 +1034,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-15-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0035-identity-record-check.md"]
 evidence_refs = ["tests/test_identity_check.py", "tests/test_bundle_html.py", "docs/governance/identity-record-check-validation.md"]
+
+[[research_decisions]]
+id = "RD-VERIFICATION-SCOPE"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-18-verification-scope.md"]
+design_refs = ["docs/architecture/decisions/0036-verification-scope.md"]
+
+[[requirements]]
+id = "REQ-VERIFICATION-SCOPE"
+statement = "Verification scope with bounded validation and explicit evidence semantics."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0036-verification-scope.md"]
+risk_refs = ["docs/verification-scope.md"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py"]
+verification_refs = ["tests/test_verification_scope.py"]
+validation_refs = ["docs/governance/verification-scope-validation.md"]
+
+[[work_items]]
+id = "SW038-VERIFICATION-SCOPE"
+title = "Verification scope"
+status = "verified"
+requirement_ids = ["REQ-VERIFICATION-SCOPE"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-18-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0036-verification-scope.md"]
+evidence_refs = ["tests/test_verification_scope.py", "docs/governance/verification-scope-validation.md"]
