@@ -173,3 +173,16 @@ The next five tasks are tracked in `docs/next-milestone.md`.
 
 Implemented `docs/architecture/decisions/0035-identity-record-check.md`. Workflow: `docs/identity-record-check.md`.
 Verification: `docs/governance/identity-record-check-validation.md`. Next five tasks: `docs/next-milestone.md`.
+
+## SW038: Verification scope (2026-11-18)
+
+Implemented `docs/architecture/decisions/0036-verification-scope.md`. Workflow: `docs/verification-scope.md`.
+Evidence: `docs/governance/verification-scope-validation.md`. Next five tasks: `docs/next-milestone.md`.
+
+## Evidence review renewal (2026-11-18)
+
+Reviewed the authority order, current architecture boundaries, roadmap/work-item
+coverage and registry links during SW038. Static traceability validation and the
+full local suite passed. Renewed the review date through 2026-12-16. Historical
+live ROS/container/S3/PostgreSQL evidence was not rerun or recertified; optional
+local skips remain explicit and existing historical evidence retains its dates.
