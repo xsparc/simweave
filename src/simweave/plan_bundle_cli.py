@@ -28,6 +28,10 @@ from simweave.sweeps import Sweep
 
 
 def register(commands):
+    identity_check = commands.add_parser(
+        "sweep-bundle-identity-check", help="Validate an identity record without matching a bundle"
+    )
+    identity_check.add_argument("path", type=Path)
     commands.add_parser("sweep-bundle-identity-schema", help="print the retained identity schema")
     commands.add_parser("sweep-bundle-schema", help="print the plan-review bundle schema")
     export = commands.add_parser("sweep-bundle", help="retain two plans and their v2 comparison")
@@ -87,6 +91,18 @@ def check_identity(args, bundle):
 
 
 def dispatch(args):
+    if args.command == "sweep-bundle-identity-check":
+        read_bundle_identity(bounded_read(args.path, MAX_IDENTITY_BYTES))
+        print(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "valid": True,
+                    "interpretation": "identity_record_validity_only",
+                }
+            )
+        )
+        return 0
     if args.command == "sweep-bundle-identity-schema":
         print(json.dumps(BundleIdentity.model_json_schema(), indent=2))
         return 0

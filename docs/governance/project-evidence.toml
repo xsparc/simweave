@@ -1006,3 +1006,31 @@ roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 approval_ref = "conversation:2026-11-15-next-autonomous-milestone-and-draft-prs"
 acceptance_refs = ["docs/architecture/decisions/0034-identity-file-export.md"]
 evidence_refs = ["tests/test_identity_export.py", "tests/test_bundle_html.py", "docs/governance/identity-file-export-validation.md"]
+
+[[research_decisions]]
+id = "RD-IDENTITY-RECORD-CHECK"
+disposition = "adopted"
+source_refs = ["docs/research/2026-11-15-identity-record-check.md"]
+design_refs = ["docs/architecture/decisions/0035-identity-record-check.md"]
+
+[[requirements]]
+id = "REQ-IDENTITY-RECORD-CHECK"
+statement = "Identity record check with bounded validation and explicit retained-evidence semantics."
+status = "implemented"
+objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+design_refs = ["docs/architecture/decisions/0035-identity-record-check.md"]
+risk_refs = ["docs/identity-record-check.md"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py", "examples/portable_review.py"]
+verification_refs = ["tests/test_identity_check.py", "tests/test_bundle_html.py"]
+validation_refs = ["docs/governance/identity-record-check-validation.md"]
+
+[[work_items]]
+id = "SW037-IDENTITY-RECORD-CHECK"
+title = "Identity record check"
+status = "verified"
+requirement_ids = ["REQ-IDENTITY-RECORD-CHECK"]
+roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
+approval_ref = "conversation:2026-11-15-next-autonomous-milestone-and-draft-prs"
+acceptance_refs = ["docs/architecture/decisions/0035-identity-record-check.md"]
+evidence_refs = ["tests/test_identity_check.py", "tests/test_bundle_html.py", "docs/governance/identity-record-check-validation.md"]

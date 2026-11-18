@@ -243,3 +243,5 @@ See [Source checked csv](docs/source-checked-csv.md) for the retained evidence w
 See [Independent review example](docs/independent-review-example.md) for the portable review workflow.
 
 [Identity file export](docs/identity-file-export.md) documents the new portable review commands and limits.
+
+[Identity record check](docs/identity-record-check.md) documents the portable review commands and their limits.

@@ -275,3 +275,8 @@ The next five planned tasks are tracked in `docs/next-milestone.md`.
 
 Implemented the accepted decision in `docs/architecture/decisions/0034-identity-file-export.md`. Evidence: `docs/governance/identity-file-export-validation.md`.
 The next five tasks are tracked in `docs/next-milestone.md`.
+
+## SW037: Identity record check (2026-11-15)
+
+Implemented `docs/architecture/decisions/0035-identity-record-check.md`. Workflow: `docs/identity-record-check.md`.
+Verification: `docs/governance/identity-record-check-validation.md`. Next five tasks: `docs/next-milestone.md`.
