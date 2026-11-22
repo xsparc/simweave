@@ -16,3 +16,20 @@ successful verification response. No input is modified and no simulation runs.
 The schema_version, verified and interpretation fields remain unchanged. These
 booleans describe checks actually completed, not authenticity or attestation.
 PR #43 merged during implementation; this milestone now builds on its squash commit on main.
+
+## Response contract
+
+`simweave sweep-bundle-verification-schema` prints the same version 1 JSON
+Schema as [the checked-in schema](../schemas/bundle-verification-response.schema.json).
+The four verification commands keep the same fields, meanings, and exit outcomes.
+
+Python callers can pass their verification response bytes to
+`simweave.verification_response.read_bundle_verification_response`. The reader
+rejects unknown or missing fields, duplicate keys, unsupported versions, incorrect
+types, and claims beyond local source consistency. It accepts at most 4 KiB;
+callers reading an arbitrary stream should also bound that read to 4 KiB plus one
+byte to detect over-limit input. JSON Schema describes the JSON data model; the
+Python reader additionally checks the encoded byte limit, duplicate keys, and
+the exact integer representation of the version. A parsed response is not proof
+that the stated checks ran. For independent evidence, rerun the verifier against
+separately retained inputs or a separately trusted identity.

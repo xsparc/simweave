@@ -25,6 +25,7 @@ from simweave.plan_bundle import (
 )
 from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
 from simweave.sweeps import Sweep
+from simweave.verification_response import BundleVerificationResponse
 
 
 def register(commands):
@@ -34,6 +35,9 @@ def register(commands):
     identity_check.add_argument("path", type=Path)
     commands.add_parser("sweep-bundle-identity-schema", help="print the retained identity schema")
     commands.add_parser("sweep-bundle-schema", help="print the plan-review bundle schema")
+    commands.add_parser(
+        "sweep-bundle-verification-schema", help="print the bundle verification response schema"
+    )
     export = commands.add_parser("sweep-bundle", help="retain two plans and their v2 comparison")
     export.add_argument("before", type=Path)
     export.add_argument("after", type=Path)
@@ -106,6 +110,9 @@ def dispatch(args):
     if args.command == "sweep-bundle-identity-schema":
         print(json.dumps(BundleIdentity.model_json_schema(), indent=2))
         return 0
+    if args.command == "sweep-bundle-verification-schema":
+        print(json.dumps(BundleVerificationResponse.model_json_schema(), indent=2))
+        return 0
     if args.command == "sweep-bundle-schema":
         print(json.dumps(PlanBundle.model_json_schema(), indent=2))
         return 0
@@ -162,14 +169,14 @@ def dispatch(args):
         }:
             print(
                 json.dumps(
-                    {
-                        "schema_version": 1,
-                        "verified": True,
-                        "source_checked": getattr(args, "before", None) is not None,
-                        "identity_checked": getattr(args, "identity", None) is not None
+                    BundleVerificationResponse(
+                        schema_version=1,
+                        verified=True,
+                        source_checked=getattr(args, "before", None) is not None,
+                        identity_checked=getattr(args, "identity", None) is not None
                         or getattr(args, "expected_sha256", None) is not None,
-                        "interpretation": "local_source_consistency_only",
-                    }
+                        interpretation="local_source_consistency_only",
+                    ).model_dump()
                 )
             )
             return 0

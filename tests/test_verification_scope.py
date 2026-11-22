@@ -1,11 +1,17 @@
 import json
+from pathlib import Path
 
+import pytest
 from test_sweep_diff import source
 
 from simweave.bundle_identity import bundle_identity
 from simweave.cli import main
 from simweave.plan_bundle import create_bundle, encode_bundle
 from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
+from simweave.verification_response import (
+    MAX_VERIFICATION_RESPONSE_BYTES,
+    read_bundle_verification_response,
+)
 
 
 def test_success_scope_is_derived_from_completed_checks(tmp_path, capsys):
@@ -34,9 +40,15 @@ def test_success_scope_is_derived_from_completed_checks(tmp_path, capsys):
     for args, sources in commands:
         for gate in [[], ["--identity", record], ["--expected-sha256", identity["bundle_sha256"]]]:
             assert main(list(map(str, args + gate))) == 0
-            result = json.loads(capsys.readouterr().out)
-            assert result["source_checked"] is sources
-            assert result["identity_checked"] is bool(gate)
+            raw = capsys.readouterr().out.encode()
+            result = read_bundle_verification_response(raw)
+            assert result.model_dump() == {
+                "schema_version": 1,
+                "verified": True,
+                "source_checked": sources,
+                "identity_checked": bool(gate),
+                "interpretation": "local_source_consistency_only",
+            }
         assert main(list(map(str, args + ["--expected-sha256", "0" * 64]))) == 2
         assert not capsys.readouterr().out
     replacement = create_bundle(a, a)
@@ -54,3 +66,59 @@ def test_success_scope_is_derived_from_completed_checks(tmp_path, capsys):
     for p, raw in saved.items():
         if p not in (path, record):
             assert p.read_bytes() == raw
+
+
+def test_verification_response_schema_matches_cli(capsys):
+    assert main(["sweep-bundle-verification-schema"]) == 0
+    emitted = json.loads(capsys.readouterr().out)
+    checked_in = (
+        Path(__file__).resolve().parents[1] / "schemas/bundle-verification-response.schema.json"
+    )
+    assert emitted == json.loads(checked_in.read_text(encoding="utf-8"))
+    assert emitted["additionalProperties"] is False
+    assert set(emitted["required"]) == set(emitted["properties"])
+
+
+VALID = {
+    "schema_version": 1,
+    "verified": True,
+    "source_checked": False,
+    "identity_checked": False,
+    "interpretation": "local_source_consistency_only",
+}
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("schema_version", True),
+        ("schema_version", 1.0),
+        ("schema_version", "1"),
+        ("schema_version", 2),
+        ("verified", 1),
+        ("verified", False),
+        ("source_checked", "false"),
+        ("identity_checked", 0),
+        ("interpretation", "external_provenance"),
+        ("unknown", "synthetic_private_value"),
+    ],
+)
+def test_response_reader_rejects_incorrect_types_or_claims_without_echo(field, value):
+    raw = json.dumps({**VALID, field: value}).encode()
+    with pytest.raises(ValueError, match="^invalid bundle verification response$"):
+        read_bundle_verification_response(raw)
+
+
+def test_response_reader_rejects_missing_duplicate_deep_invalid_and_large_records():
+    missing = {k: v for k, v in VALID.items() if k != "identity_checked"}
+    duplicate = json.dumps(VALID).replace('"verified": true', '"verified": true, "verified": true')
+    for raw in (
+        json.dumps(missing).encode(),
+        duplicate.encode(),
+        b"[" * 1500 + b"]" * 1500,
+        b"\xff",
+    ):
+        with pytest.raises(ValueError, match="^invalid bundle verification response$"):
+            read_bundle_verification_response(raw)
+    with pytest.raises(ValueError, match="^verification response exceeds byte limit$"):
+        read_bundle_verification_response(b" " * (MAX_VERIFICATION_RESPONSE_BYTES + 1))
