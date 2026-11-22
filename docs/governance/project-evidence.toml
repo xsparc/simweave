@@ -1049,7 +1049,7 @@ objective_ids = ["OBJ-PORTABLE-EXPERIMENTS"]
 roadmap_refs = ["docs/roadmap/implementation-roadmap.md"]
 design_refs = ["docs/architecture/decisions/0036-verification-scope.md"]
 risk_refs = ["docs/verification-scope.md"]
-implementation_refs = ["src/simweave/plan_bundle_cli.py"]
+implementation_refs = ["src/simweave/plan_bundle_cli.py", "src/simweave/verification_response.py", "schemas/bundle-verification-response.schema.json"]
 verification_refs = ["tests/test_verification_scope.py"]
 validation_refs = ["docs/governance/verification-scope-validation.md"]
 

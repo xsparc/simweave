@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "identity_checked": {
+      "title": "Identity Checked",
+      "type": "boolean"
+    },
+    "interpretation": {
+      "const": "local_source_consistency_only",
+      "title": "Interpretation",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source_checked": {
+      "title": "Source Checked",
+      "type": "boolean"
+    },
+    "verified": {
+      "const": true,
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "verified",
+    "source_checked",
+    "identity_checked",
+    "interpretation"
+  ],
+  "title": "BundleVerificationResponse",
+  "type": "object"
+}
