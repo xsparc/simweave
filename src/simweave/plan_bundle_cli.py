@@ -25,7 +25,11 @@ from simweave.plan_bundle import (
 )
 from simweave.sweep_diff import render_plan_diff, render_plan_diff_csv
 from simweave.sweeps import Sweep
-from simweave.verification_response import BundleVerificationResponse
+from simweave.verification_response import (
+    MAX_VERIFICATION_RESPONSE_BYTES,
+    BundleVerificationResponse,
+    read_bundle_verification_response,
+)
 
 
 def register(commands):
@@ -34,6 +38,11 @@ def register(commands):
     )
     identity_check.add_argument("path", type=Path)
     commands.add_parser("sweep-bundle-identity-schema", help="print the retained identity schema")
+    verification_check = commands.add_parser(
+        "sweep-bundle-verification-check",
+        help="validate a verification response without running verification",
+    )
+    verification_check.add_argument("path", type=Path)
     commands.add_parser("sweep-bundle-schema", help="print the plan-review bundle schema")
     commands.add_parser(
         "sweep-bundle-verification-schema", help="print the bundle verification response schema"
@@ -109,6 +118,18 @@ def dispatch(args):
         return 0
     if args.command == "sweep-bundle-identity-schema":
         print(json.dumps(BundleIdentity.model_json_schema(), indent=2))
+        return 0
+    if args.command == "sweep-bundle-verification-check":
+        read_bundle_verification_response(bounded_read(args.path, MAX_VERIFICATION_RESPONSE_BYTES))
+        print(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "valid": True,
+                    "interpretation": "verification_response_validity_only",
+                }
+            )
+        )
         return 0
     if args.command == "sweep-bundle-verification-schema":
         print(json.dumps(BundleVerificationResponse.model_json_schema(), indent=2))
