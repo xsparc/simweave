@@ -33,3 +33,15 @@ Python reader additionally checks the encoded byte limit, duplicate keys, and
 the exact integer representation of the version. A parsed response is not proof
 that the stated checks ran. For independent evidence, rerun the verifier against
 separately retained inputs or a separately trusted identity.
+
+### Validate a saved response without Python
+
+Run `simweave sweep-bundle-verification-check response.json` to check the
+format offline. The command reads at most 4 KiB plus one byte and does not
+modify the file, access a simulator, or inspect any referenced artifacts.
+On exit 0 it prints a fixed JSON receipt with `valid: true` and
+`interpretation: "verification_response_validity_only"`. The receipt never
+repeats the response's verification flags or grants them authority. Bad input
+exits 2 with a sanitized diagnostic and no success receipt. To verify artifacts
+or establish evidence scope, run the applicable verification command against
+independently retained evidence.

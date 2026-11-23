@@ -122,3 +122,36 @@ def test_response_reader_rejects_missing_duplicate_deep_invalid_and_large_record
             read_bundle_verification_response(raw)
     with pytest.raises(ValueError, match="^verification response exceeds byte limit$"):
         read_bundle_verification_response(b" " * (MAX_VERIFICATION_RESPONSE_BYTES + 1))
+
+
+def test_verification_check_validates_shape_without_repeating_claims(tmp_path, capsys):
+    path = tmp_path / "response.json"
+    raw = json.dumps({**VALID, "source_checked": True, "identity_checked": True}).encode()
+    path.write_bytes(raw)
+    assert main(["sweep-bundle-verification-check", str(path)]) == 0
+    output = capsys.readouterr()
+    assert not output.err
+    assert json.loads(output.out) == {
+        "schema_version": 1,
+        "valid": True,
+        "interpretation": "verification_response_validity_only",
+    }
+    assert path.read_bytes() == raw
+    assert list(tmp_path.iterdir()) == [path]
+
+
+def test_verification_check_rejects_bad_records_without_echo(tmp_path, capsys):
+    path = tmp_path / "response.json"
+    duplicate = json.dumps(VALID).replace('"verified": true', '"verified": true, "verified": true')
+    for raw in (
+        duplicate.encode(),
+        json.dumps({**VALID, "interpretation": "synthetic_private_value"}).encode(),
+        b" " * MAX_VERIFICATION_RESPONSE_BYTES + json.dumps(VALID).encode(),
+    ):
+        path.write_bytes(raw)
+        assert main(["sweep-bundle-verification-check", str(path)]) == 2
+        output = capsys.readouterr()
+        assert not output.out
+        assert "synthetic_private_value" not in output.err
+        assert str(path) not in output.err
+        assert path.read_bytes() == raw
