@@ -1,7 +1,7 @@
 # Verification scope
 
-Successful sweep-bundle-verify, sweep-bundle-verify-sources, sweep-bundle-verify-html
-and sweep-bundle-verify-csv responses now include two additive booleans:
+Successful responses from the bundle, source, and export verification commands
+include two booleans:
 
 - source_checked: independent before/after plans were supplied and matched.
 - identity_checked: a supplied digest or retained identity record matched.
@@ -21,7 +21,7 @@ PR #43 merged during implementation; this milestone now builds on its squash com
 
 `simweave sweep-bundle-verification-schema` prints the same version 1 JSON
 Schema as [the checked-in schema](../schemas/bundle-verification-response.schema.json).
-The four verification commands keep the same fields, meanings, and exit outcomes.
+Every verification command uses the same response fields and meanings.
 
 Python callers can pass their verification response bytes to
 `simweave.verification_response.read_bundle_verification_response`. The reader

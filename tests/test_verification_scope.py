@@ -155,3 +155,51 @@ def test_verification_check_rejects_bad_records_without_echo(tmp_path, capsys):
         assert "synthetic_private_value" not in output.err
         assert str(path) not in output.err
         assert path.read_bytes() == raw
+
+
+def test_verify_exports_emits_a_receipt_only_after_both_exports_match(tmp_path, capsys):
+    before, after = source(), source(seeds=[9])
+    bundle = create_bundle(before, after)
+    bundle_path = tmp_path / "bundle.json"
+    html_path = tmp_path / "review.html"
+    csv_path = tmp_path / "review.csv"
+    before_path = tmp_path / "before.json"
+    after_path = tmp_path / "after.json"
+    bundle_path.write_bytes(encode_bundle(bundle))
+    html_path.write_bytes(render_plan_diff(before, after, schema_version=2).encode())
+    csv_path.write_bytes(render_plan_diff_csv(before, after).encode())
+    before_path.write_text(before.model_dump_json(), encoding="utf-8")
+    after_path.write_text(after.model_dump_json(), encoding="utf-8")
+    inputs = {
+        path: path.read_bytes()
+        for path in (bundle_path, html_path, csv_path, before_path, after_path)
+    }
+    args = list(map(str, ["sweep-bundle-verify-exports", bundle_path, html_path, csv_path]))
+    sources = list(map(str, ["--before", before_path, "--after", after_path]))
+    digest = bundle_identity(bundle)["bundle_sha256"]
+    assert main(args) == 0
+    receipt = read_bundle_verification_response(capsys.readouterr().out.encode())
+    assert receipt.verified and not receipt.source_checked and not receipt.identity_checked
+
+    checked = args + sources + ["--expected-sha256", digest]
+    assert main(checked) == 0
+    receipt = read_bundle_verification_response(capsys.readouterr().out.encode())
+    assert receipt.source_checked and receipt.identity_checked
+    assert {path: path.read_bytes() for path in inputs} == inputs
+
+    for path in (html_path, csv_path):
+        edited = inputs[path] + b"synthetic_private_value"
+        path.write_bytes(edited)
+        assert main(checked) == 2
+        result = capsys.readouterr()
+        assert not result.out
+        assert "synthetic_private_value" not in result.err
+        assert str(path) not in result.err
+        assert path.read_bytes() == edited
+        path.write_bytes(inputs[path])
+
+    assert main(args + sources[:2]) == 2
+    assert not capsys.readouterr().out
+    assert main(args + ["--expected-sha256", "0" * 64]) == 2
+    assert not capsys.readouterr().out
+    assert {path: path.read_bytes() for path in inputs} == inputs
