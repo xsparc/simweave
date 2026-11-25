@@ -71,6 +71,14 @@ def register(commands):
     html_check.add_argument("html", type=Path)
     html_check.add_argument("--before", type=Path)
     html_check.add_argument("--after", type=Path)
+    export_check = commands.add_parser(
+        "sweep-bundle-verify-exports", help="verify retained HTML and CSV together"
+    )
+    export_check.add_argument("path", type=Path)
+    export_check.add_argument("html", type=Path)
+    export_check.add_argument("csv", type=Path)
+    export_check.add_argument("--before", type=Path)
+    export_check.add_argument("--after", type=Path)
     identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
     identity.add_argument("path", type=Path)
     identity.add_argument("--output", type=Path)
@@ -80,7 +88,7 @@ def register(commands):
     render.add_argument("--output", required=True, type=Path)
     render.add_argument("--before", type=Path)
     render.add_argument("--after", type=Path)
-    for command in (export, verify, sources, csv_check, html_check, render):
+    for command in (export, verify, sources, csv_check, html_check, export_check, render):
         expected = command.add_mutually_exclusive_group()
         expected.add_argument("--expected-sha256")
         expected.add_argument("--identity", type=Path)
@@ -163,6 +171,7 @@ def dispatch(args):
             "sweep-bundle-render",
             "sweep-bundle-verify-html",
             "sweep-bundle-verify-csv",
+            "sweep-bundle-verify-exports",
         }:
             if (args.before is None) != (args.after is None):
                 raise ValueError("both source plans are required")
@@ -182,11 +191,15 @@ def dispatch(args):
             verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
         elif args.command == "sweep-bundle-verify-html":
             verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
+        elif args.command == "sweep-bundle-verify-exports":
+            verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
+            verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
         if args.command in {
             "sweep-bundle-verify-html",
             "sweep-bundle-verify",
             "sweep-bundle-verify-sources",
             "sweep-bundle-verify-csv",
+            "sweep-bundle-verify-exports",
         }:
             print(
                 json.dumps(
