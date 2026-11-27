@@ -203,3 +203,47 @@ def test_verify_exports_emits_a_receipt_only_after_both_exports_match(tmp_path, 
     assert main(args + ["--expected-sha256", "0" * 64]) == 2
     assert not capsys.readouterr().out
     assert {path: path.read_bytes() for path in inputs} == inputs
+
+
+def test_export_pair_diagnostics_identify_only_first_failed_stage(tmp_path, capsys):
+    before, after = source(), source(seeds=[9])
+    bundle = create_bundle(before, after)
+    paths = {name: tmp_path / f"synthetic_private_{name}" for name in ("bundle", "html", "csv")}
+    original = {
+        "bundle": encode_bundle(bundle),
+        "html": render_plan_diff(before, after, schema_version=2).encode(),
+        "csv": render_plan_diff_csv(before, after).encode(),
+    }
+    for name, path in paths.items():
+        path.write_bytes(original[name])
+    args = [str(p) for p in ["sweep-bundle-verify-exports", *paths.values(), "--diagnostics"]]
+
+    def expect_failure(stage, extra=()):
+        assert main(args + list(extra)) == 2
+        result = capsys.readouterr()
+        assert not result.out
+        assert json.loads(result.err) == {
+            "schema_version": 1,
+            "error": "verification_failed",
+            "stage": stage,
+        }
+        assert "synthetic_private" not in result.err
+
+    assert main(args) == 0
+    result = capsys.readouterr()
+    assert not result.err
+    assert read_bundle_verification_response(result.out.encode()).verified
+    expect_failure("identity", ["--expected-sha256", "0" * 64])
+    expect_failure("sources", ["--before", str(paths["bundle"])])
+
+    for stage, path in paths.items():
+        path.write_bytes(b"synthetic_private_value")
+        expect_failure(stage)
+        assert path.read_bytes() == b"synthetic_private_value"
+        path.write_bytes(original[stage])
+
+    paths["html"].write_bytes(b"synthetic_private_value")
+    paths["csv"].unlink()
+    expect_failure("html")
+    paths["html"].write_bytes(original["html"])
+    expect_failure("csv")

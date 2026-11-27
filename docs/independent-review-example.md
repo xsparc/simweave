@@ -32,3 +32,12 @@ as shown, an independently retained digest via `--expected-sha256`, or
 neither. Existing single-export commands and the verification response schema
 are unchanged. This check is local consistency, not authorship attestation or
 proof of a simulation run.
+
+For scripts that need to distinguish failures, add `--diagnostics` to the paired
+command. A failed check exits 2 and writes one JSON object to stderr, such as
+`{"schema_version": 1, "error": "verification_failed", "stage": "csv"}`.
+Stages are fixed: `bundle`, `identity`, `sources`, `html`, `csv`. Only the
+first failed stage is reported. The stage describes which check failed, not
+whether its input was missing, invalid, oversized, or inconsistent. Diagnostics
+omit filenames, exception details and input contents. Success output and the
+default error behavior are unchanged. CLI syntax errors are handled separately.
