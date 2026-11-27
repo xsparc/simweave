@@ -1,6 +1,7 @@
 """CLI boundary for portable, non-executing plan-review bundles."""
 
 import json
+import sys
 from pathlib import Path
 
 from simweave.bundle_identity import (
@@ -79,6 +80,9 @@ def register(commands):
     export_check.add_argument("csv", type=Path)
     export_check.add_argument("--before", type=Path)
     export_check.add_argument("--after", type=Path)
+    export_check.add_argument(
+        "--diagnostics", action="store_true", help="print a fixed failure stage as JSON on stderr"
+    )
     identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
     identity.add_argument("path", type=Path)
     identity.add_argument("--output", type=Path)
@@ -111,7 +115,61 @@ def check_identity(args, bundle):
         verify_bundle_identity(bundle, args.expected_sha256)
 
 
+def check_sources(args, retained):
+    if (args.before is None) != (args.after is None):
+        raise ValueError("both source plans are required")
+    if args.before is not None:
+        sources = [
+            Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
+            for path in (args.before, args.after)
+        ]
+        verify_bundle_sources(retained, *sources)
+
+
+def verification_success(args):
+    print(
+        json.dumps(
+            BundleVerificationResponse(
+                schema_version=1,
+                verified=True,
+                source_checked=getattr(args, "before", None) is not None,
+                identity_checked=getattr(args, "identity", None) is not None
+                or getattr(args, "expected_sha256", None) is not None,
+                interpretation="local_source_consistency_only",
+            ).model_dump()
+        )
+    )
+    return 0
+
+
+def verify_export_pair(args):
+    stage = "bundle"
+    try:
+        retained = bounded_read(args.path, MAX_BUNDLE)
+        bundle = read_bundle(retained)
+        stage = "identity"
+        check_identity(args, bundle)
+        stage = "sources"
+        check_sources(args, retained)
+        stage = "html"
+        verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
+        stage = "csv"
+        verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
+    except (OSError, ValueError):
+        if not args.diagnostics:
+            raise
+        # Only static stage names are reported; never output exceptions or input paths.
+        print(
+            json.dumps({"schema_version": 1, "error": "verification_failed", "stage": stage}),
+            file=sys.stderr,
+        )
+        return 2
+    return verification_success(args)
+
+
 def dispatch(args):
+    if args.command == "sweep-bundle-verify-exports":
+        return verify_export_pair(args)
     if args.command == "sweep-bundle-identity-check":
         read_bundle_identity(bounded_read(args.path, MAX_IDENTITY_BYTES))
         print(
@@ -171,16 +229,8 @@ def dispatch(args):
             "sweep-bundle-render",
             "sweep-bundle-verify-html",
             "sweep-bundle-verify-csv",
-            "sweep-bundle-verify-exports",
         }:
-            if (args.before is None) != (args.after is None):
-                raise ValueError("both source plans are required")
-            if args.before is not None:
-                sources = [
-                    Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
-                    for path in (args.before, args.after)
-                ]
-                verify_bundle_sources(retained, *sources)
+            check_sources(args, retained)
         if args.command == "sweep-bundle-verify-sources":
             sources = [
                 Sweep.model_validate(decode_json(bounded_read(path, MAX_COMPONENT)))
@@ -191,29 +241,13 @@ def dispatch(args):
             verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
         elif args.command == "sweep-bundle-verify-html":
             verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
-        elif args.command == "sweep-bundle-verify-exports":
-            verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
-            verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
         if args.command in {
             "sweep-bundle-verify-html",
             "sweep-bundle-verify",
             "sweep-bundle-verify-sources",
             "sweep-bundle-verify-csv",
-            "sweep-bundle-verify-exports",
         }:
-            print(
-                json.dumps(
-                    BundleVerificationResponse(
-                        schema_version=1,
-                        verified=True,
-                        source_checked=getattr(args, "before", None) is not None,
-                        identity_checked=getattr(args, "identity", None) is not None
-                        or getattr(args, "expected_sha256", None) is not None,
-                        interpretation="local_source_consistency_only",
-                    ).model_dump()
-                )
-            )
-            return 0
+            return verification_success(args)
         output = (
             render_plan_diff(bundle.before, bundle.after, schema_version=2)
             if args.format == "html"
