@@ -247,3 +247,51 @@ def test_export_pair_diagnostics_identify_only_first_failed_stage(tmp_path, caps
     expect_failure("html")
     paths["html"].write_bytes(original["html"])
     expect_failure("csv")
+
+
+@pytest.mark.parametrize("format", ("html", "csv"))
+def test_single_export_diagnostics_are_opt_in_and_do_not_require_other_format(
+    format, tmp_path, capsys
+):
+    before, after = source(), source(seeds=[9])
+    bundle = tmp_path / "bundle.json"
+    bundle.write_bytes(encode_bundle(create_bundle(before, after)))
+    export = tmp_path / f"synthetic_private.{format}"
+    if format == "html":
+        canonical = render_plan_diff(before, after, schema_version=2).encode()
+    else:
+        canonical = render_plan_diff_csv(before, after).encode()
+    export.write_bytes(canonical)
+    args = [f"sweep-bundle-verify-{format}", str(bundle), str(export)]
+
+    assert main(args) == 0
+    default_success = capsys.readouterr()
+    assert main(args + ["--diagnostics"]) == 0
+    assert capsys.readouterr() == default_success
+    assert read_bundle_verification_response(default_success.out.encode()).verified
+
+    assert main(args + ["--diagnostics", "--before", str(bundle)]) == 2
+    error = capsys.readouterr()
+    assert not error.out
+    assert json.loads(error.err)["stage"] == "sources"
+
+    invalid = canonical + b"synthetic_private_value"
+    export.write_bytes(invalid)
+    assert main(args + ["--diagnostics"]) == 2
+    error = capsys.readouterr()
+    assert not error.out
+    assert json.loads(error.err) == {
+        "schema_version": 1,
+        "error": "verification_failed",
+        "stage": format,
+    }
+    assert "synthetic_private" not in error.err
+    assert export.read_bytes() == invalid
+
+    assert main(args) == 2
+    error = capsys.readouterr()
+    assert not error.out
+    assert json.loads(error.err) == {
+        "error": "ValueError",
+        "message": "Operation failed; check input, dependencies, and output path.",
+    }

@@ -34,10 +34,12 @@ are unchanged. This check is local consistency, not authorship attestation or
 proof of a simulation run.
 
 For scripts that need to distinguish failures, add `--diagnostics` to the paired
-command. A failed check exits 2 and writes one JSON object to stderr, such as
+command or to `sweep-bundle-verify-html` and `sweep-bundle-verify-csv`. A failed
+check exits 2 and writes one JSON object to stderr, such as
 `{"schema_version": 1, "error": "verification_failed", "stage": "csv"}`.
 Stages are fixed: `bundle`, `identity`, `sources`, `html`, `csv`. Only the
-first failed stage is reported. The stage describes which check failed, not
+first failed stage is reported. A single-export command never checks or reports
+the other format. The stage describes which check failed, not
 whether its input was missing, invalid, oversized, or inconsistent. Diagnostics
 omit filenames, exception details and input contents. Success output and the
 default error behavior are unchanged. CLI syntax errors are handled separately.
