@@ -80,9 +80,10 @@ def register(commands):
     export_check.add_argument("csv", type=Path)
     export_check.add_argument("--before", type=Path)
     export_check.add_argument("--after", type=Path)
-    export_check.add_argument(
-        "--diagnostics", action="store_true", help="print a fixed failure stage as JSON on stderr"
-    )
+    for command in (html_check, csv_check, export_check):
+        command.add_argument(
+            "--diagnostics", action="store_true", help="report the failed stage as JSON on stderr"
+        )
     identity = commands.add_parser("sweep-bundle-identity", help="print normalized bundle identity")
     identity.add_argument("path", type=Path)
     identity.add_argument("--output", type=Path)
@@ -142,7 +143,7 @@ def verification_success(args):
     return 0
 
 
-def verify_export_pair(args):
+def verify_exports(args):
     stage = "bundle"
     try:
         retained = bounded_read(args.path, MAX_BUNDLE)
@@ -151,10 +152,12 @@ def verify_export_pair(args):
         check_identity(args, bundle)
         stage = "sources"
         check_sources(args, retained)
-        stage = "html"
-        verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
-        stage = "csv"
-        verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
+        if args.command != "sweep-bundle-verify-csv":
+            stage = "html"
+            verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
+        if args.command != "sweep-bundle-verify-html":
+            stage = "csv"
+            verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
     except (OSError, ValueError):
         if not args.diagnostics:
             raise
@@ -168,8 +171,12 @@ def verify_export_pair(args):
 
 
 def dispatch(args):
-    if args.command == "sweep-bundle-verify-exports":
-        return verify_export_pair(args)
+    if args.command in {
+        "sweep-bundle-verify-html",
+        "sweep-bundle-verify-csv",
+        "sweep-bundle-verify-exports",
+    }:
+        return verify_exports(args)
     if args.command == "sweep-bundle-identity-check":
         read_bundle_identity(bounded_read(args.path, MAX_IDENTITY_BYTES))
         print(
@@ -225,11 +232,7 @@ def dispatch(args):
                 with args.output.open("xb") as stream:
                     stream.write(raw)
             return 0
-        if args.command in {
-            "sweep-bundle-render",
-            "sweep-bundle-verify-html",
-            "sweep-bundle-verify-csv",
-        }:
+        if args.command == "sweep-bundle-render":
             check_sources(args, retained)
         if args.command == "sweep-bundle-verify-sources":
             sources = [
@@ -237,16 +240,7 @@ def dispatch(args):
                 for path in (args.before, args.after)
             ]
             verify_bundle_sources(retained, *sources)
-        elif args.command == "sweep-bundle-verify-csv":
-            verify_bundle_csv(bundle, bounded_read(args.csv, MAX_COMPONENT))
-        elif args.command == "sweep-bundle-verify-html":
-            verify_bundle_html(bundle, bounded_read(args.html, MAX_COMPONENT))
-        if args.command in {
-            "sweep-bundle-verify-html",
-            "sweep-bundle-verify",
-            "sweep-bundle-verify-sources",
-            "sweep-bundle-verify-csv",
-        }:
+        if args.command in {"sweep-bundle-verify", "sweep-bundle-verify-sources"}:
             return verification_success(args)
         output = (
             render_plan_diff(bundle.before, bundle.after, schema_version=2)
